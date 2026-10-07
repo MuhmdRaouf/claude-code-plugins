@@ -1,0 +1,18 @@
+{
+  "name": "huddle",
+  "version": "0.0.1",
+  "description": "Join a Huddle channel: sessions in different projects (and their subagents) share events, tasks with cross-session dependencies, pause/resume, messages and shared knowledge, and work as one team.",
+  "author": {
+    "name": "Raouf"
+  },
+  "keywords": [
+    "coordination",
+    "multi-session",
+    "subagents",
+    "mcp",
+    "pubsub"
+  ],
+  "repository": "https://github.com/MuhmdRaouf/claude-code-plugins",
+  "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/huddle",
+  "license": "GPL-3.0-or-later"
+}

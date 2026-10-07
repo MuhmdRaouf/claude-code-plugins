@@ -1,0 +1,36 @@
+{
+  "name": "huddle",
+  "version": "0.0.1",
+  "description": "Channels where AI coding sessions and their subagents work as one team: shared events, tasks with cross-session dependencies, pause/resume, messages and shared knowledge.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "huddle": "plugin/bin/huddle",
+    "huddle-mcp": "plugin/bin/huddle-mcp"
+  },
+  "engines": {
+    "bun": ">=1.3",
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "start": "bun plugin/server/server.ts",
+    "build": "bun scripts/build.mjs",
+    "dist:fresh": "bun scripts/build.mjs --check",
+    "test": "bun test",
+    "test:node": "node --test --test-concurrency=1 tests/node/e2e.mjs tests/node/fresh-install.mjs",
+    "rehearse": "bin/rehearse",
+    "css": "tailwindcss -i plugin/server/public/src/app.css -o plugin/server/public/app.css --minify",
+    "connect": "bun -e \"const s=await Bun.file('plugin/skills/huddle/SKILL.md').text(); await Bun.write('plugin/server/CONNECT.md', '<!-- generated from plugin/skills/huddle/SKILL.md by bun run connect: edit the skill -->\\n' + s.replace(/^---[\\\\s\\\\S]*?\\\\n---\\\\n\\\\n?/, ''))\""
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "esbuild": "0.28.2",
+    "tailwindcss": "4.3.3"
+  },
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MuhmdRaouf/claude-code-plugins.git",
+    "directory": "plugins/huddle"
+  }
+}

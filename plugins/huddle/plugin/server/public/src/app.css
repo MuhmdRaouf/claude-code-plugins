@@ -1,0 +1,479 @@
+/* Huddle — owner UI styles. Tailwind v4 input; `bun run css` compiles it to public/app.css.
+   Look: calm layered panels in the ProxMenux manner, coloured with Catppuccin — Mocha in dark,
+   Latte in light. [data-theme] (set before first paint by index.html) picks the theme; without it
+   the system does.
+   Three layers of tokens:
+   1. --ctp-*  the official Catppuccin palette, exactly (Latte on :root, Mocha for dark).
+   2. semantic --bg (page) · --topbar · --panel (cards) · --panel-2 (wells, table heads) · --hover ·
+      --border · --border-2 · --text · --muted · --faint · --primary · --success · --warning ·
+      --danger · --info, plus the status hues the carriers use. Components use only these.
+   3. Tailwind colours (bg-card, text-muted, …) read the semantic tokens.
+   Colour carries meaning only: blue is the primary action and focus; green done and healthy;
+   yellow doing; peach waiting; red blocked and errors; mauve needs you and paused; lavender
+   knowledge and agents. Every hue has a fill (--green: dots, bars, tints) and an ink (--green-ink:
+   text) — in Latte the inks are mixed toward --ctp-text so each reaches 4.5:1. */
+@import "tailwindcss" source(none);
+@source "../index.html";
+@source "../*.js";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ── 1. palette: Catppuccin Latte (light) ────────────────────────────────────── */
+:root {
+  --ctp-rosewater: #dc8a78; --ctp-flamingo: #dd7878; --ctp-pink: #ea76cb; --ctp-mauve: #8839ef;
+  --ctp-red: #d20f39; --ctp-maroon: #e64553; --ctp-peach: #fe640b; --ctp-yellow: #df8e1d;
+  --ctp-green: #40a02b; --ctp-teal: #179299; --ctp-sky: #04a5e5; --ctp-sapphire: #209fb5;
+  --ctp-blue: #1e66f5; --ctp-lavender: #7287fd;
+  --ctp-text: #4c4f69; --ctp-subtext1: #5c5f77; --ctp-subtext0: #6c6f85;
+  --ctp-overlay2: #7c7f93; --ctp-overlay1: #8c8fa1; --ctp-overlay0: #9ca0b0;
+  --ctp-surface2: #acb0be; --ctp-surface1: #bcc0cc; --ctp-surface0: #ccd0da;
+  --ctp-base: #eff1f5; --ctp-mantle: #e6e9ef; --ctp-crust: #dce0e8;
+  color-scheme: light;
+}
+/* Catppuccin Mocha (dark): chosen, or the system's when nothing is chosen */
+:root[data-theme="dark"] {
+  --ctp-rosewater: #f5e0dc; --ctp-flamingo: #f2cdcd; --ctp-pink: #f5c2e7; --ctp-mauve: #cba6f7;
+  --ctp-red: #f38ba8; --ctp-maroon: #eba0ac; --ctp-peach: #fab387; --ctp-yellow: #f9e2af;
+  --ctp-green: #a6e3a1; --ctp-teal: #94e2d5; --ctp-sky: #89dceb; --ctp-sapphire: #74c7ec;
+  --ctp-blue: #89b4fa; --ctp-lavender: #b4befe;
+  --ctp-text: #cdd6f4; --ctp-subtext1: #bac2de; --ctp-subtext0: #a6adc8;
+  --ctp-overlay2: #9399b2; --ctp-overlay1: #7f849c; --ctp-overlay0: #6c7086;
+  --ctp-surface2: #585b70; --ctp-surface1: #45475a; --ctp-surface0: #313244;
+  --ctp-base: #1e1e2e; --ctp-mantle: #181825; --ctp-crust: #11111b;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ctp-rosewater: #f5e0dc; --ctp-flamingo: #f2cdcd; --ctp-pink: #f5c2e7; --ctp-mauve: #cba6f7;
+    --ctp-red: #f38ba8; --ctp-maroon: #eba0ac; --ctp-peach: #fab387; --ctp-yellow: #f9e2af;
+    --ctp-green: #a6e3a1; --ctp-teal: #94e2d5; --ctp-sky: #89dceb; --ctp-sapphire: #74c7ec;
+    --ctp-blue: #89b4fa; --ctp-lavender: #b4befe;
+    --ctp-text: #cdd6f4; --ctp-subtext1: #bac2de; --ctp-subtext0: #a6adc8;
+    --ctp-overlay2: #9399b2; --ctp-overlay1: #7f849c; --ctp-overlay0: #6c7086;
+    --ctp-surface2: #585b70; --ctp-surface1: #45475a; --ctp-surface0: #313244;
+    --ctp-base: #1e1e2e; --ctp-mantle: #181825; --ctp-crust: #11111b;
+    color-scheme: dark;
+  }
+}
+
+/* ── 2. semantic tokens: one mapping for both flavours ──────────────────────── */
+:root {
+  /* surfaces: the page, the top bar, cards on the page, wells inside cards */
+  --bg: var(--ctp-mantle); --topbar: var(--ctp-base); --panel: var(--ctp-base); --panel-2: var(--ctp-mantle);
+  --hover: color-mix(in srgb, var(--ctp-surface0) 55%, var(--ctp-base)); --press: var(--ctp-surface0);
+  --border: var(--ctp-surface0); --border-2: var(--ctp-surface1);
+  /* text: body, secondary, tertiary (all AA on every surface) */
+  --text: var(--ctp-text); --muted: var(--ctp-subtext1); --faint: color-mix(in srgb, var(--ctp-subtext0) 60%, var(--ctp-text));
+  --disabled: var(--ctp-overlay1);
+  /* meaning */
+  --primary: var(--ctp-blue); --primary-bg: color-mix(in srgb, var(--ctp-blue) 85%, var(--ctp-text)); --on-primary: var(--ctp-base);
+  --success: var(--ctp-green); --warning: var(--ctp-yellow); --danger: var(--ctp-red); --info: var(--ctp-sapphire);
+  /* status hues: fills are the palette, inks are readable text in that hue */
+  --rosewater: var(--ctp-rosewater); --flamingo: var(--ctp-flamingo); --pink: var(--ctp-pink); --mauve: var(--ctp-mauve);
+  --red: var(--ctp-red); --maroon: var(--ctp-maroon); --peach: var(--ctp-peach); --yellow: var(--ctp-yellow);
+  --green: var(--ctp-green); --teal: var(--ctp-teal); --sky: var(--ctp-sky); --sapphire: var(--ctp-sapphire);
+  --blue: var(--ctp-blue); --lavender: var(--ctp-lavender); --overlay: var(--ctp-overlay1);
+  --green-ink: color-mix(in srgb, var(--ctp-green) 35%, var(--ctp-text)); --yellow-ink: color-mix(in srgb, var(--ctp-yellow) 30%, var(--ctp-text));
+  --peach-ink: color-mix(in srgb, var(--ctp-peach) 35%, var(--ctp-text)); --red-ink: color-mix(in srgb, var(--ctp-red) 80%, var(--ctp-text));
+  --mauve-ink: color-mix(in srgb, var(--ctp-mauve) 80%, var(--ctp-text)); --blue-ink: color-mix(in srgb, var(--ctp-blue) 65%, var(--ctp-text));
+  --teal-ink: color-mix(in srgb, var(--ctp-teal) 40%, var(--ctp-text)); --sky-ink: color-mix(in srgb, var(--ctp-sky) 30%, var(--ctp-text));
+  --pink-ink: color-mix(in srgb, var(--ctp-pink) 30%, var(--ctp-text)); --lavender-ink: color-mix(in srgb, var(--ctp-lavender) 30%, var(--ctp-text));
+  --flamingo-ink: color-mix(in srgb, var(--ctp-flamingo) 35%, var(--ctp-text)); --sapphire-ink: color-mix(in srgb, var(--ctp-sapphire) 35%, var(--ctp-text));
+  --overlay-ink: var(--faint);
+  --scrim: color-mix(in srgb, var(--ctp-text) 35%, transparent);
+  --shadow: 0 1px 2px rgb(76 79 105 / .06), 0 12px 32px -10px rgb(76 79 105 / .28);
+  --shadow-sm: 0 1px 2px rgb(76 79 105 / .06);
+  --radius: 10px;
+}
+:root[data-theme="dark"] {
+  --topbar: var(--ctp-crust); --panel-2: var(--ctp-mantle); --hover: var(--ctp-surface0); --press: var(--ctp-surface1);
+  --muted: var(--ctp-subtext0); --faint: var(--ctp-overlay2); --disabled: var(--ctp-overlay0);
+  --primary-bg: var(--ctp-blue); --on-primary: var(--ctp-crust);
+  --green-ink: var(--ctp-green); --yellow-ink: var(--ctp-yellow); --peach-ink: var(--ctp-peach); --red-ink: var(--ctp-red);
+  --mauve-ink: var(--ctp-mauve); --blue-ink: var(--ctp-blue); --teal-ink: var(--ctp-teal); --sky-ink: var(--ctp-sky);
+  --pink-ink: var(--ctp-pink); --lavender-ink: var(--ctp-lavender); --flamingo-ink: var(--ctp-flamingo); --sapphire-ink: var(--ctp-sapphire);
+  --scrim: rgb(17 17 27 / .7);
+  --shadow: 0 1px 2px rgb(0 0 0 / .35), 0 18px 44px -12px rgb(0 0 0 / .7);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / .3);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --topbar: var(--ctp-crust); --panel-2: var(--ctp-mantle); --hover: var(--ctp-surface0); --press: var(--ctp-surface1);
+    --muted: var(--ctp-subtext0); --faint: var(--ctp-overlay2); --disabled: var(--ctp-overlay0);
+    --primary-bg: var(--ctp-blue); --on-primary: var(--ctp-crust);
+    --green-ink: var(--ctp-green); --yellow-ink: var(--ctp-yellow); --peach-ink: var(--ctp-peach); --red-ink: var(--ctp-red);
+    --mauve-ink: var(--ctp-mauve); --blue-ink: var(--ctp-blue); --teal-ink: var(--ctp-teal); --sky-ink: var(--ctp-sky);
+    --pink-ink: var(--ctp-pink); --lavender-ink: var(--ctp-lavender); --flamingo-ink: var(--ctp-flamingo); --sapphire-ink: var(--ctp-sapphire);
+    --scrim: rgb(17 17 27 / .7);
+    --shadow: 0 1px 2px rgb(0 0 0 / .35), 0 18px 44px -12px rgb(0 0 0 / .7);
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / .3);
+  }
+}
+
+@theme {
+  --color-*: initial;
+  /* Inter when the machine has it, else the platform's own UI face (SF Pro, Segoe UI, Roboto): nothing is downloaded */
+  --font-sans: "Inter", "InterVariable", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --text-2xs: 11px;
+  --text-2xs--line-height: 16px;
+  --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
+  --animate-hr-flash: hr-flash 1.5s ease-out;
+  --animate-pop: pop .16s ease-out;
+  --animate-slide: slide .2s cubic-bezier(.2, .8, .2, 1);
+  --animate-rise: rise .22s cubic-bezier(.2, .8, .2, 1);
+  @keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 55%, transparent) } 60% { box-shadow: 0 0 0 5px transparent } }
+  @keyframes hr-flash { from { box-shadow: inset 2px 0 0 var(--primary); background: color-mix(in srgb, var(--primary) 10%, transparent) } to { box-shadow: inset 2px 0 0 transparent; background: transparent } }
+  @keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.98) } to { opacity: 1; transform: none } }
+  @keyframes slide { from { opacity: .4; transform: translateX(32px) } to { opacity: 1; transform: none } }
+  @keyframes rise { from { opacity: .4; transform: translateY(32px) } to { opacity: 1; transform: none } }
+}
+/* Tailwind colours over the semantic tokens, under the names the views use */
+@theme inline {
+  --color-white: #fff; --color-black: #000; --color-transparent: transparent;
+  --color-bg: var(--bg); --color-chrome: var(--panel-2); --color-topbar: var(--topbar); --color-card: var(--panel); --color-panel: var(--panel);
+  --color-sunken: var(--panel-2); --color-card-alt: var(--panel-2); --color-panel-2: var(--panel-2);
+  --color-good: var(--success); --color-accent: var(--primary); --color-primary: var(--primary); --color-primary-bg: var(--primary-bg);
+  --color-hover: var(--hover); --color-press: var(--press); --color-line: var(--border); --color-line2: var(--border-2);
+  --color-fg: var(--text); --color-muted: var(--muted); --color-faint: var(--faint); --color-disabled: var(--disabled); --color-on-accent: var(--on-primary);
+  --color-mauve: var(--mauve); --color-red: var(--red); --color-peach: var(--peach); --color-yellow: var(--yellow);
+  --color-green: var(--green); --color-teal: var(--teal); --color-sky: var(--sky); --color-blue: var(--blue);
+  --color-pink: var(--pink); --color-lavender: var(--lavender); --color-overlay: var(--overlay);
+  --color-mauve-ink: var(--mauve-ink); --color-red-ink: var(--red-ink); --color-peach-ink: var(--peach-ink); --color-yellow-ink: var(--yellow-ink);
+  --color-green-ink: var(--green-ink); --color-blue-ink: var(--blue-ink); --color-teal-ink: var(--teal-ink); --color-lavender-ink: var(--lavender-ink);
+  --shadow-overlay: var(--shadow);
+}
+
+/* ── base ────────────────────────────────────────────────────────────────────── */
+@layer base {
+  html, body { height: 100%; }
+  body { @apply bg-bg text-fg font-sans text-sm antialiased; font-feature-settings: "cv11", "ss01"; }
+  a { color: inherit; text-decoration: none; }
+  button, select, summary { cursor: pointer; }
+  button:disabled { cursor: default; }
+  :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+  code, kbd, pre, .mono { font-family: var(--font-mono); }
+  ::selection { background: color-mix(in srgb, var(--primary) 28%, transparent); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 8px; border: 3px solid transparent; background-clip: padding-box; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  dialog { color: inherit; }
+  dialog::backdrop { background: var(--scrim); }
+  time, .tnum { font-variant-numeric: tabular-nums; }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  }
+}
+
+/* ── components ──────────────────────────────────────────────────────────────── */
+@layer components {
+  /* color carriers: --c is the fill (dots, bars, tints), --ci the ink (text) */
+  .c-mauve { --c: var(--mauve); --ci: var(--mauve-ink); } .c-blue { --c: var(--blue); --ci: var(--blue-ink); }
+  .c-green { --c: var(--green); --ci: var(--green-ink); } .c-yellow { --c: var(--yellow); --ci: var(--yellow-ink); }
+  .c-peach { --c: var(--peach); --ci: var(--peach-ink); } .c-red { --c: var(--red); --ci: var(--red-ink); }
+  .c-teal { --c: var(--teal); --ci: var(--teal-ink); } .c-sky { --c: var(--sky); --ci: var(--sky-ink); }
+  .c-pink { --c: var(--pink); --ci: var(--pink-ink); } .c-lavender { --c: var(--lavender); --ci: var(--lavender-ink); }
+  .c-flamingo { --c: var(--flamingo); --ci: var(--flamingo-ink); } .c-sapphire { --c: var(--sapphire); --ci: var(--sapphire-ink); }
+  .c-idle { --c: var(--overlay); --ci: var(--overlay-ink); }
+  .ink { color: var(--ci, var(--text)); }
+
+  /* cards: one radius, a hairline, no decoration */
+  .card { @apply rounded-[10px] border border-line bg-card; box-shadow: var(--shadow-sm); }
+  .card-h { @apply flex min-h-12 items-center gap-2 border-b border-line px-4 py-2 text-[14px] font-semibold; }
+  .card-b { @apply p-4; }
+  .sec-t { @apply text-xs font-medium text-faint; }
+  .h1 { @apply text-xl font-semibold tracking-tight; }
+  .h2 { @apply text-[14px] font-semibold; }
+  .page-sub { @apply mt-1 max-w-prose text-[13px] text-muted; }
+
+  /* buttons: one primary per screen (filled blue), quiet outlined secondaries, ghost for the rest.
+     32 px tall on desktop, 44 px on phones */
+  .btn { @apply inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-line2 bg-transparent px-3 text-[13px] font-medium whitespace-nowrap text-fg transition-colors select-none hover:bg-hover active:bg-press disabled:text-disabled disabled:hover:bg-transparent; }
+  .btn-pri { @apply border-transparent bg-primary-bg text-on-accent hover:bg-primary-bg hover:brightness-110 active:bg-primary-bg active:brightness-95 disabled:bg-hover disabled:text-disabled; }
+  .btn-ghost { @apply border-transparent bg-transparent hover:bg-hover disabled:hover:bg-transparent; }
+  .btn-sm { @apply h-7 px-2.5 text-xs; }
+  .btn-icon { @apply w-8 px-0; }
+  .btn .kbd { @apply ml-1; }
+
+  .chip { @apply inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-line bg-card px-3 text-xs whitespace-nowrap text-muted transition-colors hover:bg-hover hover:text-fg aria-pressed:border-primary aria-pressed:bg-primary/12 aria-pressed:font-medium aria-pressed:text-fg; }
+  .chip .n { @apply text-faint tabular-nums; }
+
+  .input { @apply h-8 w-full min-w-0 rounded-lg border border-line2 bg-bg px-2.5 text-[13px] text-fg transition-colors placeholder:text-faint hover:border-faint focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none; }
+  textarea.input { @apply h-auto py-2 leading-relaxed; resize: vertical; }
+  select.input { @apply pr-7; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c7f93' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 14px; }
+  .label { @apply flex flex-col gap-1.5 text-[13px] font-medium text-fg; }
+  .help { @apply text-xs font-normal text-muted; }
+
+  /* status: a badge = dot or icon + word in the ink, on a 12% tint of the hue */
+  .pill { @apply inline-flex h-6 shrink-0 items-center gap-1 rounded-md border px-2 text-xs font-medium whitespace-nowrap;
+    color: var(--ci, var(--muted)); background: color-mix(in srgb, var(--c, var(--overlay)) 12%, var(--panel)); border-color: color-mix(in srgb, var(--c, var(--overlay)) 30%, var(--panel)); }
+  .tag { @apply inline-flex h-6 shrink-0 items-center gap-1 rounded-md border border-line bg-card px-1.5 text-xs whitespace-nowrap text-muted; }
+  .tag .dot { @apply size-1.5; }
+  .nb { @apply inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-2xs font-semibold tabular-nums; background: var(--c, var(--mauve)); color: var(--on-primary); }
+  .dot { @apply inline-block size-2 shrink-0 rounded-full; background: var(--c, var(--overlay)); }
+  .dot.live { @apply motion-safe:animate-pulse-dot; }
+  .kbd { @apply inline-flex h-5 min-w-5 items-center justify-center rounded border border-line2 bg-sunken px-1 font-mono text-2xs text-muted; }
+  .skel { @apply rounded-[10px] bg-hover motion-safe:animate-pulse; }
+  .link { @apply text-blue-ink underline-offset-2 hover:underline; }
+  .tid { @apply inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-line bg-sunken px-1.5 font-mono text-2xs text-muted tabular-nums; }
+  .hint { @apply text-xs text-muted; }
+  .err { @apply text-xs text-red-ink; }
+  .av { @apply inline-flex size-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold;
+    color: var(--ci, var(--text)); background: color-mix(in srgb, var(--c, var(--mauve)) 16%, var(--panel)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c, var(--mauve)) 35%, transparent); }
+  .av-sm { @apply size-6 text-2xs; }
+  .empty { @apply flex flex-col items-center gap-2 rounded-[10px] border border-dashed border-line2 px-6 py-10 text-center text-[13px] text-muted; }
+  .empty b { @apply text-[15px] font-semibold text-fg; }
+
+  /* navigation: the current place is a raised row with a blue edge */
+  .nav-i { @apply relative flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-[13px] font-medium text-muted transition-colors hover:bg-hover hover:text-fg aria-[current=page]:bg-card aria-[current=page]:text-fg aria-[current=page]:shadow-[inset_0_0_0_1px_var(--border)]; }
+  .nav-i[aria-current="page"]::before { content: ""; @apply absolute top-2 bottom-2 -left-3 w-[3px] rounded-r-full bg-primary; }
+  .bnav-i { @apply relative flex h-14 flex-col items-center justify-center gap-0.5 text-2xs font-medium text-muted aria-[current=page]:text-blue-ink; }
+
+  /* tabs and toggles: a quiet track, the chosen one a raised panel — no colour, it is not news */
+  .seg { @apply inline-flex max-w-full flex-wrap gap-0.5 rounded-lg border border-line bg-sunken p-0.5; }
+  .seg > button, .seg > a { @apply inline-flex h-7 items-center gap-1.5 rounded-md px-3 text-xs font-medium whitespace-nowrap text-muted transition-colors hover:text-fg aria-selected:bg-card aria-selected:text-fg aria-selected:shadow-[0_1px_2px_rgb(0_0_0/.12),inset_0_0_0_1px_var(--border)] aria-pressed:bg-card aria-pressed:text-fg aria-pressed:shadow-[0_1px_2px_rgb(0_0_0/.12),inset_0_0_0_1px_var(--border)]; }
+
+  .menu { @apply z-50 min-w-48 rounded-[10px] border border-line2 bg-card p-1 shadow-overlay motion-safe:animate-pop; }
+  .menu > button, .menu > a { @apply flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] hover:bg-hover focus:bg-hover focus:outline-none; }
+  .row { @apply flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-hover; }
+  .toggle { @apply relative inline-flex h-6 w-10 shrink-0 items-center rounded-full bg-line2 transition-colors aria-checked:bg-primary-bg; }
+  .toggle::after { content: ""; @apply absolute left-1 size-4 rounded-full bg-white shadow transition-transform; }
+  .toggle[aria-checked="true"]::after { @apply translate-x-4; }
+
+  /* progress: one segmented bar */
+  .pbar { @apply flex h-2 w-full overflow-hidden rounded-full bg-hover; }
+  .pbar > i { @apply block h-full; background: var(--c); }
+  .pbar > i + i { box-shadow: inset 1px 0 0 var(--panel); }
+
+  /* toasts */
+  .toast { @apply pointer-events-auto flex w-full items-center gap-2.5 rounded-[10px] border border-line2 bg-card py-1.5 pr-1.5 pl-3 text-[13px] motion-safe:animate-pop sm:w-96; box-shadow: var(--shadow); }
+  .toast.out { @apply opacity-0 transition-opacity duration-150; }
+
+  /* dialogs: centered; drawers: docked right, a full-screen sheet on phones */
+  .dlg { @apply m-auto max-h-[85dvh] w-[min(640px,calc(100vw-24px))] overflow-hidden rounded-xl border border-line2 bg-card p-0; box-shadow: var(--shadow); }
+  .dlg[open] { @apply flex flex-col motion-safe:animate-pop; }
+  .dlg-top { @apply mt-[12dvh] mb-auto; }
+  .dlg-h { @apply flex h-13 shrink-0 items-center gap-2 border-b border-line px-4; }
+  .dlg-h h2 { @apply text-[15px]; }
+  .drawer { @apply m-0 ml-auto h-dvh max-h-dvh w-[min(600px,100vw)] max-w-none overflow-hidden border-0 border-l border-line bg-bg p-0 shadow-overlay; }
+  .drawer[open] { @apply flex flex-col motion-safe:animate-slide; }
+  .drawer-h { @apply flex min-h-14 shrink-0 items-center gap-3 border-b border-line bg-topbar px-4 py-2; }
+
+  /* markdown and text blocks */
+  .prose-h { @apply text-[13.5px] leading-relaxed text-fg; overflow-wrap: anywhere; }
+  .prose-h p { @apply my-1.5; }
+  .prose-h p:first-child { @apply mt-0; }
+  .prose-h p:last-child { @apply mb-0; }
+  .prose-h ul { @apply my-1.5 list-disc pl-5; }
+  .prose-h ol { @apply my-1.5 list-decimal pl-5; }
+  .prose-h li { @apply my-0.5; }
+  .prose-h h2, .prose-h h3, .prose-h h4 { @apply mt-4 mb-1.5 text-[14px] font-semibold; }
+  .prose-h a, .md a { @apply text-blue-ink underline underline-offset-2; }
+  .md code, .prose-h code { @apply rounded border border-line bg-sunken px-1 py-px text-[0.88em]; }
+  .md mark, .hit mark { @apply rounded-sm bg-yellow/35 px-0.5 text-fg; }
+
+  /* code blocks with the small offline highlighter */
+  .code { @apply m-0 overflow-x-auto bg-sunken px-0 py-3 font-mono text-xs leading-[1.65] text-fg; tab-size: 2; }
+  .code .ln { @apply inline-block w-10 pr-3 text-right text-faint select-none; }
+  .code .hc { color: var(--faint); font-style: italic; } .code .hs { color: var(--green-ink); } .code .hk { color: var(--mauve-ink); }
+  .code .hv { color: var(--blue-ink); } .code .hn { color: var(--peach-ink); } .code .hp { color: var(--teal-ink); }
+
+  /* timeline */
+  .ev { @apply relative flex gap-3 px-4 py-2.5; }
+  .ev + .ev, .ev + .burst, .burst + .ev, .burst + .burst { @apply border-t border-line; }
+  .ev.mine { background: color-mix(in srgb, var(--primary) 5%, transparent); }
+  .ev.is-ask::before { content: ""; @apply absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-mauve; }
+  .burst > summary { @apply flex min-h-11 list-none items-center gap-3 px-4 py-2 text-xs text-muted hover:bg-hover; }
+  .burst > summary::-webkit-details-marker { display: none; }
+  .burst[open] > summary .chev { @apply rotate-90; }
+
+  /* board */
+  .kc { @apply rounded-lg border border-line bg-card p-2.5 transition-shadow hover:border-line2; box-shadow: var(--shadow-sm); }
+  .kc.drag { @apply opacity-50; }
+  .kcol.over { @apply border-primary bg-primary/10; }
+
+  /* dependency graph (svg) */
+  .dgraph .ge { fill: none; stroke: var(--border-2); stroke-width: 1.3; }
+  .dgraph .ge.ok { stroke-dasharray: 3 3; opacity: .7; }
+  .dgraph .ge.crit { stroke: var(--primary); stroke-width: 2.2; }
+  .dgraph .gn { cursor: pointer; }
+  .dgraph .gn rect { fill: var(--panel); stroke: var(--border-2); stroke-width: 1; }
+  .dgraph .gn.crit rect { stroke: var(--primary); stroke-width: 1.6; }
+  .dgraph .gn .bar { stroke: none; fill: var(--c); }
+  .dgraph .gn text { fill: var(--text); font-size: 12px; font-family: var(--font-sans); }
+  .dgraph .gn .gid { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
+  .dgraph .gn .gow, .dgraph .gn .gx { font-size: 10.5px; fill: var(--faint); }
+  .dgraph .gn:hover rect, .dgraph .gn:focus-visible rect { stroke: var(--primary); stroke-width: 2; }
+  .dgraph .gn:focus-visible { outline: none; }
+  .dgraph.focus .gn { opacity: .3; } .dgraph.focus .ge { opacity: .15; }
+  .dgraph.focus .gn.sel, .dgraph.focus .gn.up, .dgraph.focus .gn.down { opacity: 1; }
+  .dgraph.focus .gn.sel rect { stroke: var(--primary); stroke-width: 2.5; }
+  .dgraph.focus .gn.up rect { stroke: var(--peach); } .dgraph.focus .gn.down rect { stroke: var(--sapphire); }
+  .dgraph.focus .ge.hot { opacity: 1; stroke: var(--primary); stroke-width: 1.8; }
+
+  /* phase diagram (svg) */
+  .pgraph .edge path { fill: none; stroke: var(--border-2); stroke-width: 1.4; }
+  .pgraph .edge text { fill: var(--muted); font-size: 10px; font-family: var(--font-sans); }
+  .pgraph .edge .pillbg { fill: var(--panel); stroke: var(--border); }
+  .pgraph .node { cursor: pointer; }
+  .pgraph .node text { fill: var(--text); font-size: 12px; font-family: var(--font-sans); }
+  .pgraph .node text.k { fill: var(--faint); font-size: 10px; }
+  .pgraph .node.sel rect { stroke-width: 2.5; }
+
+  /* shortcuts: a fixed key column, so a long key never runs into its label */
+  .keys { @apply grid items-center gap-x-4 gap-y-2; grid-template-columns: 4.5rem minmax(0, 1fr); }
+  .keys > dt { @apply flex flex-wrap gap-1; }
+  .keys > dd { @apply text-[13px] text-muted; }
+
+  /* the sign-in page (signed out): a centred card, the logo above it, the version below */
+  .signin { @apply grid min-h-dvh place-items-center bg-bg p-4; }
+  .signin-logo { @apply mx-auto inline-flex size-16 items-center justify-center rounded-2xl text-blue-ink; background: color-mix(in srgb, var(--primary) 14%, var(--panel)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent); }
+
+  /* ── the hr- kit: the views build on these; one line each ──────────────────────
+     .hr-tint-good|-warn|-bad|-accent|-info|-violet|-pink|-muted — hue carriers: green/yellow/red/blue(primary)/sapphire/lavender/pink/idle
+     .hr-topbar — the slim top bar: logo, channel, live state, ⌘K search, theme, help
+     .hr-ver — the version chip; .hr-live (+ -ok/-warn/-bad) — the live-updates badge, .hr-live-dot its dot
+     .hr-updated — "Updated HH:MM:SS"; .hr-iconbtn — a 32 px icon button
+     .hr-seg / .hr-seg-item / .hr-seg-on — a segmented filter (track, item, the chosen one)
+     .hr-card — a card; .hr-card-feature — the overview's lead card; .hr-card-head — its header row
+     .hr-label — a small sentence-case caption (inside .hr-card-head it is the card's title)
+     .hr-hero / .hr-hero-num / .hr-hero-sub — the plan's progress figure
+     .hr-stats / .hr-stat / .hr-stat-icon / .hr-stat-val / .hr-stat-sub — stat cards: title, icon, value, subline
+     .hr-delta-up|-down — a small change badge
+     .hr-pill (+ -done|-doing|-waiting|-blocked|-needs|-idle|-info|-violet) — a status badge: dot + word
+     .hr-chip — a small tinted label; .hr-kbd — a key; .hr-mono — tabular figures
+     .hr-table / .hr-num / .hr-row-open / .hr-chev / .hr-detail / .hr-flash — tables and their rows
+     .hr-bar / .hr-bar-fill (+ -good|-warn|-bad) — a progress bar
+     .hr-ring — the circular progress meter
+     .hr-kv / .hr-kv-row — key-value rows
+     .hr-empty / .hr-empty-hint — an empty state and its next step
+     .hr-feed / .hr-feed-row / .hr-feed-icon (+ topic hues) / .hr-feed-time — the activity feed
+     .hr-chart-line|-fill|-grid|-axis|-cross|-tip — the area chart
+     .hr-dialog / .hr-toast (+ -good|-bad|-info) / .hr-palette / .hr-input — overlays and inputs
+     .hr-footer — the quiet shortcut hint under the page, wide screens only ── */
+  .hr-tint-good { --c: var(--success); --ci: var(--green-ink); } .hr-tint-warn { --c: var(--warning); --ci: var(--yellow-ink); }
+  .hr-tint-bad { --c: var(--danger); --ci: var(--red-ink); } .hr-tint-accent { --c: var(--primary); --ci: var(--blue-ink); }
+  .hr-tint-info { --c: var(--info); --ci: var(--sapphire-ink); } .hr-tint-violet { --c: var(--lavender); --ci: var(--lavender-ink); }
+  .hr-tint-pink { --c: var(--pink); --ci: var(--pink-ink); } .hr-tint-muted { --c: var(--overlay); --ci: var(--overlay-ink); }
+
+  .hr-topbar { @apply sticky top-0 z-30 flex h-13 shrink-0 items-center gap-2 border-b border-line bg-topbar px-3 sm:px-4; }
+  .hr-ver { @apply inline-flex h-5 shrink-0 items-center rounded-md border border-line px-1.5 text-2xs font-medium text-faint tabular-nums; }
+  .hr-live { @apply inline-flex h-6 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium whitespace-nowrap; color: var(--ci, var(--muted)); background: color-mix(in srgb, var(--c, var(--overlay)) 10%, var(--topbar)); border-color: color-mix(in srgb, var(--c, var(--overlay)) 28%, var(--topbar)); }
+  .hr-live-dot { @apply inline-block size-1.5 shrink-0 rounded-full; background: var(--c, var(--overlay)); }
+  .hr-live-ok .hr-live-dot { @apply motion-safe:animate-pulse-dot; }
+  .hr-live-ok { --c: var(--success); --ci: var(--green-ink); } .hr-live-warn { --c: var(--peach); --ci: var(--peach-ink); } .hr-live-bad { --c: var(--danger); --ci: var(--red-ink); }
+  .hr-updated { @apply text-xs text-faint tabular-nums; }
+  .hr-iconbtn { @apply inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-hover hover:text-fg active:bg-press; }
+
+  .hr-seg { @apply inline-flex max-w-full items-center gap-0.5 overflow-x-auto rounded-lg border border-line bg-sunken p-0.5 scrollbar-none; }
+  .hr-seg-item { @apply inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md px-3 text-xs font-medium whitespace-nowrap text-muted transition-colors hover:text-fg; }
+  .hr-seg-on { @apply bg-card text-fg; box-shadow: 0 1px 2px rgb(0 0 0 / .12), inset 0 0 0 1px var(--border); }
+
+  .hr-card { @apply rounded-[10px] border border-line bg-card; box-shadow: var(--shadow-sm); }
+  .hr-card-feature { @apply rounded-[10px] border border-line bg-card; box-shadow: var(--shadow-sm); }
+  .hr-card-head { @apply flex min-h-12 items-center justify-between gap-2 border-b border-line px-4 py-2; }
+  .hr-label { @apply text-[13px] font-medium text-muted; }
+  .hr-card-head .hr-label, .card-h .hr-label, .drawer h3.hr-label { @apply text-[14px] font-semibold text-fg; }
+
+  .hr-hero { @apply flex flex-col items-start gap-1; }
+  .hr-hero-num { @apply text-[40px] leading-none font-semibold tracking-tight text-fg tabular-nums; }
+  .hr-hero-sub { @apply text-[13px] text-muted; }
+  .hr-ring { --c: var(--success); @apply block shrink-0; }
+  .hr-ring .track { fill: none; stroke: var(--hover); stroke-width: 3.2; }
+  .hr-ring .meter { fill: none; stroke: var(--c); stroke-width: 3.2; stroke-linecap: round; transition: stroke-dasharray .4s ease-out; }
+  .hr-ring text { fill: var(--text); font-family: var(--font-sans); font-weight: 600; font-size: 7.5px; font-variant-numeric: tabular-nums; }
+
+  .hr-stats { @apply grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 xl:grid-cols-4; }
+  .hr-stat { @apply flex flex-col gap-1 rounded-[10px] border border-line bg-card p-4; box-shadow: var(--shadow-sm); }
+  .hr-stat-icon { @apply inline-flex size-7 shrink-0 items-center justify-center rounded-lg; color: var(--ci, var(--muted)); background: color-mix(in srgb, var(--c, var(--overlay)) 13%, var(--panel)); }
+  .hr-stat-val { @apply text-[28px] leading-tight font-semibold text-fg tabular-nums; }
+  .hr-stat-sub { @apply text-xs text-muted; }
+  .hr-delta-up, .hr-delta-down { @apply inline-flex h-5 shrink-0 items-center gap-0.5 rounded-md px-1.5 text-2xs font-semibold tabular-nums; }
+  .hr-delta-up { color: var(--green-ink); background: color-mix(in srgb, var(--green) 12%, var(--panel)); }
+  .hr-delta-down { color: var(--red-ink); background: color-mix(in srgb, var(--red) 12%, var(--panel)); }
+
+  .hr-pill { @apply inline-flex h-6 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium whitespace-nowrap; color: var(--ci, var(--muted)); background: color-mix(in srgb, var(--c, var(--overlay)) 11%, var(--panel)); border-color: color-mix(in srgb, var(--c, var(--overlay)) 28%, var(--panel)); }
+  .hr-pill::before { content: ""; @apply inline-block size-1.5 shrink-0 rounded-full; background: var(--c, var(--overlay)); }
+  .hr-pill-done { --c: var(--success); --ci: var(--green-ink); } .hr-pill-doing { --c: var(--warning); --ci: var(--yellow-ink); }
+  .hr-pill-waiting { --c: var(--peach); --ci: var(--peach-ink); } .hr-pill-blocked { --c: var(--danger); --ci: var(--red-ink); }
+  .hr-pill-needs { --c: var(--mauve); --ci: var(--mauve-ink); } .hr-pill-idle { --c: var(--overlay); --ci: var(--overlay-ink); }
+  .hr-pill-info { --c: var(--info); --ci: var(--sapphire-ink); } .hr-pill-violet { --c: var(--mauve); --ci: var(--mauve-ink); }
+  .hr-chip { @apply inline-flex h-5 shrink-0 items-center gap-1 rounded-md border px-1.5 text-2xs font-medium whitespace-nowrap; color: var(--ci, var(--muted)); background: color-mix(in srgb, var(--c, var(--overlay)) 11%, var(--panel)); border-color: color-mix(in srgb, var(--c, var(--overlay)) 28%, var(--panel)); }
+  .hr-kbd { @apply inline-flex h-5 min-w-5 items-center justify-center rounded border border-line2 bg-sunken px-1 font-sans text-2xs font-medium text-muted; }
+  .hr-mono { @apply tabular-nums; }
+
+  /* tables: a quiet sentence-case header on the well, hairline rows */
+  .hr-table { @apply w-full border-collapse text-left text-[13px]; }
+  .hr-table thead th { @apply sticky top-0 z-10 border-b border-line bg-card-alt px-3 py-2.5 text-left text-xs font-medium whitespace-nowrap text-muted; }
+  .hr-table tbody td { @apply border-b border-line px-3 py-2.5 align-middle; }
+  .hr-table tbody tr:last-child td { @apply border-b-0; }
+  .hr-table tbody tr { @apply transition-colors hover:bg-hover; }
+  .hr-num { @apply text-right tabular-nums; }
+  .hr-row-open { @apply cursor-pointer; }
+  .hr-chev { @apply inline-block shrink-0 text-faint transition-transform; }
+  .hr-row-open[aria-expanded="true"] .hr-chev, .hr-row-open[aria-selected="true"] .hr-chev, .hr-row-open.open .hr-chev { transform: rotate(90deg); }
+  .hr-detail { @apply bg-card-alt px-3 py-3; }
+  .hr-flash { @apply motion-safe:animate-hr-flash; }
+
+  .hr-bar { @apply flex h-1.5 w-full overflow-hidden rounded-full bg-hover; }
+  .hr-bar-fill { @apply block h-full; background: var(--c, var(--success)); }
+  .hr-bar-fill + .hr-bar-fill { box-shadow: inset 2px 0 0 var(--panel); }
+  .hr-bar-good { --c: var(--success); } .hr-bar-warn { --c: var(--warning); } .hr-bar-bad { --c: var(--danger); }
+
+  /* key-value rows: label left, value right, hairline between */
+  .hr-kv { @apply divide-y divide-line rounded-[10px] border border-line bg-card; }
+  .hr-kv-row { @apply flex min-h-10 items-center justify-between gap-3 px-4 py-1.5 text-[13px]; }
+  .hr-kv-row > :first-child { @apply text-muted; }
+  .hr-kv-row > :last-child { @apply font-medium tabular-nums; color: var(--ci, var(--text)); }
+
+  .hr-empty { @apply flex flex-col items-center gap-1.5 rounded-[10px] border border-dashed border-line2 px-6 py-10 text-center text-[13px] text-muted; }
+  .hr-empty > p { @apply text-[14px] font-medium text-fg; }
+  .hr-empty > svg, .hr-empty > span > svg { @apply text-faint; }
+  .hr-empty-hint { @apply max-w-sm text-[13px] text-muted; }
+  /* inside a card the card is the frame: no second, dashed one */
+  :is(.hr-card, .card) :is(.hr-empty, .empty) { @apply rounded-none border-0; }
+
+  /* the feed: one line per event, a tinted round icon, the time at the end */
+  .hr-feed { @apply flex flex-col; }
+  .hr-feed-row { @apply flex items-start gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-hover; }
+  .hr-feed-icon { @apply mt-px inline-flex size-6 shrink-0 items-center justify-center rounded-full; color: var(--ci, var(--muted)); background: color-mix(in srgb, var(--c, var(--overlay)) 14%, var(--panel)); }
+  .hr-feed-time { @apply ml-auto shrink-0 pl-2 text-xs text-faint tabular-nums; }
+  .hr-feed-task-done { --c: var(--success); --ci: var(--green-ink); } .hr-feed-task-doing { --c: var(--warning); --ci: var(--yellow-ink); }
+  .hr-feed-task-blocked, .hr-feed-pause { --c: var(--danger); --ci: var(--red-ink); }
+  .hr-feed-turn { --c: var(--primary); --ci: var(--blue-ink); } .hr-feed-knowledge { --c: var(--lavender); --ci: var(--lavender-ink); }
+  .hr-feed-message { --c: var(--sapphire); --ci: var(--sapphire-ink); }
+
+  /* the area chart: svg the views build; the series hue comes from --c on the element */
+  .hr-chart-line { fill: none; stroke: var(--c, var(--primary)); stroke-width: 2; stroke-linecap: round; }
+  .hr-chart-fill { fill: color-mix(in srgb, var(--c, var(--primary)) 18%, transparent); }
+  .hr-chart-fill.grad { fill: url(#hr-chart-grad); }
+  .hr-chart-grid { stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 4; }
+  .hr-chart-axis { fill: var(--faint); font-family: var(--font-sans); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .hr-chart-cross { stroke: var(--border-2); stroke-width: 1; stroke-dasharray: 2 3; }
+  .hr-chart-tip { @apply pointer-events-none rounded-lg border border-line2 bg-card px-2.5 py-2 text-xs text-fg tabular-nums shadow-overlay; }
+
+  /* overlays */
+  .hr-dialog { @apply border-line2; box-shadow: var(--shadow); }
+  .hr-toast { box-shadow: var(--shadow); }
+  .hr-toast-good { --c: var(--success); --ci: var(--green-ink); } .hr-toast-bad { --c: var(--danger); --ci: var(--red-ink); } .hr-toast-info { --c: var(--info); --ci: var(--sapphire-ink); }
+  .hr-toast-good, .hr-toast-bad, .hr-toast-info { border-color: color-mix(in srgb, var(--c) 34%, var(--panel)); background: color-mix(in srgb, var(--c) 7%, var(--panel)); }
+  .hr-palette { @apply w-[min(600px,calc(100vw-24px))] border-line2; box-shadow: var(--shadow); }
+  .hr-footer { @apply hidden items-center justify-center gap-1.5 border-t border-line bg-bg px-4 py-2 text-xs text-muted md:flex; }
+  .hr-input { @apply h-8 w-full min-w-0 rounded-lg border border-line2 bg-bg px-2.5 text-[13px] text-fg transition-colors placeholder:text-faint hover:border-faint focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none; }
+}
+
+/* phones: 44 px hit areas, drawers become full-screen sheets */
+@media (width <= 640px) {
+  .btn, .btn-sm, .chip, .input, .nav-i, .menu > button, .menu > a, .seg > button, .seg > a, .hr-iconbtn { min-height: 44px; }
+  .btn-icon, .hr-iconbtn { min-width: 44px; }
+  .row { min-height: 48px; }
+  .drawer { width: 100vw; border-left: 0; }
+  .drawer[open] { animation-name: rise; }
+  .dlg { max-height: 92dvh; }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}

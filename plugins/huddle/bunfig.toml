@@ -1,0 +1,3 @@
+[test]
+# every server and client a test starts shares one root credential and a throwaway state dir (tests/env.ts)
+preload = ["./tests/env.ts"]

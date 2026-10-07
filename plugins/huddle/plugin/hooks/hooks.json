@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "SessionStart": [
+      { "matcher": "startup|resume|clear|compact",
+        "hooks": [{ "type": "command", "command": "R=$(command -v bun || command -v node) || exit 0; \"$R\" \"${CLAUDE_PLUGIN_ROOT}/dist/session-start.js\" 2>/dev/null || exit 0", "timeout": 10 }] }
+    ],
+    "PreToolUse": [
+      { "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "R=$(command -v bun || command -v node) || exit 0; \"$R\" \"${CLAUDE_PLUGIN_ROOT}/dist/approve.js\" 2>/dev/null || exit 0", "timeout": 5 }] }
+    ],
+    "PostToolUse": [
+      { "hooks": [{ "type": "command", "command": "R=$(command -v bun || command -v node) || exit 0; \"$R\" \"${CLAUDE_PLUGIN_ROOT}/dist/listen.js\" 2>/dev/null || exit 0", "timeout": 5 }] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "R=$(command -v bun || command -v node) || exit 0; \"$R\" \"${CLAUDE_PLUGIN_ROOT}/dist/listen.js\" 2>/dev/null || exit 0", "timeout": 5 }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "R=$(command -v bun || command -v node) || exit 0; \"$R\" \"${CLAUDE_PLUGIN_ROOT}/dist/stop.js\" 2>/dev/null || exit 0", "timeout": 15 }] }
+    ]
+  }
+}

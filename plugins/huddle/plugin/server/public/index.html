@@ -1,0 +1,58 @@
+<!doctype html>
+<!-- Huddle: the owner's control room. Channels where AI coding sessions (and their subagents)
+     work as one team. Five destinations per channel: Inbox (what needs you), Team (sessions and
+     activity), Work (the tasks as a list, board, graph or map), Knowledge and Settings; plus Home
+     (every channel) and the ⌘K palette.
+     A channel opens on its Overview; Today is its digest.
+     Routes: #/ · #/c/<ch>/{overview,today,inbox,team,work[/list|board|graph|map|repo/<view>],knowledge[/<id>],settings}
+     A drawer opens over any view: ?t=<task> (task drawer), ?s=<session> (session drawer).
+     Aliases (needs, live, plan, board, graph, review, kb, repo, t/<id>) redirect.
+     Styles: public/src/app.css (Tailwind v4, Catppuccin Latte and Mocha) → `bun run css` → public/app.css. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Huddle</title>
+<script>/* theme before first paint: the saved choice (System, Light or Dark), else the system's */
+try { const t = JSON.parse(localStorage.getItem("huddle:theme") || "null"); document.documentElement.dataset.theme = t === "light" || t === "dark" ? t : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch { document.documentElement.dataset.theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; }</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'><rect width='26' height='26' rx='7' fill='%231e1e2e'/><path d='M5 17 Q13 2 21 17' fill='none' stroke='%2389b4fa' stroke-width='1.6' stroke-dasharray='2.2 2.2' opacity='.75'/><circle cx='13' cy='9.6' r='2.4' fill='%2389b4fa'/><rect x='2.5' y='17' width='5' height='6' rx='2.5' fill='%2389b4fa'/><rect x='18.5' y='17' width='5' height='6' rx='2.5' fill='%2389b4fa'/></svg>">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="overflow-hidden">
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-card focus:px-3 focus:shadow-overlay focus:py-2">Skip to content</a>
+<div class="flex h-dvh flex-col">
+  <header class="hr-topbar">
+    <a class="flex shrink-0 items-center gap-2.5 rounded-lg pr-1 text-[15px] font-semibold tracking-tight" href="#/" aria-label="Huddle: all channels">
+      <span class="inline-flex size-8 items-center justify-center rounded-lg bg-primary/15 text-blue-ink"><svg viewBox="0 0 26 26" class="size-5" aria-hidden="true"><path d="M5 17 Q13 2 21 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.2 2.2" opacity=".75"/><circle cx="13" cy="9.6" r="2.4" fill="currentColor"/><rect x="2.5" y="17" width="5" height="6" rx="2.5" fill="currentColor"/><rect x="18.5" y="17" width="5" height="6" rx="2.5" fill="currentColor"/></svg></span>
+      <span class="hidden sm:inline">Huddle</span>
+    </a>
+    <span class="hr-ver hidden md:inline-flex" id="ver">v0.0.1</span>
+    <div id="chbox" class="flex min-w-0 items-center gap-1.5" hidden>
+      <span class="text-line2" aria-hidden="true"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+      <button id="chbtn" class="btn btn-ghost h-8 min-w-0 max-w-[44vw] gap-1.5 px-2 font-semibold sm:max-w-72" aria-haspopup="menu" aria-expanded="false"><span id="chname" class="truncate"></span><svg class="size-3.5 shrink-0 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <span id="ldot" class="c-idle inline-flex size-6 items-center justify-center" role="img" aria-label="Live updates: connecting" title="Live updates: connecting"><i class="dot"></i></span>
+    </div>
+    <span class="flex-1"></span>
+    <button id="palbtn" class="btn h-8 gap-2 border-line bg-bg font-normal text-muted hover:text-fg max-md:btn-icon max-md:border-transparent max-md:bg-transparent md:w-64 md:justify-start" aria-label="Search or run a command" aria-keyshortcuts="Meta+K Control+K"><svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="hidden flex-1 text-left md:inline">Search or jump to…</span><kbd class="hr-kbd hidden md:inline-flex" id="palkbd">⌘K</kbd></button>
+    <button id="theme" class="hr-iconbtn" aria-haspopup="menu" aria-expanded="false" aria-label="Theme"></button>
+    <button id="help" class="hr-iconbtn hidden md:inline-flex" aria-label="Keyboard shortcuts" aria-keyshortcuts="?"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M18 13h.01M8 17h8M10 13h4"/></svg></button>
+  </header>
+  <div class="flex min-h-0 flex-1">
+    <nav id="side" class="hidden w-60 shrink-0 flex-col gap-5 overflow-y-auto border-r border-line bg-bg px-3 py-4 md:flex" aria-label="Channel" hidden></nav>
+    <main id="main" tabindex="-1" class="relative min-h-0 min-w-0 flex-1 overflow-y-auto outline-none"></main>
+  </div>
+  <footer class="hr-footer">Press <kbd class="hr-kbd">⌘K</kbd> to search or run a command · <kbd class="hr-kbd">?</kbd> for keyboard shortcuts</footer>
+  <nav id="bnav" class="z-30 grid shrink-0 grid-cols-5 border-t border-line bg-topbar pb-[env(safe-area-inset-bottom)] md:hidden" aria-label="Channel" hidden></nav>
+</div>
+
+<dialog id="modal" class="dlg hr-dialog" aria-labelledby="mtitle"><div class="dlg-h"><h2 id="mtitle" class="min-w-0 flex-1 truncate font-semibold"></h2><button class="btn btn-ghost btn-icon" id="mclose" aria-label="Close"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="min-h-0 overflow-y-auto" id="mbody"></div></dialog>
+<dialog id="pal" class="dlg dlg-top hr-palette" aria-label="Command palette"></dialog>
+<dialog id="cdlg" class="dlg dlg-top hr-dialog" aria-labelledby="ctitle-h"></dialog>
+<dialog id="tdrawer" class="drawer hr-dialog" aria-labelledby="td-title"></dialog>
+<dialog id="sdrawer" class="drawer hr-dialog" aria-labelledby="sd-title"></dialog>
+<div id="announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<div id="toasts" popover="manual" class="pointer-events-none fixed inset-x-3 top-auto bottom-20 z-50 m-0 w-auto overflow-visible border-0 bg-transparent p-0 flex flex-col items-center gap-2 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:items-end" aria-live="polite"></div>
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>
