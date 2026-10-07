@@ -1,0 +1,9 @@
+{
+  "name": "zai",
+  "version": "0.0.1",
+  "description": "Delegate bulk mechanical work to GLM (Z.ai); Claude orchestrates, verifies and reviews.",
+  "author": {
+    "name": "Raouf"
+  },
+  "license": "GPL-3.0-or-later"
+}

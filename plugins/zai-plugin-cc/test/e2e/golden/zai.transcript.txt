@@ -1,0 +1,937 @@
+$ zai --help
+usage: <command> [--json]   (the /zai: slash commands run these; there is no zai command on PATH)
+  run <brief.md|-> [--flash] [--mode edit|exec|readonly] [--wait|--bg] [--json]
+  wait <id> [<id>…] [--json]
+  batch <dir|glob|manifest.txt> [--wait] [--json]
+  board [--all] [--watch] [--json]
+  show <id> [--follow] [--json]
+  review <id> [--diff] [--summary] [--json]
+  accept <id> [--no-commit] [--force] [--no-verify] [--json]
+  return <id> <feedback…> [--json]
+  discard <id> [--reason <text>] [--json]
+  stop <id|--all> [--json]
+  usage [--json]
+  setup [--remove] [--json]
+  setup --engines [--json]
+  setup --engine-check <omp|opencode|pi> [--json]
+  setup --engine-enable <omp|opencode|pi> --watcher provider|sonnet
+  brief new <title> [--mode edit|exec|readonly]
+  brief lint <path>
+[exit 0]
+
+$ zai 
+stderr| zai: which command?
+stderr| usage: <command> [--json]   (the /zai: slash commands run these; there is no zai command on PATH)
+stderr|   run <brief.md|-> [--flash] [--mode edit|exec|readonly] [--wait|--bg] [--json]
+stderr|   wait <id> [<id>…] [--json]
+stderr|   batch <dir|glob|manifest.txt> [--wait] [--json]
+stderr|   board [--all] [--watch] [--json]
+stderr|   show <id> [--follow] [--json]
+stderr|   review <id> [--diff] [--summary] [--json]
+stderr|   accept <id> [--no-commit] [--force] [--no-verify] [--json]
+stderr|   return <id> <feedback…> [--json]
+stderr|   discard <id> [--reason <text>] [--json]
+stderr|   stop <id|--all> [--json]
+stderr|   usage [--json]
+stderr|   setup [--remove] [--json]
+stderr|   setup --engines [--json]
+stderr|   setup --engine-check <omp|opencode|pi> [--json]
+stderr|   setup --engine-enable <omp|opencode|pi> --watcher provider|sonnet
+stderr|   brief new <title> [--mode edit|exec|readonly]
+stderr|   brief lint <path>
+[exit 2]
+
+$ zai frobnicate
+stderr| zai: unknown command "frobnicate"
+stderr| usage: <command> [--json]   (the /zai: slash commands run these; there is no zai command on PATH)
+stderr|   run <brief.md|-> [--flash] [--mode edit|exec|readonly] [--wait|--bg] [--json]
+stderr|   wait <id> [<id>…] [--json]
+stderr|   batch <dir|glob|manifest.txt> [--wait] [--json]
+stderr|   board [--all] [--watch] [--json]
+stderr|   show <id> [--follow] [--json]
+stderr|   review <id> [--diff] [--summary] [--json]
+stderr|   accept <id> [--no-commit] [--force] [--no-verify] [--json]
+stderr|   return <id> <feedback…> [--json]
+stderr|   discard <id> [--reason <text>] [--json]
+stderr|   stop <id|--all> [--json]
+stderr|   usage [--json]
+stderr|   setup [--remove] [--json]
+stderr|   setup --engines [--json]
+stderr|   setup --engine-check <omp|opencode|pi> [--json]
+stderr|   setup --engine-enable <omp|opencode|pi> --watcher provider|sonnet
+stderr|   brief new <title> [--mode edit|exec|readonly]
+stderr|   brief lint <path>
+[exit 2]
+
+$ zai setup
+zai setup: ready. GLM 5.3 and GLM 5.3 Flash are in /model; zai:glm-5.3 and zai:glm-5.3-flash run on them.
+  runtime:  bun 1.3.14 (/usr/local/bin/bun)
+  claude:   <plugin>/test/support/fake-claude.ts (2.1.289 (Claude Code, fake))
+  key:      present (ZAI_API_KEY)
+  ping:     ok: glm-5.3-flash answered (1 turn, est. $0.0000)
+  router:   running on http://127.0.0.1:18787 (already running)
+  models:   glm-5.3, glm-5.3-flash
+  settings: <sandbox>/.claude/settings.json (updated)
+Restart Claude Code now. This session keeps talking to Anthropic until it restarts; GLM 5.3 in /model and the zai agents work from the next session.
+[exit 0]
+
+$ zai setup --ping
+zai setup: ready. GLM 5.3 and GLM 5.3 Flash are in /model; zai:glm-5.3 and zai:glm-5.3-flash run on them.
+  runtime:  bun 1.3.14 (/usr/local/bin/bun)
+  claude:   <plugin>/test/support/fake-claude.ts (2.1.289 (Claude Code, fake))
+  key:      present (ZAI_API_KEY)
+  ping:     ok: glm-5.3-flash answered (1 turn, est. $0.0000)
+  router:   running on http://127.0.0.1:18787 (already running)
+  models:   glm-5.3, glm-5.3-flash
+  settings: <sandbox>/.claude/settings.json (already set)
+[exit 0]
+
+$ zai setup --json
+{
+  "ready": true,
+  "runtime": "bun 1.3.14 (/usr/local/bin/bun)",
+  "claude": {
+    "ok": true,
+    "value": "2.1.289 (Claude Code, fake)",
+    "bin": "<plugin>/test/support/fake-claude.ts"
+  },
+  "key": {
+    "ok": true,
+    "value": "ZAI_API_KEY"
+  },
+  "state": "<sandbox>/state",
+  "cap": {
+    "now": 16,
+    "max": 16
+  },
+  "ping": {
+    "ok": true,
+    "value": "ok: glm-5.3-flash answered (1 turn, est. $0.0000)"
+  },
+  "router": {
+    "ok": true,
+    "value": "running on http://127.0.0.1:18787 (already running)"
+  },
+  "models": {
+    "ok": true,
+    "value": "glm-5.3, glm-5.3-flash"
+  },
+  "settings": {
+    "ok": true,
+    "path": "<sandbox>/.claude/settings.json",
+    "changed": false,
+    "value": "no changes"
+  }
+}
+[exit 0]
+
+$ zai board
+No Z.ai GLM activity yet. After /zai:setup, the sessions and subagents on its models appear here.
+[exit 0]
+
+$ zai board --hook
+[exit 0]
+
+$ zai usage
+Z.ai GLM usage
+Est. cost: today $0.0000 · 7 days $0.0000 · 30 days $0.0000 (30 days: agents and /model $0.0000, jobs $0.0000)
+Estimated from Z.ai GLM list prices read 2026-10-08; your bill is the provider's. Token counts are exact.
+
+Router health, last 24 h: no fallbacks, refusals, rate limits or restarts.
+
+Today: no agent or /model requests.
+Last 7 days: no agent or /model requests.
+Last 30 days: no agent or /model requests.
+
+No zai jobs in this repository yet.
+[exit 0]
+
+$ zai show nope
+stderr| zai: no zai job matches "nope" (/zai:board lists them)
+[exit 4]
+
+$ zai accept
+stderr| zai: accept needs a job id
+stderr| usage: accept <id> [--no-commit] [--force] [--no-verify] [--json]
+[exit 2]
+
+$ zai stop --all
+zai: no queued or running job to stop
+[exit 0]
+
+$ zai batch missing-dir
+stderr| zai: no briefs found for missing-dir
+[exit 2]
+
+$ zai brief new Golden edit --mode edit
+<sandbox>/state/briefs/golden-edit.md
+[exit 0]
+
+# template edit
+---
+# Short name shown on the board and in commit messages.
+title: "Golden edit"
+# edit: own git worktree and branch zai/<id>; the worker may change files inside scope.
+# exec: may run commands but must not change the repository; outputs go to $ZAI_ARTIFACTS.
+# readonly: plan mode, read tools only.
+mode: edit
+# glm (glm-5.3) or flash (glm-5.3-flash). Default: glm for edit, flash otherwise.
+model: glm
+# low | high | max, passed to claude --effort. Default: unset.
+# effort: high
+# Repository the job works on; a relative path resolves against the default, the current git root.
+# cwd: .
+# Ref the worktree starts from.
+base: HEAD
+# Globs the change set may touch (picomatch, dotfiles included). Default: everything for edit, nothing otherwise.
+scope: ["**"]
+# Globs that must stay untouched even inside scope.
+forbid: []
+# Shell commands the plugin runs in the workspace after the worker, each a string or {run, timeout} (default 10m).
+# Example: [npm test, { run: npm run lint, timeout: 5m }]
+gates: []
+# Per attempt: 90s, 15m, 2h, 1h30m or milliseconds.
+timeout: 2h
+# fix: auto-fix rounds after a failed verdict; infra: re-runs after infrastructure errors.
+retries: { fix: 1, infra: 2 }
+# Report contract: change, sweep, notes or a path to a JSON schema file. Default: by mode.
+report: change
+# Extra readable paths, passed as --add-dir.
+addDirs: []
+# Names of orchestrator environment variables passed to the worker and gates; values are never stored.
+env: []
+# Spending cap in USD, passed as --max-budget-usd. Default: unset.
+# budgetUsd: 2
+# high or normal: among jobs waiting for a free slot, high goes first. Default: high (run), normal (batch).
+# priority: normal
+# Free labels for batches and board filters.
+tags: []
+---
+TODO: describe the task for the worker: what to change, where, and what done looks like.
+
+$ zai brief lint <sandbox>/state/briefs/golden-edit.md
+<sandbox>/state/briefs/golden-edit.md: the body still has the TODO placeholder
+[exit 2]
+
+$ zai brief new Golden exec --mode exec
+<sandbox>/state/briefs/golden-exec.md
+[exit 0]
+
+# template exec
+---
+# Short name shown on the board and in commit messages.
+title: "Golden exec"
+# edit: own git worktree and branch zai/<id>; the worker may change files inside scope.
+# exec: may run commands but must not change the repository; outputs go to $ZAI_ARTIFACTS.
+# readonly: plan mode, read tools only.
+mode: exec
+# glm (glm-5.3) or flash (glm-5.3-flash). Default: glm for edit, flash otherwise.
+model: flash
+# low | high | max, passed to claude --effort. Default: unset.
+# effort: high
+# Repository the job works on; a relative path resolves against the default, the current git root.
+# cwd: .
+# Ref the worktree starts from.
+base: HEAD
+# Globs the change set may touch (picomatch, dotfiles included). Default: everything for edit, nothing otherwise.
+scope: []
+# Globs that must stay untouched even inside scope.
+forbid: []
+# Shell commands the plugin runs in the workspace after the worker, each a string or {run, timeout} (default 10m).
+# Example: [npm test, { run: npm run lint, timeout: 5m }]
+gates: []
+# Per attempt: 90s, 15m, 2h, 1h30m or milliseconds.
+timeout: 2h
+# fix: auto-fix rounds after a failed verdict; infra: re-runs after infrastructure errors.
+retries: { fix: 1, infra: 2 }
+# Report contract: change, sweep, notes or a path to a JSON schema file. Default: by mode.
+report: sweep
+# Extra readable paths, passed as --add-dir.
+addDirs: []
+# Names of orchestrator environment variables passed to the worker and gates; values are never stored.
+env: []
+# Spending cap in USD, passed as --max-budget-usd. Default: unset.
+# budgetUsd: 2
+# high or normal: among jobs waiting for a free slot, high goes first. Default: high (run), normal (batch).
+# priority: normal
+# Free labels for batches and board filters.
+tags: []
+---
+TODO: describe the task for the worker: what to change, where, and what done looks like.
+
+$ zai brief lint <sandbox>/state/briefs/golden-exec.md
+<sandbox>/state/briefs/golden-exec.md: the body still has the TODO placeholder
+[exit 2]
+
+$ zai brief new Golden readonly --mode readonly
+<sandbox>/state/briefs/golden-readonly.md
+[exit 0]
+
+# template readonly
+---
+# Short name shown on the board and in commit messages.
+title: "Golden readonly"
+# edit: own git worktree and branch zai/<id>; the worker may change files inside scope.
+# exec: may run commands but must not change the repository; outputs go to $ZAI_ARTIFACTS.
+# readonly: plan mode, read tools only.
+mode: readonly
+# glm (glm-5.3) or flash (glm-5.3-flash). Default: glm for edit, flash otherwise.
+model: flash
+# low | high | max, passed to claude --effort. Default: unset.
+# effort: high
+# Repository the job works on; a relative path resolves against the default, the current git root.
+# cwd: .
+# Ref the worktree starts from.
+base: HEAD
+# Globs the change set may touch (picomatch, dotfiles included). Default: everything for edit, nothing otherwise.
+scope: []
+# Globs that must stay untouched even inside scope.
+forbid: []
+# Shell commands the plugin runs in the workspace after the worker, each a string or {run, timeout} (default 10m).
+# Example: [npm test, { run: npm run lint, timeout: 5m }]
+gates: []
+# Per attempt: 90s, 15m, 2h, 1h30m or milliseconds.
+timeout: 2h
+# fix: auto-fix rounds after a failed verdict; infra: re-runs after infrastructure errors.
+retries: { fix: 1, infra: 2 }
+# Report contract: change, sweep, notes or a path to a JSON schema file. Default: by mode.
+report: notes
+# Extra readable paths, passed as --add-dir.
+addDirs: []
+# Names of orchestrator environment variables passed to the worker and gates; values are never stored.
+env: []
+# Spending cap in USD, passed as --max-budget-usd. Default: unset.
+# budgetUsd: 2
+# high or normal: among jobs waiting for a free slot, high goes first. Default: high (run), normal (batch).
+# priority: normal
+# Free labels for batches and board filters.
+tags: []
+---
+TODO: describe the task for the worker: what to change, where, and what done looks like.
+
+$ zai brief lint <sandbox>/state/briefs/golden-readonly.md
+<sandbox>/state/briefs/golden-readonly.md: the body still has the TODO placeholder
+[exit 2]
+
+$ zai brief lint <sandbox>/edit.md
+ok: Fix the value (glm-5.3, edit, 1 gate)
+[exit 0]
+
+$ zai run <sandbox>/edit.md --wait
+zai job 261006-000001 started: Fix the value (glm-5.3, edit)
+zai job 261006-000001: verdict pass (awaiting review)
+Fix the value (glm-5.3, edit); 2 attempts: #1 initial gate_fail, #2 auto_fix pass
+Changed 1 file: src/value.txt
+Gates: 1/1 passed
+Report: Set the value to right (1 open item)
+Next: /zai:review 261006-000001 to read the diff and accept it, or return it with feedback.
+[exit 0]
+
+# driver 261006-000001
+zai job 261006-000001: verdict pass (awaiting review)
+Fix the value (glm-5.3, edit); 2 attempts: #1 initial gate_fail, #2 auto_fix pass
+Changed 1 file: src/value.txt
+Gates: 1/1 passed
+Report: Set the value to right (1 open item)
+Next: /zai:review 261006-000001 to read the diff and accept it, or return it with feedback.
+[exit 0]
+
+# worker env names (attempt 2)
+ANTHROPIC_AUTH_TOKEN
+ANTHROPIC_BASE_URL
+ANTHROPIC_DEFAULT_HAIKU_MODEL
+ANTHROPIC_DEFAULT_OPUS_MODEL
+ANTHROPIC_DEFAULT_SONNET_MODEL
+API_TIMEOUT_MS
+CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC
+CLAUDE_CONFIG_DIR
+FAKE_CLAUDE_DUMP
+FAKE_CLAUDE_EDIT
+FAKE_CLAUDE_EDIT_ON_RESUME
+FAKE_CLAUDE_REPORT
+FAKE_CLAUDE_SCENARIO
+HOME
+PATH
+TMPDIR
+ZAI_ARTIFACTS
+
+$ zai board
+KIND  ID             MODEL    STATE         REQ  IN   OUT  LAST      TITLE
+job   261006-000001  glm-5.3  review: pass  2    200  40   just now  Fix the value
+[exit 0]
+
+$ zai board --hook
+zai: 1 job awaits review (/zai:review 261006-000001). /zai:board lists them.
+[exit 0]
+
+$ zai show 261006-000001
+zai job 261006-000001: Fix the value
+awaiting review · glm-5.3 · edit · created just now · updated just now
+workspace <sandbox>/state/worktrees/261006-000001
+Attempts:
+  #1 (initial): gate_fail; gates 0/1 passed (failing: `npm run --silent check`); 1 changed path, in scope; report valid.
+  #2 (auto_fix): pass; gates 1/1 passed; 1 changed path, in scope; report valid.
+[exit 0]
+
+$ zai review 261006-000001
+zai job 261006-000001: Fix the value
+verdict pass · glm-5.3 · edit · attempt 2 (auto_fix) · awaiting review
+worktree <sandbox>/state/worktrees/261006-000001 (branch zai/261006-000001, base a5cff5e)
+
+Attempts
+  #1 (initial): gate_fail; gates 0/1 passed (failing: `npm run --silent check`); 1 changed path, in scope; report valid.
+  #2 (auto_fix): pass; gates 1/1 passed; 1 changed path, in scope; report valid.
+
+Report
+  Set the value to right
+  Open items:
+  - the README still says wrong
+
+Gates (1/1 passed)
+  pass  npm run --silent check  exit 0  0.0s
+
+Scope: in scope
+Changes (1):
+  M src/value.txt
+
+Usage: 1 turn · 100 in / 20 out tokens · 50 cache read · est. $0.0002 · 0.0s
+
+Diff stat
+   src/value.txt | 2 +-
+   1 file changed, 1 insertion(+), 1 deletion(-)
+
+Next
+  /zai:review 261006-000001 to read the diff and accept it, or return it with feedback.
+[exit 0]
+
+$ zai review 261006-000001 --diff
+zai job 261006-000001: Fix the value
+verdict pass · glm-5.3 · edit · attempt 2 (auto_fix) · awaiting review
+worktree <sandbox>/state/worktrees/261006-000001 (branch zai/261006-000001, base a5cff5e)
+
+Attempts
+  #1 (initial): gate_fail; gates 0/1 passed (failing: `npm run --silent check`); 1 changed path, in scope; report valid.
+  #2 (auto_fix): pass; gates 1/1 passed; 1 changed path, in scope; report valid.
+
+Report
+  Set the value to right
+  Open items:
+  - the README still says wrong
+
+Gates (1/1 passed)
+  pass  npm run --silent check  exit 0  0.0s
+
+Scope: in scope
+Changes (1):
+  M src/value.txt
+
+Usage: 1 turn · 100 in / 20 out tokens · 50 cache read · est. $0.0002 · 0.0s
+
+Diff stat
+   src/value.txt | 2 +-
+   1 file changed, 1 insertion(+), 1 deletion(-)
+
+Diff
+```diff
+diff --git a/src/value.txt b/src/value.txt
+index 8e933d0..c376d89 100644
+--- a/src/value.txt
++++ b/src/value.txt
+@@ -1 +1 @@
+-wrong
++right
+```
+
+Next
+  /zai:review 261006-000001 to read the diff and accept it, or return it with feedback.
+[exit 0]
+
+$ zai wait 261006-000001
+zai job 261006-000001: verdict pass (awaiting review)
+Fix the value (glm-5.3, edit); 2 attempts: #1 initial gate_fail, #2 auto_fix pass
+Changed 1 file: src/value.txt
+Gates: 1/1 passed
+Report: Set the value to right (1 open item)
+Next: /zai:review 261006-000001 to read the diff and accept it, or return it with feedback.
+[exit 0]
+
+$ zai accept 261006-000001
+zai job 261006-000001 accepted: commit 88fdb7cfa546 on the current branch of <repo>
+[exit 0]
+
+# commit on main
+88fdb7cfa5466cd284eed4b65b9ab8b1521fc444
+Fix the value
+
+Set the value to right
+
+Worked-by: glm-5.3 via zai
+
+# branches
+* main
+
+$ zai accept 261006-000001
+stderr| zai: job 261006-000001 was already accepted; this only works on a job that awaits review
+[exit 2]
+
+$ zai run <sandbox>/exec.md --flash
+zai job 261006-000002 started: Measure the value (glm-5.3-flash, exec)
+Running detached: /zai:board shows it, /zai:review 261006-000002 once it awaits review.
+[exit 0]
+
+# driver 261006-000002
+zai job 261006-000002: verdict report_invalid (awaiting review)
+Measure the value (glm-5.3-flash, exec); 2 attempts: #1 initial report_invalid, #2 auto_fix report_invalid
+Changed: nothing
+Gates: 1/1 passed
+Report: invalid (2 problems)
+Next: /zai:review 261006-000002 to return it with the failing output as feedback, or discard it.
+[exit 0]
+
+# prompt (attempt 1)
+Write the value's length to a file.
+
+## zai contract
+
+You work directly in the repository. The repository must stay unchanged.
+Do not create, edit or delete files in it.
+Write every output file to <sandbox>/state/jobs/261006-000002/artifacts (also in $ZAI_ARTIFACTS).
+Do not commit, stage, stash or switch branches.
+Never print, log or write secrets: API keys, tokens, passwords, private keys.
+
+## Gates
+
+After you finish, the plugin runs these commands in your workspace. Each must exit 0.
+```sh
+true
+```
+
+## Finish
+
+Run the gates yourself before you finish. Fix what fails.
+End your run with the structured report (schema: sweep). Report only what you did and checked.
+
+# worker env names (attempt 1)
+ANTHROPIC_AUTH_TOKEN
+ANTHROPIC_BASE_URL
+ANTHROPIC_DEFAULT_HAIKU_MODEL
+ANTHROPIC_DEFAULT_OPUS_MODEL
+ANTHROPIC_DEFAULT_SONNET_MODEL
+API_TIMEOUT_MS
+CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC
+CLAUDE_CONFIG_DIR
+FAKE_CLAUDE_DUMP
+FAKE_CLAUDE_REPORT
+FAKE_CLAUDE_SCENARIO
+HOME
+PATH
+TMPDIR
+ZAI_ARTIFACTS
+
+$ zai wait 261006-000002
+zai job 261006-000002: verdict report_invalid (awaiting review)
+Measure the value (glm-5.3-flash, exec); 2 attempts: #1 initial report_invalid, #2 auto_fix report_invalid
+Changed: nothing
+Gates: 1/1 passed
+Report: invalid (2 problems)
+Next: /zai:review 261006-000002 to return it with the failing output as feedback, or discard it.
+[exit 3]
+
+$ zai show 261006-000002
+zai job 261006-000002: Measure the value
+awaiting review · glm-5.3-flash · exec · created just now · updated just now
+workspace <repo>
+Attempts:
+  #1 (initial): report_invalid; gates 1/1 passed; 0 changed paths, in scope; report invalid.
+  #2 (auto_fix): report_invalid; gates 1/1 passed; 0 changed paths, in scope; report invalid.
+[exit 0]
+
+$ zai review 261006-000002
+zai job 261006-000002: Measure the value
+verdict report_invalid · glm-5.3-flash · exec · attempt 2 (auto_fix) · awaiting review
+repository <repo> (must stay unchanged), artifacts <sandbox>/state/jobs/261006-000002/artifacts
+
+Attempts
+  #1 (initial): report_invalid; gates 1/1 passed; 0 changed paths, in scope; report invalid.
+  #2 (auto_fix): report_invalid; gates 1/1 passed; 0 changed paths, in scope; report invalid.
+
+Report
+  Set the value to right
+  Open items:
+  - the README still says wrong
+  Invalid against its contract:
+  - items: Invalid input: expected array, received undefined
+  - (root): Unrecognized keys: "files", "tests_added"
+
+Gates (1/1 passed)
+  pass  true  exit 0  0.0s
+
+Scope: in scope
+Changes: none
+
+Usage: 1 turn · 100 in / 20 out tokens · 50 cache read · est. $0.0000 · 0.0s
+
+Next
+  /zai:review 261006-000002 to return it with the failing output as feedback, or discard it.
+[exit 0]
+
+$ zai return 261006-000002
+stderr| zai: return needs feedback for the worker
+stderr| usage: return <id> <feedback…> [--json]
+[exit 2]
+
+$ zai return 261006-000002 Also write the value itself.
+zai job 261006-000002 returned with feedback: attempt 3 runs detached. /zai:review 261006-000002 once it awaits review again.
+[exit 0]
+
+# driver 261006-000002
+zai job 261006-000002: verdict report_invalid (awaiting review)
+Measure the value (glm-5.3-flash, exec); 4 attempts: #1 initial report_invalid, #2 auto_fix report_invalid, #3 review_fix report_invalid, #4 auto_fix report_invalid
+Changed: nothing
+Gates: 1/1 passed
+Report: invalid (2 problems)
+Next: /zai:review 261006-000002 to return it with the failing output as feedback, or discard it.
+[exit 0]
+
+# prompt (attempt 2)
+Verification failed: report_invalid.
+
+The structured report is invalid:
+- items: Invalid input: expected array, received undefined
+- (root): Unrecognized keys: "files", "tests_added"
+
+Make the smallest change that fixes exactly these failures. Keep everything else as it is.
+The contract from your first message still applies. End your run with the structured report.
+
+# prompt (attempt 3)
+The reviewer returned your work with this feedback:
+
+```text
+Also write the value itself.
+```
+
+Last attempt #2 (auto_fix): report_invalid; gates 1/1 passed; 0 changed paths, in scope; report invalid.
+
+The structured report is invalid:
+- items: Invalid input: expected array, received undefined
+- (root): Unrecognized keys: "files", "tests_added"
+
+Address the feedback with the smallest change that satisfies it. Keep everything else as it is.
+The contract from your first message still applies. End your run with the structured report.
+
+$ zai review 261006-000002
+zai job 261006-000002: Measure the value
+verdict report_invalid · glm-5.3-flash · exec · attempt 4 (auto_fix) · awaiting review
+repository <repo> (must stay unchanged), artifacts <sandbox>/state/jobs/261006-000002/artifacts
+
+Attempts
+  #1 (initial): report_invalid; gates 1/1 passed; 0 changed paths, in scope; report invalid.
+  #2 (auto_fix): report_invalid; gates 1/1 passed; 0 changed paths, in scope; report invalid.
+  #3 (review_fix): report_invalid; gates 1/1 passed; 0 changed paths, in scope; report invalid.
+  #4 (auto_fix): report_invalid; gates 1/1 passed; 0 changed paths, in scope; report invalid.
+
+Report
+  Set the value to right
+  Open items:
+  - the README still says wrong
+  Invalid against its contract:
+  - items: Invalid input: expected array, received undefined
+  - (root): Unrecognized keys: "files", "tests_added"
+
+Gates (1/1 passed)
+  pass  true  exit 0  0.0s
+
+Scope: in scope
+Changes: none
+
+Usage: 1 turn · 100 in / 20 out tokens · 50 cache read · est. $0.0000 · 0.0s
+
+Next
+  /zai:review 261006-000002 to return it with the failing output as feedback, or discard it.
+[exit 0]
+
+$ zai accept 261006-000002
+stderr| zai: job 261006-000002 has verdict report_invalid, not pass: accept --force to accept it anyway
+[exit 3]
+
+$ zai discard 261006-000002 --reason measured elsewhere
+zai job 261006-000002 discarded: measured elsewhere
+[exit 0]
+
+$ zai run <sandbox>/readonly.md --bg --json
+{
+  "id": "261006-000003",
+  "brief": {
+    "title": "Survey the value",
+    "body": "Find every use of the value.\n",
+    "model": "flash",
+    "mode": "readonly",
+    "cwd": "<repo>",
+    "base": "HEAD",
+    "scope": [],
+    "forbid": [],
+    "gates": [],
+    "timeoutMs": 7200000,
+    "retries": {
+      "fix": 1,
+      "infra": 2
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "notes"
+    },
+    "addDirs": [],
+    "env": [
+      "FAKE_CLAUDE_SCENARIO",
+      "FAKE_CLAUDE_REPORT"
+    ],
+    "tags": [],
+    "priority": "high"
+  },
+  "state": "queued",
+  "workspace": {
+    "repoRoot": "<repo>",
+    "baseSha": "88fdb7cfa5466cd284eed4b65b9ab8b1521fc444",
+    "artifactsDir": "<sandbox>/state/jobs/261006-000003/artifacts"
+  },
+  "attempts": [],
+  "createdAt": "2026-10-06T12:00:00.000Z",
+  "updatedAt": "2026-10-06T12:00:00.000Z",
+  "version": 1
+}
+[exit 0]
+
+$ zai stop 261006-000003
+zai job 261006-000003: stopping; it will wait for your review as "stopped"
+[exit 0]
+
+# driver 261006-000003
+zai job 261006-000003: verdict stopped (awaiting review)
+Survey the value (glm-5.3-flash, readonly); 1 attempt: #1 initial stopped
+Worker: stopped on request
+Changed: nothing
+Gates: none
+Report: missing
+Next: it was stopped before it finished: /zai:review 261006-000003 to return it with feedback, or discard it.
+[exit 0]
+
+$ zai review 261006-000003
+zai job 261006-000003: Survey the value
+verdict stopped · glm-5.3-flash · readonly · attempt 1 (initial) · awaiting review
+repository <repo> (must stay unchanged), artifacts <sandbox>/state/jobs/261006-000003/artifacts
+
+Worker: stopped on request
+
+Report: missing (the worker ended without a structured report)
+
+Gates: none run
+
+Scope: in scope
+Changes: none
+
+Usage: 0 turns · 0 in / 0 out tokens · 0 cache read · est. $0.0000 · 0.0s
+
+Next
+  it was stopped before it finished: /zai:review 261006-000003 to return it with feedback, or discard it.
+[exit 0]
+
+$ zai discard 261006-000003
+zai job 261006-000003 discarded
+[exit 0]
+
+$ zai batch <sandbox>/batch
+submitted 261006-000004: Batch survey (<sandbox>/batch/a-good.md)
+stderr| zai: rejected <sandbox>/batch/b-bad.md: invalid brief: mode: Invalid option: expected one of "edit"|"exec"|"readonly"
+[exit 2]
+
+# driver 261006-000004
+zai job 261006-000004: verdict report_invalid (awaiting review)
+Batch survey (glm-5.3-flash, readonly); 2 attempts: #1 initial report_invalid, #2 auto_fix report_invalid
+Changed: nothing
+Gates: none
+Report: invalid (2 problems)
+Next: /zai:review 261006-000004 to return it with the failing output as feedback, or discard it.
+[exit 0]
+
+# prompt (attempt 1)
+Look.
+
+## zai contract
+
+This is a read-only investigation. Read and search; run only commands that change nothing.
+Do not create, edit or delete any file.
+Do not commit, stage, stash or switch branches.
+Never print, log or write secrets: API keys, tokens, passwords, private keys.
+
+## Gates
+
+No gates: the plugin runs no checks after you finish.
+
+## Finish
+
+End your run with the structured report (schema: notes). Report only what you did and checked.
+
+$ zai run <sandbox>/echo.md --wait
+zai job 261006-000005 started: Echo the contract (glm-5.3, edit)
+zai job 261006-000005: verdict pass (awaiting review)
+Echo the contract (glm-5.3, edit); 1 attempt: #1 initial pass
+Changed: nothing
+Gates: none
+Report: Set the value to right (1 open item)
+Next: /zai:review 261006-000005 to read the diff and accept it, or return it with feedback.
+[exit 0]
+
+# driver 261006-000005
+zai job 261006-000005: verdict pass (awaiting review)
+Echo the contract (glm-5.3, edit); 1 attempt: #1 initial pass
+Changed: nothing
+Gates: none
+Report: Set the value to right (1 open item)
+Next: /zai:review 261006-000005 to read the diff and accept it, or return it with feedback.
+[exit 0]
+
+# prompt (attempt 1)
+Say what you were told.
+
+## zai contract
+
+You work in an isolated git worktree of the repository. Edit files only there.
+Change only files matching these globs:
+- `src/**`
+- `docs/*.md`
+Never touch files matching these globs, even inside scope:
+- `src/secret/**`
+Leave your changes in the working tree. The plugin reviews and commits them.
+Do not commit, stage, stash or switch branches.
+Never print, log or write secrets: API keys, tokens, passwords, private keys.
+
+## Gates
+
+No gates: the plugin runs no checks after you finish.
+
+## Finish
+
+End your run with the structured report (schema: change). Report only what you did and checked.
+
+# branches
+* main
++ zai/261006-000005
+
+$ zai discard 261006-000005 --reason seen enough
+zai job 261006-000005 discarded: seen enough
+[exit 0]
+
+# branches
+* main
+
+$ zai board --all
+KIND  ID             MODEL          STATE                   REQ  IN   OUT  LAST      TITLE
+job   261006-000005  glm-5.3        discarded               1    100  20   just now  Echo the contract
+job   261006-000004  glm-5.3-flash  review: report_invalid  2    200  40   just now  Batch survey
+job   261006-000003  glm-5.3-flash  discarded               0    0    0    just now  Survey the value
+job   261006-000002  glm-5.3-flash  discarded               4    400  80   just now  Measure the value
+job   261006-000001  glm-5.3        accepted                2    200  40   just now  Fix the value
+[exit 0]
+
+$ zai usage
+Z.ai GLM usage
+Est. cost: today $0.0009 · 7 days $0.0009 · 30 days $0.0009 (30 days: agents and /model $0.0000, jobs $0.0009)
+Estimated from Z.ai GLM list prices read 2026-10-08; your bill is the provider's. Token counts are exact.
+
+Router health, last 24 h: no fallbacks, refusals, rate limits or restarts.
+
+Today: no agent or /model requests.
+Last 7 days: no agent or /model requests.
+Last 30 days: no agent or /model requests.
+
+zai jobs in this repository
+MODEL          JOBS  ACCEPTED  DISCARDED  1ST-TRY  RETURNS  IN   OUT  429S  TIME
+glm-5.3        2     1         1          50%      0        300  60   0     0.0s
+glm-5.3-flash  3     0         2          0%       1        600  120  0     0.1s
+[exit 0]
+
+$ zai usage --json
+{
+  "estimate": {
+    "pricesRetrieved": "2026-10-08",
+    "windows": [
+      {
+        "label": "Today",
+        "router": 0,
+        "jobs": 0.000882
+      },
+      {
+        "label": "Last 7 days",
+        "router": 0,
+        "jobs": 0.000882
+      },
+      {
+        "label": "Last 30 days",
+        "router": 0,
+        "jobs": 0.000882
+      }
+    ]
+  },
+  "spool": [
+    {
+      "label": "Today",
+      "days": 1,
+      "rows": []
+    },
+    {
+      "label": "Last 7 days",
+      "days": 7,
+      "rows": []
+    },
+    {
+      "label": "Last 30 days",
+      "days": 30,
+      "rows": []
+    }
+  ],
+  "jobs": [
+    {
+      "tier": "glm",
+      "jobs": 2,
+      "decided": 2,
+      "accepted": 1,
+      "discarded": 1,
+      "firstTryPassRate": 0.5,
+      "acceptRate": 0.5,
+      "meanAttemptsToAccept": 2,
+      "reviewReturns": 0,
+      "inputTokens": 300,
+      "outputTokens": 60,
+      "cacheReadTokens": 150,
+      "costUsd": 0.0036,
+      "rateLimitRetries": 0,
+      "durationMs": 36
+    },
+    {
+      "tier": "flash",
+      "jobs": 3,
+      "decided": 2,
+      "accepted": 0,
+      "discarded": 2,
+      "firstTryPassRate": 0,
+      "acceptRate": 0,
+      "meanAttemptsToAccept": null,
+      "reviewReturns": 1,
+      "inputTokens": 600,
+      "outputTokens": 120,
+      "cacheReadTokens": 300,
+      "costUsd": 0.007199999999999999,
+      "rateLimitRetries": 0,
+      "durationMs": 72
+    }
+  ],
+  "routerHealth": {
+    "fallback": 0,
+    "refusal": 0,
+    "rate_limited": 0,
+    "budget_stop": 0,
+    "restart": 0
+  }
+}
+[exit 0]
+
