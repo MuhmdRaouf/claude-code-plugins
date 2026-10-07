@@ -1,0 +1,293 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Everything, unfiltered, on any branch.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Runners are pinned (ubuntu-24.04, macos-15) so an image migration never changes the toolchain under a green build;
+# the ubuntu-26.04 job below tries the next image without blocking. Third-party actions are pinned to commit SHAs
+# (Dependabot proposes the bumps). Branch protection requires `ci-ok` alone: jobs skipped by the path filter pass it.
+
+jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      core: ${{ steps.pick.outputs.core }}
+      zai: ${{ steps.pick.outputs.zai }}
+      providers: ${{ steps.pick.outputs.providers }}
+      huddle: ${{ steps.pick.outputs.huddle }}
+      observatory: ${{ steps.pick.outputs.observatory }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3.0.4
+        if: github.event_name != 'workflow_dispatch'
+        id: filter
+        with:
+          # Every provider plugin bundles core, ships the root LICENSE in plugin/ and is checked by the shared suites
+          # in core, so a core change re-checks all five. The setup action and this file re-run everything.
+          filters: |
+            # Shared lists (YAML anchors; paths-filter flattens them). Their names never end in -plugin-cc.
+            workspace: &workspace
+              - package.json
+              - package-lock.json
+              - .github/actions/**
+              - .github/workflows/ci.yml
+            provider-shared: &provider
+              - *workspace
+              - packages/core/**
+              - LICENSE
+              - .claude-plugin/marketplace.json
+            core:
+              - *workspace
+              - packages/core/**
+              # core's cross-plugin provider test reads these
+              - plugins/*-plugin-cc/src/provider.ts
+              - plugins/*-plugin-cc/plugin/agents/**
+            zai-plugin-cc: [*provider, plugins/zai-plugin-cc/**]
+            kimi-plugin-cc: [*provider, plugins/kimi-plugin-cc/**]
+            deepseek-plugin-cc: [*provider, plugins/deepseek-plugin-cc/**]
+            minimax-plugin-cc: [*provider, plugins/minimax-plugin-cc/**]
+            qwen-plugin-cc: [*provider, plugins/qwen-plugin-cc/**]
+            huddle:
+              - plugins/huddle/**
+              - .github/workflows/ci.yml
+            observatory:
+              - *workspace
+              - plugins/observatory/**
+              # the producer of the spool lines observatory parses
+              - packages/core/src/router/spool.ts
+      - id: pick
+        env:
+          ALL: ${{ github.event_name == 'workflow_dispatch' }}
+          CHANGES: ${{ steps.filter.outputs.changes || '[]' }}
+        run: |
+          all='["core","zai-plugin-cc","kimi-plugin-cc","deepseek-plugin-cc","minimax-plugin-cc","qwen-plugin-cc","huddle","observatory"]'
+          if [ "$ALL" = true ]; then changes=$all; else changes=$CHANGES; fi
+          has() { jq -r --arg name "$1" 'index($name) != null' <<<"$changes"; }
+          {
+            echo "core=$(has core)"
+            echo "zai=$(has zai-plugin-cc)"
+            echo "providers=$(jq -c '[.[] | select(endswith("-plugin-cc"))]' <<<"$changes")"
+            echo "huddle=$(has huddle)"
+            echo "observatory=$(has observatory)"
+          } >> "$GITHUB_OUTPUT"
+          cat "$GITHUB_OUTPUT"
+
+  # The five provider plugins are hand-written copies: every file must match zai's after normalising the names,
+  # except the differences scripts/check-siblings.mjs allows with a reason. Git and Node only, no install.
+  siblings:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 24
+      - run: npm run check:siblings
+
+  core:
+    needs: changes
+    if: needs.changes.outputs.core == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: ./.github/actions/setup
+      # Typecheck, Biome, tests with coverage gates, no it.todo left, then the router chaos suite again with every
+      # router process on bun (the node leg is part of the coverage run).
+      - run: npm run check --workspace packages/core
+
+  providers:
+    needs: changes
+    if: needs.changes.outputs.providers != '[]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: ${{ fromJSON(needs.changes.outputs.providers) }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: ./.github/actions/setup
+      # Typecheck, Biome, tests with coverage gates (the shared surface suite, the bundle smoke and the fresh install
+      # on node), no it.todo left, the committed bundle (and dist/run) is fresh, then the bundle e2e again on bun.
+      - run: npm run check --workspace plugins/${{ matrix.plugin }}
+
+  # The oldest Node the packages promise (engines: node >=22.3; 22.x has type stripping on by default) for core and
+  # the reference plugin; the full check above runs on 24.
+  node-22:
+    needs: changes
+    if: needs.changes.outputs.core == 'true' || needs.changes.outputs.zai == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace: [packages/core, plugins/zai-plugin-cc]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: ./.github/actions/setup
+        with:
+          node-version: "22"
+      - run: npm test --workspace ${{ matrix.workspace }}
+
+  # macOS: launchd/Keychain paths, /private/tmp realpaths and BSD tools. Core and zai, then a real Keychain round trip
+  # (a throwaway item, removed again) that only this job enables.
+  macos:
+    needs: changes
+    if: needs.changes.outputs.core == 'true' || needs.changes.outputs.zai == 'true'
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: ./.github/actions/setup
+      - run: npm test --workspace packages/core
+      - run: npm test --workspace plugins/zai-plugin-cc
+      - run: npm run test:bun --workspace plugins/zai-plugin-cc
+      - run: npx vitest run test/adapters/keystore/os-roundtrip.test.ts
+        working-directory: packages/core
+        env:
+          KEYSTORE_ROUNDTRIP: "1"
+
+  # The next Ubuntu image, before ubuntu-latest moves to it: core and zai's full checks. Non-blocking (and outside
+  # ci-ok) until it is green and the pinned image moves.
+  ubuntu-next:
+    needs: changes
+    if: needs.changes.outputs.core == 'true' || needs.changes.outputs.zai == 'true'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: ./.github/actions/setup
+      - run: npm run check --workspace packages/core
+      - run: npm run check --workspace plugins/zai-plugin-cc
+
+  observatory:
+    needs: changes
+    if: needs.changes.outputs.observatory == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: ./.github/actions/setup
+      # Typecheck, Biome, tests with coverage gates (the runtime leg runs under node and bun), no it.todo left,
+      # the committed bundle is fresh.
+      - run: npm run check --workspace plugins/observatory
+      # The committed bundle, started on a random port, per runtime: page, assets, live stream, hooks.
+      - run: npm run leg:bun --workspace plugins/observatory
+      - run: npm run leg:node --workspace plugins/observatory
+
+  huddle:
+    needs: changes
+    if: needs.changes.outputs.huddle == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: plugins/huddle
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.14 # the floor the README promises; bump with bun.lock
+      # Bun is the default runtime; its own bun.lock (not an npm workspace); no services: channels are SQLite files.
+      - run: bun install --frozen-lockfile
+      # Every test from the sources, plugin/dist/ a fresh build of them, the compiled CSS current.
+      - run: bun test
+      # The end-to-end rehearsal on plugin/dist/: a real server, sessions, waits, asks and a handoff.
+      - run: bin/rehearse
+      # A brand-new user: plugin/ alone in a temp HOME's plugin cache, /huddle:setup the only step,
+      # every hook, the MCP server and the commands run as Claude Code runs them, on Bun alone on PATH
+      # (the runner's own node drives the script; its Node leg runs in huddle-node).
+      - run: node --test tests/node/fresh-install.mjs
+
+  huddle-node:
+    needs: changes
+    if: needs.changes.outputs.huddle == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # the floor the README promises (node:sqlite behind a flag, no FTS5), and the current LTS
+        node: ["22.5", 24]
+    defaults:
+      run:
+        working-directory: plugins/huddle
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: ${{ matrix.node }}
+      # No Bun and no install: the committed plugin/dist/ under node — server, invites, events, tasks,
+      # knowledge search, the dashboard sign-in, SSE, the MCP bridge, the hooks and huddle up/down.
+      - run: node --test --test-concurrency=1 --test-reporter=spec tests/node/e2e.mjs tests/node/fresh-install.mjs
+      - run: bin/rehearse
+        env:
+          HUDDLE_RUNTIME: node
+
+  catalogue:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 24
+      - name: Validate the marketplace and every plugin it lists
+        run: |
+          npx -y @anthropic-ai/claude-code plugin validate .
+          for source in $(jq -r '.plugins[].source' .claude-plugin/marketplace.json); do
+            npx -y @anthropic-ai/claude-code plugin validate "$source"
+          done
+
+  secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0 # every commit, not just the tip
+      # The gitleaks CLI at a pinned release, its tarball checked against the release's published SHA-256; no licence
+      # and no secret needed. It scans the whole history with the default rules (.gitleaks.toml extends them with the
+      # exact fake keys the tests use, once those tests exist).
+      - name: Install gitleaks 8.30.1
+        run: |
+          curl -sSfLo gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          rm gitleaks.tar.gz
+      - name: Scan every commit for secrets
+        run: ./gitleaks git --redact --verbose .
+      # GitHub lists every author and co-author as a contributor: no commit may credit an AI tool.
+      - name: No AI attribution in any commit
+        run: node scripts/check-attribution.mjs
+
+  # The one required check: fails when any job it needs failed or was cancelled; a job the path filter skipped passes.
+  ci-ok:
+    if: always()
+    needs:
+      [changes, siblings, core, providers, node-22, macos, observatory, huddle, huddle-node, catalogue, secrets]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - env:
+          FAILED: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          if [ "$FAILED" = true ]; then
+            echo "a required job failed or was cancelled"
+            exit 1
+          fi
+          echo "every required job passed or was skipped"

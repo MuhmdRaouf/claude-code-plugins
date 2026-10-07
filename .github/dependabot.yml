@@ -1,0 +1,23 @@
+# Every dependency is pinned exactly (npm) or to a commit SHA (actions), so nothing moves unless a pull request moves
+# it: Dependabot proposes those, once a week, grouped so one review covers a batch.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    # The workflows and the composite setup action.
+    directories: ["/", "/.github/actions/*"]
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+  # The npm workspaces (core, the five provider plugins, observatory) share the root package-lock.json.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      dev-tooling:
+        dependency-type: development
+      runtime:
+        dependency-type: production

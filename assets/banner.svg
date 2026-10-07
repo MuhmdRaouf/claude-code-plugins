@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" role="img" aria-label="claude-code-plugins: a marketplace of Claude Code plugins">
+  <title>claude-code-plugins: a marketplace of Claude Code plugins</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e1e2e"/>
+      <stop offset="1" stop-color="#11111b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="24%" cy="44%" r="58%">
+      <stop offset="0" stop-color="#cba6f7" stop-opacity="0.30"/>
+      <stop offset="0.5" stop-color="#cba6f7" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#cba6f7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a6e3a1"/>
+      <stop offset="0.25" stop-color="#89b4fa"/>
+      <stop offset="0.5" stop-color="#cba6f7"/>
+      <stop offset="0.75" stop-color="#f5c2e7"/>
+      <stop offset="1" stop-color="#fab387"/>
+    </linearGradient>
+    <linearGradient id="link" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cba6f7"/>
+      <stop offset="1" stop-color="#89b4fa"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="320" fill="url(#bg)"/>
+  <rect width="1200" height="320" fill="url(#glow)"/>
+
+  <!-- the logo mark -->
+  <g transform="translate(64 64) scale(0.75)">
+    <rect x="4" y="4" width="120" height="120" rx="28" fill="#181825" stroke="#45475a"/>
+    <g stroke="url(#link)" stroke-width="7" stroke-linecap="round">
+      <path d="M64 64 L64 34 M64 64 L94 64 M64 64 L64 94 M64 64 L34 64"/>
+    </g>
+    <rect x="50" y="50" width="28" height="28" rx="9" fill="#1e1e2e" stroke="#cba6f7" stroke-width="5"/>
+    <circle cx="64" cy="28" r="9" fill="#a6e3a1"/>
+    <circle cx="100" cy="64" r="9" fill="#fab387"/>
+    <circle cx="64" cy="100" r="9" fill="#89b4fa"/>
+    <circle cx="28" cy="64" r="9" fill="#f5c2e7"/>
+  </g>
+
+  <g font-family="ui-sans-serif, -apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif">
+    <text x="176" y="96" fill="#a6adc8" font-size="15" letter-spacing="3" font-weight="600">PLUGIN MARKETPLACE · MUHMDRAOUF</text>
+    <text x="176" y="140" fill="#cdd6f4" font-size="44" font-weight="700">claude-code-plugins</text>
+    <text x="64" y="208" fill="#bac2de" font-size="20">Delegate bulk work to other models, run sessions as one team,</text>
+    <text x="64" y="236" fill="#bac2de" font-size="20">and watch every agent, request and cost on a local dashboard.</text>
+  </g>
+  <rect x="64" y="262" width="560" height="4" rx="2" fill="url(#bar)"/>
+
+  <!-- the catalogue -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+    <rect x="728" y="56" width="420" height="208" rx="14" fill="#181825" stroke="#313244"/>
+    <text x="752" y="88" fill="#6c7086">/plugin install …@muhmdraouf</text>
+    <text x="752" y="120" fill="#a6e3a1">● zai-plugin-cc</text>
+    <text x="944" y="120" fill="#89b4fa">● kimi-plugin-cc</text>
+    <text x="752" y="148" fill="#cba6f7">● deepseek-plugin-cc</text>
+    <text x="968" y="148" fill="#f5c2e7">● qwen-plugin-cc</text>
+    <text x="752" y="176" fill="#fab387">● minimax-plugin-cc</text>
+    <text x="752" y="212" fill="#cdd6f4">◆ huddle</text>
+    <text x="752" y="240" fill="#cdd6f4">◆ observatory</text>
+  </g>
+</svg>
