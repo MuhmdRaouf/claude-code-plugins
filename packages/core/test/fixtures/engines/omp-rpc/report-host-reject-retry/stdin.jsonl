@@ -1,0 +1,9 @@
+{"id":"neg","type":"negotiate_protocol","protocolVersion":2}
+{"id":"tools","type":"set_host_tools","tools":[{"name":"submit_report","label":"Submit report","description":"Submit your final structured report. Call it exactly once, as your last action.","parameters":{"type":"object","properties":{"status":{"type":"string","enum":["done","blocked"]},"summary":{"type":"string","minLength":40},"files":{"type":"array","items":{"type":"object","properties":{"path":{"type":"string"},"change":{"type":"string"}},"required":["path","change"],"additionalProperties":false}}},"required":["status","summary","files"],"additionalProperties":false},"loadMode":"essential"}]}
+{"id":"filt","type":"set_event_filter","events":["message_update","message_end","tool_execution_start","tool_execution_end","auto_retry_start","auto_retry_end","retry_fallback_applied","auto_compaction_start","auto_compaction_end","notice"],"messageUpdates":"delta"}
+{"id":"state0","type":"get_state"}
+{"id":"stats0","type":"get_session_stats"}
+{"id":"p1","type":"prompt","message":"Protocol test. Read calc.py, then call submit_report with status \"done\", summary \"short\", and files [{\"path\": \"calc.py\", \"change\": \"none\"}]. If the tool returns an error, fix exactly what it says and call submit_report again."}
+{"type":"host_tool_result","id":"159b902f561bde69","isError":true,"result":{"content":[{"type":"text","text":"Invalid report: files.0.change: must describe the change in at least five words"}]}}
+{"type":"host_tool_result","id":"159b9034791bde6a","result":{"content":[{"type":"text","text":"Report received."}]}}
+{"id":"stats1","type":"get_session_stats"}

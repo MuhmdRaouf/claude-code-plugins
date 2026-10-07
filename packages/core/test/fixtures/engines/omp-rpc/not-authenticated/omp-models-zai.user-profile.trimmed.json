@@ -1,0 +1,55 @@
+{
+ "models": [
+  {
+   "provider": "zai",
+   "kind": "chat",
+   "id": "glm-5.3",
+   "selector": "zai/glm-5.3",
+   "name": "GLM-5.3",
+   "contextWindow": 1000000,
+   "maxTokens": 131072,
+   "reasoning": true,
+   "thinking": [
+    "low",
+    "high",
+    "max"
+   ],
+   "input": [
+    "text"
+   ],
+   "cost": {
+    "input": 1.4,
+    "output": 4.4,
+    "cacheRead": 0.26,
+    "cacheWrite": 0
+   },
+   "pricingStatus": "fixed"
+  },
+  {
+   "provider": "zai",
+   "kind": "chat",
+   "id": "glm-5.3-flash",
+   "selector": "zai/glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "contextWindow": 1000000,
+   "maxTokens": 131072,
+   "reasoning": true,
+   "thinking": [
+    "low",
+    "high",
+    "max"
+   ],
+   "input": [
+    "text",
+    "image"
+   ],
+   "cost": {
+    "input": 0.15,
+    "output": 0.5,
+    "cacheRead": 0.015,
+    "cacheWrite": 0
+   },
+   "pricingStatus": "fixed"
+  }
+ ]
+}

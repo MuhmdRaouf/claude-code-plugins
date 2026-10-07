@@ -1,0 +1,24 @@
+{
+  "pi": "1.0.4",
+  "probe": "P4",
+  "fixture": "resume-turn2",
+  "description": "A second turn in a resumed session (--session-id): get_state reports messageCount 4 and the turn starts without the system message again.",
+  "synthetic": true,
+  "source": "hand-written from pi 1.0.4 wire shapes",
+  "frames": 16,
+  "argv": [
+    "pi",
+    "--mode",
+    "rpc",
+    "--model",
+    "zai/glm-5.3",
+    "--no-extensions",
+    "--no-mcp",
+    "--no-skills",
+    "--no-context-files",
+    "--session-id",
+    "<id>"
+  ],
+  "exit": 0,
+  "handshake_ms": 12
+}

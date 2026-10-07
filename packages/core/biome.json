@@ -1,0 +1,44 @@
+{
+  "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": ["src/**", "test/**", "scripts/**", "*.ts", "*.json", "!test/fixtures/engines/omp-rpc"]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 110
+  },
+  "linter": {
+    "rules": {
+      "preset": "recommended",
+      "suspicious": {
+        "noExplicitAny": "error"
+      },
+      "style": {
+        "noDefaultExport": "error",
+        "useImportType": "error",
+        "noNonNullAssertion": "error"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": {
+          "level": "error",
+          "options": {
+            "maxAllowedComplexity": 12
+          }
+        }
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["vitest.config.ts", "stryker.config.mjs"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    }
+  ]
+}

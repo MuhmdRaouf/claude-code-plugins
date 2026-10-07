@@ -1,0 +1,3 @@
+{"type":"step_start","timestamp":1791316970000,"sessionID":"ses_00000007","part":{"id":"prt_000000000020","messageID":"msg_000000000007","sessionID":"ses_00000007","type":"step-start"}}
+{"type":"text","timestamp":1791316970200,"sessionID":"ses_00000007","part":{"id":"prt_000000000021","messageID":"msg_000000000007","sessionID":"ses_00000007","type":"text","text":"The rename is complete.","time":{"start":1791316970170,"end":1791316970190}}}
+{"type":"step_finish","timestamp":1791316970300,"sessionID":"ses_00000007","part":{"id":"prt_000000000022","reason":"stop","messageID":"msg_000000000007","sessionID":"ses_00000007","type":"step-finish","tokens":{"total":90,"input":60,"output":10,"reasoning":0,"cache":{"write":0,"read":20}},"cost":0.00005}}
