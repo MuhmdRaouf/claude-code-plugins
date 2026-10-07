@@ -1,0 +1,58 @@
+{
+  "description": "At session start, bring the deepseek router up and re-apply the setup (/model entries, agent models), then print a one-line summary when deepseek jobs await review; before each prompt and subagent, bring a router that died back; after a deepseek model agent finishes, tell the user what it ran on (deepseek-v4-pro via the router, or Sonnet and why).",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/dist/run\" deepseek.js setup --hook",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/dist/run\" deepseek.js board --hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/dist/run\" deepseek-ensure.js --hook",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/dist/run\" deepseek-ensure.js --hook",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/dist/run\" deepseek.js usage --hook",
+            "timeout": 2
+          }
+        ]
+      }
+    ]
+  }
+}
