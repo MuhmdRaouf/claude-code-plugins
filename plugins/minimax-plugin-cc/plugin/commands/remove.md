@@ -1,0 +1,10 @@
+---
+description: Turn minimax off — agents back on Sonnet, its models out of /model, router stopped, stored key removed. Run it before /plugin uninstall
+allowed-tools: Bash(sh:*)
+---
+
+!`sh "${CLAUDE_PLUGIN_ROOT}/dist/run" minimax.js setup --remove`
+
+Show the report above to the user as it is. If it has a FAILED line, say what failed in one line and that running
+`/minimax:remove` again retries it. Otherwise add one line: to uninstall the plugin as well, run
+`/plugin uninstall minimax-plugin-cc@muhmdraouf` now. Add nothing else.
