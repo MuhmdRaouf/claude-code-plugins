@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Observatory</title>
+    <link rel="icon" href="data:," />
+    <script>
+      // Resolve the theme before first paint so nobody sees a flash of the wrong palette: a saved choice wins,
+      // otherwise the system preference decides (Catppuccin Latte for light, Mocha for dark).
+      (function () {
+        var theme = null;
+        try {
+          theme = localStorage.getItem("observatory-theme");
+        } catch (error) {
+          /* no storage: follow the system */
+        }
+        if (theme !== "light" && theme !== "dark") {
+          theme = window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    <link rel="stylesheet" href="/app.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <div id="root" class="boot">
+      <p class="boot-line">Starting Observatory…</p>
+    </div>
+  </body>
+</html>
