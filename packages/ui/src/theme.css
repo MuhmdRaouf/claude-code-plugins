@@ -1,0 +1,322 @@
+/* The look Radar and Huddle share: two daisyUI themes on Catppuccin's official palettes, the bundled IBM Plex
+ * faces, one colour per model, and the few utilities daisyUI has no component for.
+ *
+ * A dashboard's CSS entry imports Tailwind, turns daisyUI on without its stock themes, then this file:
+ *   @import "tailwindcss";
+ *   @plugin "daisyui" { themes: false; }
+ *   @import "@muhmdraouf/ui/theme.css";
+ * <html data-theme="mocha|latte"> picks the theme; mocha is the default and the prefers-dark choice. Fonts load
+ * from the bundle, never from the network. */
+
+@import "@fontsource-variable/ibm-plex-sans/standard.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+@plugin "daisyui/theme" {
+  name: "mocha";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #1e1e2e; /* base: panels */
+  --color-base-200: #181825; /* mantle: the rail */
+  --color-base-300: #11111b; /* crust: the page */
+  --color-base-content: #cdd6f4;
+  --color-primary: #89b4fa;
+  --color-primary-content: #11111b;
+  --color-secondary: #cba6f7;
+  --color-secondary-content: #11111b;
+  --color-accent: #94e2d5;
+  --color-accent-content: #11111b;
+  --color-neutral: #313244;
+  --color-neutral-content: #cdd6f4;
+  --color-info: #74c7ec;
+  --color-info-content: #11111b;
+  --color-success: #a6e3a1;
+  --color-success-content: #11111b;
+  --color-warning: #fab387;
+  --color-warning-content: #11111b;
+  --color-error: #f38ba8;
+  --color-error-content: #11111b;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.875rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "latte";
+  default: false;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #eff1f5;
+  --color-base-200: #e6e9ef;
+  --color-base-300: #dce0e8;
+  --color-base-content: #4c4f69;
+  --color-primary: #1e66f5;
+  --color-primary-content: #eff1f5;
+  --color-secondary: #8839ef;
+  --color-secondary-content: #eff1f5;
+  --color-accent: #179299;
+  --color-accent-content: #eff1f5;
+  --color-neutral: #ccd0da;
+  --color-neutral-content: #4c4f69;
+  --color-info: #209fb5;
+  --color-info-content: #eff1f5;
+  --color-success: #40a02b;
+  --color-success-content: #eff1f5;
+  --color-warning: #fe640b;
+  --color-warning-content: #eff1f5;
+  --color-error: #d20f39;
+  --color-error-content: #eff1f5;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.875rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* One colour per model family, the same in every dot, chart series, strip and chip (read by modelColor()). */
+[data-theme="mocha"] {
+  --model-opus: #fab387;
+  --model-sonnet: #f9e2af;
+  --model-haiku: #f2cdcd;
+  --model-glm: #94e2d5;
+  --model-glm-flash: #89dceb;
+  --model-kimi: #cba6f7;
+  --model-deepseek: #b4befe;
+  --model-minimax: #f5c2e7;
+  --model-qwen: #eba0ac;
+  --model-other: #7f849c;
+  /* the neon: Catppuccin's blue, mauve and teal as light, strong on mocha's dark glass */
+  --glow-primary: rgb(137 180 250 / 0.5);
+  --glow-secondary: rgb(203 166 247 / 0.45);
+  --glow-accent: rgb(148 226 213 / 0.4);
+  --haze: rgb(137 180 250 / 0.09);
+  --haze-2: rgb(203 166 247 / 0.08);
+}
+
+[data-theme="latte"] {
+  --model-opus: #fe640b;
+  --model-sonnet: #df8e1d;
+  --model-haiku: #dd7878;
+  --model-glm: #179299;
+  --model-glm-flash: #04a5e5;
+  --model-kimi: #8839ef;
+  --model-deepseek: #7287fd;
+  --model-minimax: #ea76cb;
+  --model-qwen: #e64553;
+  --model-other: #8c8fa1;
+  /* latte keeps the neon as a soft tint so it never washes the light panels out */
+  --glow-primary: rgb(30 102 245 / 0.22);
+  --glow-secondary: rgb(136 57 239 / 0.18);
+  --glow-accent: rgb(23 146 153 / 0.18);
+  --haze: rgb(30 102 245 / 0.06);
+  --haze-2: rgb(136 57 239 / 0.05);
+}
+
+@theme {
+  --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.125rem;
+  --text-row: 0.9375rem;
+  --text-row--line-height: 1.375rem;
+}
+
+@layer base {
+  html {
+    font-size: 15px;
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum" 0;
+  }
+
+  body {
+    /* two faint neon hazes in the top corners over crust; fixed so they stay put while the page scrolls */
+    background:
+      radial-gradient(70rem 36rem at 0% -12%, var(--haze), transparent 70%),
+      radial-gradient(60rem 32rem at 100% -8%, var(--haze-2), transparent 70%), var(--color-base-300);
+    background-attachment: fixed;
+    color: var(--color-base-content);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--color-base-content) 22%, transparent) transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0s !important;
+      animation-duration: 0s !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Figures that line up in columns and tick without jitter. */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-stretch: 92%;
+  }
+
+  /* Lines between rows and panels: the text colour at low strength, so both themes get the same weight. */
+  .hairline {
+    border-color: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+  }
+
+  .muted {
+    color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+  }
+}
+
+/* The neon kit: light used sparingly, on what is selected, live or the brand. Everything else stays matte. */
+
+/* a selected or focused surface: a 1px primary edge with a soft bloom around it */
+@utility neon-ring {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-primary) 75%, transparent),
+    0 0 1.5rem -0.25rem var(--glow-primary);
+}
+
+/* text that glows in its own colour: the brand word, a live count, the active tab */
+@utility neon-text {
+  text-shadow: 0 0 0.9rem color-mix(in oklab, currentColor 55%, transparent);
+}
+
+/* a dot that glows in its own colour (live status, model dots) */
+@utility neon-dot {
+  box-shadow:
+    0 0 0 0.1875rem color-mix(in oklab, currentColor 22%, transparent),
+    0 0 0.625rem currentColor;
+}
+
+/* the 2px gradient line under the top bar: blue to mauve to teal */
+@utility neon-line {
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary) 55%, var(--color-accent));
+  box-shadow: 0 0 0.75rem var(--glow-secondary);
+}
+
+/* frosted glass for sticky bars and the slide-over header */
+@utility glass {
+  background: color-mix(in oklab, var(--color-base-100) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+/* the one panel surface every view uses: base, a hairline edge and a faint top highlight */
+@utility panel {
+  background: var(--color-base-100);
+  border: 1px solid color-mix(in oklab, var(--color-base-content) 9%, transparent);
+  border-radius: var(--radius-box);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--color-base-content) 5%, transparent),
+    0 1px 2px rgb(0 0 0 / 0.18);
+}
+
+/* the icon tile beside a page title: tinted primary with a bloom */
+@utility neon-tile {
+  background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+  color: var(--color-primary);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--color-primary) 35%, transparent),
+    0 0 1.25rem -0.25rem var(--glow-primary);
+}
+
+/* daisyUI's aura as one quiet sweep: a single soft highlight in the lighter shade travels slowly round a ring of the
+ * deeper one, so a selected card reads as lit, not flashing */
+@utility aura-catppuccin {
+  background-image: conic-gradient(
+    from var(--aura-angle),
+    var(--aura-a) 0%,
+    var(--aura-b) 20%,
+    var(--aura-a) 40%,
+    var(--aura-a) 100%
+  );
+}
+
+/* the ring's two shades: two of mocha's blues on dark, two of Catppuccin's lavenders on latte */
+[data-theme="mocha"] {
+  --aura-a: #89b4fa;
+  --aura-b: #74c7ec;
+}
+
+[data-theme="latte"] {
+  --aura-a: #7287fd;
+  --aura-b: #b4befe;
+}
+
+/* Latte's legibility floor. On mocha a faded text colour still reads (light ink on near-black), on latte the same
+ * fade drops under WCAG AA. So on latte every muted ink becomes Catppuccin's Subtext 1, and the pastel status hues
+ * deepen when they colour text (the fills and dots keep the palette's own hue through their bg-/border- classes). */
+@layer utilities {
+  /* daisyUI fades inactive tabs to 3.96:1 on mocha; Subtext 1 keeps them quieter than the active tab and above AA */
+  [data-theme="mocha"] .tab:not(.tab-active) {
+    color: #bac2de;
+  }
+
+  [data-theme="latte"] {
+    [class*="text-base-content/"],
+    .muted,
+    .stat-title,
+    .stat-desc,
+    .tab:not(.tab-active),
+    .menu li > :not(.menu-active),
+    .label,
+    .fieldset-legend ~ .label {
+      color: #5c5f77;
+    }
+
+    .text-warning {
+      color: color-mix(in oklab, var(--color-warning) 70%, black);
+    }
+
+    .text-success {
+      color: color-mix(in oklab, var(--color-success) 72%, black);
+    }
+
+    .text-info {
+      color: color-mix(in oklab, var(--color-info) 72%, black);
+    }
+
+    .text-accent {
+      color: color-mix(in oklab, var(--color-accent) 72%, black);
+    }
+
+    .text-primary:not(.btn, .tab, svg) {
+      color: color-mix(in oklab, var(--color-primary) 85%, black);
+    }
+
+    /* soft and outline components paint their text in the pastel itself: deepen that ink, keep the tint */
+    .badge-soft,
+    .badge-outline:not([class*="text-"]) {
+      color: color-mix(in oklab, var(--badge-color, var(--color-base-content)) 68%, black);
+    }
+
+    .btn-soft:not(:hover, :active, [aria-pressed="true"], .btn-active),
+    .btn-ghost.text-primary {
+      color: color-mix(in oklab, var(--btn-color, var(--color-base-content)) 70%, black);
+    }
+
+    .alert-soft {
+      color: color-mix(in oklab, var(--alert-color, var(--color-base-content)) 68%, black);
+    }
+  }
+}
