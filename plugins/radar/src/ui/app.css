@@ -1,0 +1,21 @@
+/* Radar's CSS entry. Tailwind scans only this directory (source(none) + @source), daisyUI ships its
+ * components with the stock themes off — the two themes come from the shared package, and legacy.css keeps
+ * Radar's pre-daisyUI visual system until the redesign replaces it.
+ *
+ * A dashboard's CSS entry imports Tailwind, turns daisyUI on without its stock themes, then theme.css: the
+ * shared package defines mocha (dark, default) and latte (light), the bundled IBM Plex faces and the
+ * --model-<key> colours. <html data-theme="mocha|latte"> picks the theme. */
+
+/* Layer order: legacy.css sits above the reset and below daisyUI components and Tailwind utilities, so a
+ * component or utility always wins over a pre-daisyUI rule that shares its class name (.btn, .block, .status). */
+@layer theme, base, legacy, components, utilities;
+
+@import "tailwindcss" source(none);
+@source "./";
+/* the shared frames (PageIntro, Panel, SlideOver) carry their own classes */
+@source "../../../../packages/ui/src";
+@plugin "daisyui" {
+  themes: false;
+}
+@import "@muhmdraouf/ui/theme.css";
+@import "./legacy.css" layer(legacy);

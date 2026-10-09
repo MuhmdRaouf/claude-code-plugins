@@ -60,6 +60,7 @@ Commands every provider plugin has (`<p>` is `zai`, `kimi`, `deepseek`, `minimax
 | Plugin | What it does | Setup |
 |---|---|---|
 | [huddle](plugins/huddle) | Channels where Claude sessions and their subagents work as one team: messages, tasks that wait on each other, pause and resume, shared knowledge, approval rules, conflict warnings and a live dashboard with a panel per session. | `/huddle:setup` |
+| [radar](plugins/radar) | A zero-token dashboard of every session, agent, request, tool call and estimated cost: live agent transcripts, a request inspector showing the context the model saw, budgets, alerts, desktop notifications and a `/metrics` endpoint. | none: `/radar:start` |
 
 Both dashboards are local pages on `127.0.0.1` and follow your system's light or dark mode (Catppuccin Latte and
 Mocha).
@@ -135,6 +136,13 @@ Uninstalled without `/<p>:remove` first:
 - Your channels stay in the Huddle home under `data/channels/`; `LEFT-BEHIND.md` beside them says how to delete
   them.
 - Each project's `.agents/huddle/huddle.json` is left as it is.
+
+### radar
+
+- Run `/plugin uninstall radar@muhmdraouf`.
+- The running dashboard stops and deletes its state folder (`~/.agents/radar`, or `$RADAR_HOME`)
+  within about 20 s.
+- If the dashboard was not running at the time, delete that folder yourself.
 
 ### Remove the marketplace
 

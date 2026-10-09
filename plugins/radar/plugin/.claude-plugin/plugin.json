@@ -1,0 +1,10 @@
+{
+  "name": "radar",
+  "version": "0.0.1",
+  "description": "Live, token-free observability dashboard for Claude Code sessions: agents, subagents, requests, tokens and tools, on a random localhost port.",
+  "author": {
+    "name": "Raouf"
+  },
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/radar"
+}

@@ -1,0 +1,727 @@
+/* Radar — the whole visual system in one file.
+ *
+ * Palette: Catppuccin Mocha (dark) and Latte (light), the official hex values, on :root and
+ * [data-theme="latte"]. Components never touch a palette colour directly: they use the semantic tokens below
+ * (bg, panel, panel-2, border, text, muted, primary, success, warning, danger, info, series-1…8), so the two
+ * themes, and the sibling huddle dashboard, stay one family. Text-on-panel pairs clear WCAG AA in both
+ * themes: Latte's pastel accents are too light for text, so their *-fg variants are darkened for type only.
+ *
+ * Fully offline: Tailwind supplies preflight at build time, the font stack is local (Inter when installed,
+ * then the platform UI face), icons are inline svg. No CDN, no remote font, no request off 127.0.0.1. */
+
+/* ------------------------------ Catppuccin palettes ------------------------------ */
+
+:root {
+  /* Mocha */
+  --ctp-rosewater: #f5e0dc;
+  --ctp-flamingo: #f2cdcd;
+  --ctp-pink: #f5c2e7;
+  --ctp-mauve: #cba6f7;
+  --ctp-red: #f38ba8;
+  --ctp-maroon: #eba0ac;
+  --ctp-peach: #fab387;
+  --ctp-yellow: #f9e2af;
+  --ctp-green: #a6e3a1;
+  --ctp-teal: #94e2d5;
+  --ctp-sky: #89dceb;
+  --ctp-sapphire: #74c7ec;
+  --ctp-blue: #89b4fa;
+  --ctp-lavender: #b4befe;
+  --ctp-text: #cdd6f4;
+  --ctp-subtext1: #bac2de;
+  --ctp-subtext0: #a6adc8;
+  --ctp-overlay2: #9399b2;
+  --ctp-overlay1: #7f849c;
+  --ctp-overlay0: #6c7086;
+  --ctp-surface2: #585b70;
+  --ctp-surface1: #45475a;
+  --ctp-surface0: #313244;
+  --ctp-base: #1e1e2e;
+  --ctp-mantle: #181825;
+  --ctp-crust: #11111b;
+
+  /* type that sits on accents (Mocha: dark text on light pastels) */
+  --on-accent: var(--ctp-crust);
+  --muted-ink: var(--ctp-subtext0);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-lg: 0 18px 48px rgb(0 0 0 / 0.5);
+  --tint: 16%;
+  color-scheme: dark;
+}
+
+[data-theme="latte"] {
+  /* Latte */
+  --ctp-rosewater: #dc8a78;
+  --ctp-flamingo: #dd7878;
+  --ctp-pink: #ea76cb;
+  --ctp-mauve: #8839ef;
+  --ctp-red: #d20f39;
+  --ctp-maroon: #e64553;
+  --ctp-peach: #fe640b;
+  --ctp-yellow: #df8e1d;
+  --ctp-green: #40a02b;
+  --ctp-teal: #179299;
+  --ctp-sky: #04a5e5;
+  --ctp-sapphire: #209fb5;
+  --ctp-blue: #1e66f5;
+  --ctp-lavender: #7287fd;
+  --ctp-text: #4c4f69;
+  --ctp-subtext1: #5c5f77;
+  --ctp-subtext0: #6c6f85;
+  --ctp-overlay2: #7c7f93;
+  --ctp-overlay1: #8c8fa1;
+  --ctp-overlay0: #9ca0b0;
+  --ctp-surface2: #acb0be;
+  --ctp-surface1: #bcc0cc;
+  --ctp-surface0: #ccd0da;
+  --ctp-base: #eff1f5;
+  --ctp-mantle: #e6e9ef;
+  --ctp-crust: #dce0e8;
+
+  --on-accent: #ffffff;
+  --muted-ink: var(--ctp-subtext1);
+  --shadow: 0 1px 2px rgb(76 79 105 / 0.12);
+  --shadow-lg: 0 18px 48px rgb(76 79 105 / 0.22);
+  --tint: 13%;
+  color-scheme: light;
+}
+
+/* ------------------------------- semantic tokens -------------------------------- */
+
+:root,
+[data-theme="latte"] {
+  --bg: var(--ctp-crust);
+  --panel: var(--ctp-base);
+  --panel-2: var(--ctp-mantle);
+  --line: var(--ctp-surface0);
+  --line-strong: var(--ctp-surface1);
+  --text: var(--ctp-text);
+  --muted: var(--muted-ink);
+  --faint: var(--ctp-overlay1);
+  --primary: var(--ctp-blue);
+  --success: var(--ctp-green);
+  --warning: var(--ctp-peach);
+  --danger: var(--ctp-red);
+  --info: var(--ctp-sapphire);
+
+  --series-1: var(--ctp-blue);
+  --series-2: var(--ctp-mauve);
+  --series-3: var(--ctp-green);
+  --series-4: var(--ctp-peach);
+  --series-5: var(--ctp-teal);
+  --series-6: var(--ctp-pink);
+  --series-7: var(--ctp-yellow);
+  --series-8: var(--ctp-lavender);
+
+  /* type-safe foregrounds (identical to the accent in Mocha, darkened in Latte) */
+  --primary-fg: var(--primary);
+  --success-fg: var(--success);
+  --warning-fg: var(--warning);
+  --danger-fg: var(--danger);
+  --info-fg: var(--info);
+
+  --focus: var(--ctp-lavender);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+[data-theme="latte"] {
+  --primary-fg: color-mix(in srgb, var(--ctp-blue) 85%, black);
+  --success-fg: color-mix(in srgb, var(--ctp-green) 68%, black);
+  --warning-fg: color-mix(in srgb, var(--ctp-peach) 62%, black);
+  --danger-fg: color-mix(in srgb, var(--ctp-red) 90%, black);
+  --info-fg: color-mix(in srgb, var(--ctp-sapphire) 62%, black);
+  --focus: var(--ctp-blue);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-border: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-danger: var(--danger);
+}
+
+/* ------------------------------------ base ------------------------------------ */
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+h2 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.icon-xs {
+  width: 12px;
+  height: 12px;
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  letter-spacing: -0.01em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.boot {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+/* ------------------------------------ cards ------------------------------------ */
+
+/* ------------------------------ badges and statuses ----------------------------- */
+
+.dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--tone);
+  flex: none;
+}
+
+.dot-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid var(--tone);
+  opacity: 0;
+  animation: pulse 2.4s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* `presence`, not `status`: daisyUI ships its own .status dot (a fixed 0.5rem box), and sharing the
+ * name squeezed the dot and its word into that box until the word clipped mid-letter. */
+.presence {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.presence-word {
+  font-size: 13px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex: none;
+}
+
+/* --------------------------- icon buttons (drawer, blocks) ----------------------- */
+
+/* ---------------------------------- banner / boot -------------------------------- */
+
+.banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  color: var(--danger-fg);
+  background: color-mix(in srgb, var(--danger) 10%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+}
+
+/* ------------------------------------ token flow --------------------------------- */
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.rate-chart {
+  min-width: 0;
+  position: relative;
+}
+
+.chart-frame {
+  position: relative;
+  display: grid;
+  gap: 6px;
+}
+
+.chart {
+  display: block;
+  overflow: visible;
+}
+
+.chart-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-axis {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-line {
+  fill: none;
+  stroke-width: 1.75;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-band {
+  fill-opacity: 0.22;
+}
+
+[data-theme="latte"] .chart-band {
+  fill-opacity: 0.28;
+}
+
+.chart-ymax {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-x {
+  position: relative;
+  height: 16px;
+}
+
+.chart-mark {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.mark-start {
+  transform: none;
+}
+
+.mark-end {
+  transform: translateX(-100%);
+}
+
+.chart-tip {
+  position: fixed;
+  z-index: 50;
+  display: none;
+  min-width: 170px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.tip-head {
+  font-weight: 600;
+  margin-bottom: 6px;
+  white-space: pre;
+}
+
+.tip-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.tip-value {
+  margin-left: auto;
+  color: var(--text);
+}
+
+.chart-cross {
+  position: fixed;
+  z-index: 40;
+  display: none;
+  width: 1px;
+  background: var(--faint);
+  pointer-events: none;
+}
+
+/* ------------------------------------- empty ------------------------------------ */
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 40px 20px 44px;
+  text-align: center;
+}
+
+.empty-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+
+.empty-icon .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.empty-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.empty-hint {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ------------------------------------- agents ----------------------------------- */
+
+.tree-note {
+  margin: 0;
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.tree-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: var(--muted);
+  flex: none;
+}
+
+.tree-toggle:hover {
+  color: var(--text);
+  background: var(--line);
+}
+
+.tree-leaf {
+  visibility: hidden;
+}
+
+/* ------------------------------------- tables ----------------------------------- */
+
+.table-wrap {
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.row[data-action] {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--panel-2);
+}
+
+.row:focus-visible {
+  outline-offset: -2px;
+}
+
+.row-new td {
+  animation: row-in 1.5s ease-out;
+}
+
+@keyframes row-in {
+  from {
+    background: color-mix(in srgb, var(--primary) 18%, var(--panel));
+  }
+}
+
+/* a request still streaming: the daisyUI dots before the word, in a cell or a badge (also used by the
+ * request inspector's overview) */
+.streaming {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* -------------------------------------- tools ----------------------------------- */
+
+.provider {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.bar-track {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--panel-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.bar-seg {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.bar-empty {
+  width: 100%;
+}
+
+.rate-chart {
+  padding: 16px 18px 14px;
+}
+
+/* ------------------------------------- timeline --------------------------------- */
+
+.feed {
+  list-style: none;
+  margin: 0;
+  padding: 6px 8px 8px;
+}
+
+/* ------------------------------------ request inspector -------------------------- */
+
+/* The inspector itself is daisyUI components and utilities in the markup now. What stays here is only
+ * what no component fits: the slide-in keyframes the panel's animate-[inspector-in…] utility names, and
+ * the labelled fields the shared kit Field renders (the settings form uses them too). The rest of the
+ * old rules are gone; classes that remain in the markup (inspector-title, ctx-msg, token-total…) are
+ * test and controller hooks, not styles. */
+
+.field {
+  display: grid;
+  gap: 3px;
+}
+
+.field-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.field-value {
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------- costs, budgets, alerts, router ------------------------ */
+
+.attr-label {
+  min-width: 220px;
+  padding-left: calc(14px + var(--depth, 0) * 22px);
+}
+
+.attr-name {
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 360px;
+  vertical-align: middle;
+}
+
+.attr-row .tree-toggle {
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+.attr-note {
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* the model mix rides under the name, thin, one segment per model */
+.attr-mix {
+  display: block;
+  margin: 6px 0 2px 24px;
+}
+
+.attr-mix .bar-track {
+  height: 4px;
+  max-width: 360px;
+}
+
+/* ------------------------------------ responsive -------------------------------- */
+
+@media (max-width: 520px) {
+  .attr-label {
+    padding-left: calc(10px + var(--depth, 0) * 14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .dot-pulse::after {
+    display: none;
+  }
+}
+
+/* ------------------- the inspector's stored sides and blocks --------------------- */
+
+/* The stored sides render as daisyUI collapses with code mockups from the markup now. The markdown
+ * wrapper below is the class the shared @muhmdraouf/ui Markdown component emits for text blocks. */
+
+/* the shared markdown, as the drawer's text blocks render it */
+.prose-h {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.prose-h h1,
+.prose-h h2,
+.prose-h h3,
+.prose-h h4 {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.prose-h ul,
+.prose-h ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.prose-h blockquote {
+  margin: 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--line);
+  color: var(--muted);
+}
+
+.prose-h pre {
+  margin: 0;
+  padding: 10px;
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--ctp-crust) 45%, transparent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.prose-h code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.prose-h a {
+  color: var(--info-fg);
+}
+
+.prose-h .hk {
+  color: var(--ctp-mauve);
+}
+.prose-h .hs {
+  color: var(--ctp-green);
+}
+.prose-h .hn {
+  color: var(--ctp-peach);
+}
+.prose-h .hc {
+  color: var(--ctp-overlay1);
+  font-style: italic;
+}
+.prose-h .hv {
+  color: var(--ctp-blue);
+}
+.prose-h .hp {
+  color: var(--ctp-maroon);
+}
+
+/* --------------------------------- history settings ------------------------------ */
