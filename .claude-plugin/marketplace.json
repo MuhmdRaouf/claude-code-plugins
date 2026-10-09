@@ -18,6 +18,17 @@
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/zai-plugin-cc",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/zai-plugin-cc/plugin"
+    },
+    {
+      "name": "kimi-plugin-cc",
+      "description": "Delegate bulk mechanical work to Kimi (Moonshot AI); Claude orchestrates, verifies and reviews.",
+      "version": "0.0.1",
+      "author": {
+        "name": "Raouf"
+      },
+      "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/kimi-plugin-cc",
+      "license": "GPL-3.0-or-later",
+      "source": "./plugins/kimi-plugin-cc/plugin"
     }
   ]
 }

@@ -5,7 +5,8 @@
   "license": "GPL-3.0-or-later",
   "workspaces": [
     "packages/core",
-    "plugins/zai-plugin-cc"
+    "plugins/zai-plugin-cc",
+    "plugins/kimi-plugin-cc"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
