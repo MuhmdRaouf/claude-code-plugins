@@ -1,0 +1,16 @@
+{
+  "name": "claude-code-plugins",
+  "private": true,
+  "description": "The muhmdraouf marketplace of Claude Code plugins.",
+  "license": "GPL-3.0-or-later",
+  "workspaces": [],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "check": "npm run check:attribution && npm run check:siblings && npm run check --workspaces --if-present",
+    "check:attribution": "node scripts/check-attribution.mjs",
+    "check:siblings": "node scripts/check-siblings.mjs",
+    "test": "npm run test --workspaces --if-present",
+    "test:bun": "npm run test:bun --workspaces --if-present",
+    "mutate": "npm run mutate --workspaces --if-present"
+  }
+}

@@ -1,0 +1,35 @@
+# gitleaks: the default rules, plus the fake keys core's tests use. Each allowlist names one exact value in the exact
+# files that hold it; nothing else is exempt.
+title = "claude-code-plugins"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "core: the fake Z.ai key the worker and engine tests hand to fake workers"
+condition = "AND"
+regexes = ['''^zai-test-key-0123456789abcdef$''']
+paths = [
+  '''^packages/core/test/adapters/claude-headless\.test\.ts$''',
+  '''^packages/core/test/adapters/engines/omp-rpc/worker\.test\.ts$''',
+  '''^packages/core/test/adapters/engines/opencode/worker\.test\.ts$''',
+  '''^packages/core/test/adapters/engines/pi-rpc/worker\.test\.ts$''',
+]
+
+[[allowlists]]
+description = "core: the fake keystore's stored key"
+condition = "AND"
+regexes = ['''^zt-SECRET\.key_0123456789abcdef$''']
+paths = ['''^packages/core/test/support/fake-keystore\.ts$''']
+
+[[allowlists]]
+description = "radar: the fake key the redaction tests prove gets masked"
+condition = "AND"
+regexes = ['''^sk-abcdefgh123456$''']
+paths = ['''^plugins/radar/test/redact\.test\.ts$''']
+
+[[allowlists]]
+description = "core: the fake Z.ai key the router's error-reason tests prove gets redacted"
+condition = "AND"
+regexes = ['''^sk\-zai\-9f2c88d4a1b34e6f8d7c5b3a2e1f0d9c8b7a6f5e$''']
+paths = ['''^packages/core/test/router/router\.test\.ts$''']
