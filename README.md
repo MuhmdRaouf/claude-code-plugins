@@ -42,6 +42,7 @@ the faster tier for the same work, read-only sweeps included.
 | [zai-plugin-cc](plugins/zai-plugin-cc) | GLM (Z.ai) | `zai:glm-5.3`, `zai:glm-5.3-flash` | `/zai:setup` |
 | [kimi-plugin-cc](plugins/kimi-plugin-cc) | Kimi (Moonshot AI) | `kimi:kimi-k3`, `kimi:kimi-k2.6` | `/kimi:setup` |
 | [deepseek-plugin-cc](plugins/deepseek-plugin-cc) | DeepSeek | `deepseek:deepseek-v4-pro`, `deepseek:deepseek-flash` | `/deepseek:setup` |
+| [minimax-plugin-cc](plugins/minimax-plugin-cc) | MiniMax | `minimax:MiniMax-M3`, `minimax:MiniMax-M2.7-highspeed` | `/minimax:setup` |
 
 Commands every provider plugin has (`<p>` is `zai`, `kimi`, `deepseek`, `minimax` or `qwen`):
 

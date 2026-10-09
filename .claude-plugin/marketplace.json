@@ -40,6 +40,17 @@
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/deepseek-plugin-cc",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/deepseek-plugin-cc/plugin"
+    },
+    {
+      "name": "minimax-plugin-cc",
+      "description": "Delegate bulk mechanical work to MiniMax; Claude orchestrates, verifies and reviews.",
+      "version": "0.0.1",
+      "author": {
+        "name": "Raouf"
+      },
+      "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/minimax-plugin-cc",
+      "license": "GPL-3.0-or-later",
+      "source": "./plugins/minimax-plugin-cc/plugin"
     }
   ]
 }
