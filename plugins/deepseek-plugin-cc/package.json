@@ -1,0 +1,38 @@
+{
+  "name": "deepseek-plugin-cc",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Claude Code plugin: DeepSeek does bulk mechanical work; Claude orchestrates, verifies and reviews.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.3",
+    "bun": ">=1.3"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome ci .",
+    "format": "biome check --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "todos": "node scripts/no-todos.mjs",
+    "dist:fresh": "node scripts/build.mjs --check",
+    "test:bun": "TEST_RUNTIME=bun vitest run test/e2e",
+    "check": "npm run typecheck && npm run lint && npm run coverage && npm run todos && npm run dist:fresh && npm run test:bun"
+  },
+  "dependencies": {
+    "@muhmdraouf/core": "0.1.0",
+    "yaml": "2.9.1",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@types/node": "26.6.4",
+    "@vitest/coverage-v8": "5.0.3",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  },
+  "license": "GPL-3.0-or-later"
+}
