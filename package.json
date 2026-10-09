@@ -4,7 +4,8 @@
   "description": "The muhmdraouf marketplace of Claude Code plugins.",
   "license": "GPL-3.0-or-later",
   "workspaces": [
-    "packages/core"
+    "packages/core",
+    "plugins/zai-plugin-cc"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",

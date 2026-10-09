@@ -7,5 +7,17 @@
   "metadata": {
     "description": "Raouf's Claude Code plugins, developed together in this repository."
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "zai-plugin-cc",
+      "description": "Delegate bulk mechanical work to GLM (Z.ai); Claude orchestrates, verifies and reviews.",
+      "version": "0.0.1",
+      "author": {
+        "name": "Raouf"
+      },
+      "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/zai-plugin-cc",
+      "license": "GPL-3.0-or-later",
+      "source": "./plugins/zai-plugin-cc/plugin"
+    }
+  ]
 }
