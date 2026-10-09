@@ -3,7 +3,9 @@
   "private": true,
   "description": "The muhmdraouf marketplace of Claude Code plugins.",
   "license": "GPL-3.0-or-later",
-  "workspaces": [],
+  "workspaces": [
+    "packages/core"
+  ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "check": "npm run check:attribution && npm run check:siblings && npm run check --workspaces --if-present",

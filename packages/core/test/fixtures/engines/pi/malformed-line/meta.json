@@ -1,0 +1,24 @@
+{
+  "pi": "1.0.4",
+  "probe": "P6",
+  "fixture": "malformed-line",
+  "description": "A stray line mid-stream: something that is not JSON lands between frames, is logged and skipped, and the turn still settles.",
+  "synthetic": true,
+  "source": "hand-written from pi 1.0.4 wire shapes",
+  "frames": 17,
+  "argv": [
+    "pi",
+    "--mode",
+    "rpc",
+    "--model",
+    "zai/glm-5.3",
+    "--no-extensions",
+    "--no-mcp",
+    "--no-skills",
+    "--no-context-files",
+    "--session-id",
+    "<id>"
+  ],
+  "exit": 0,
+  "handshake_ms": 12
+}

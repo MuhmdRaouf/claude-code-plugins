@@ -1,0 +1,3 @@
+{"type":"step_start","timestamp":1791316960000,"sessionID":"ses_00000006","part":{"id":"prt_000000000017","messageID":"msg_000000000006","sessionID":"ses_00000006","type":"step-start"}}
+{"type":"text","timestamp":1791316960400,"sessionID":"ses_00000006","part":{"id":"prt_000000000018","messageID":"msg_000000000006","sessionID":"ses_00000006","type":"text","text":"Done! {\"kind\":\"file\"} — everything moved.","time":{"start":1791316960370,"end":1791316960390}}}
+{"type":"step_finish","timestamp":1791316960450,"sessionID":"ses_00000006","part":{"id":"prt_000000000019","reason":"stop","messageID":"msg_000000000006","sessionID":"ses_00000006","type":"step-finish","tokens":{"total":150,"input":80,"output":40,"reasoning":0,"cache":{"write":0,"read":30}},"cost":0.0001}}

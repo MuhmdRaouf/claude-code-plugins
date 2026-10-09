@@ -1,0 +1,6 @@
+{"type":"step_start","timestamp":1791316924559,"sessionID":"ses_00000001","part":{"id":"prt_000000000001","messageID":"msg_000000000001","sessionID":"ses_00000001","type":"step-start"}}
+this line is not json
+{"type":"reasoning"}
+{"type":"text","timestamp":1791316924600,"sessionID":"ses_00000001","part":{"type":"text"}}
+{"type":"text","timestamp":1791316925090,"sessionID":"ses_00000001","part":{"id":"prt_000000000002","messageID":"msg_000000000001","sessionID":"ses_00000001","type":"text","text":"{\"kind\":\"file\"}","time":{"start":1791316925060,"end":1791316925080}}}
+{"type":"step_finish","timestamp":1791316925140,"sessionID":"ses_00000001","part":{"id":"prt_000000000003","reason":"stop","messageID":"msg_000000000001","sessionID":"ses_00000001","type":"step-finish","tokens":{"total":170,"input":100,"output":20,"reasoning":0,"cache":{"write":10,"read":50}},"cost":0.0002}}
