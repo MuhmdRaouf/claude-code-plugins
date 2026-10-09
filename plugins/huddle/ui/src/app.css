@@ -1,0 +1,617 @@
+/* Huddle's CSS entry. Tailwind scans only this directory (source(none) + @source), daisyUI ships its
+ * components with the stock themes off — the two themes come from the shared package, which also
+ * carries the bundled IBM Plex faces. <html data-theme="mocha|latte"> picks the theme.
+ *
+ * What is still hand-written here is the little daisyUI has no component for: the hue carriers the
+ * avatars and status marks read (--c the fill, --ci the ink), the segmented progress bar, the
+ * activity feed's rows, the two SVG diagrams, and the thin bridge for the class names the shared
+ * package's own components (packages/ui, shared with Radar) emit. */
+
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../../../packages/ui/src";
+@plugin "daisyui" {
+  themes: false;
+}
+@import "@muhmdraouf/ui/theme.css";
+
+/* One hue per name the way the models have theirs: the avatar ring, the doing tick, the paused
+ * chip. Latte darkens each so the ink stays readable on the light panels. */
+[data-theme="mocha"] {
+  --hue-blue: #89b4fa;
+  --hue-teal: #94e2d5;
+  --hue-sky: #89dceb;
+  --hue-lavender: #b4befe;
+  --hue-pink: #f5c2e7;
+  --hue-flamingo: #f2cdcd;
+  --hue-sapphire: #74c7ec;
+  --hue-mauve: #cba6f7;
+  --hue-green: #a6e3a1;
+  --hue-yellow: #f9e2af;
+  --hue-peach: #fab387;
+  --hue-red: #f38ba8;
+}
+[data-theme="latte"] {
+  --hue-blue: #1e66f5;
+  --hue-teal: #179299;
+  --hue-sky: #04a5e5;
+  --hue-lavender: #7287fd;
+  --hue-pink: #ea76cb;
+  --hue-flamingo: #dd7878;
+  --hue-sapphire: #209fb5;
+  --hue-mauve: #8839ef;
+  --hue-green: #40a02b;
+  --hue-yellow: #df8e1d;
+  --hue-peach: #fe640b;
+  --hue-red: #d20f39;
+}
+
+/* The hue carriers: --c is the fill (dots, tints, bars), --ci the ink (text, icons). */
+@utility c-blue {
+  --c: var(--hue-blue);
+  --ci: var(--hue-blue);
+}
+@utility c-teal {
+  --c: var(--hue-teal);
+  --ci: var(--hue-teal);
+}
+@utility c-sky {
+  --c: var(--hue-sky);
+  --ci: var(--hue-sky);
+}
+@utility c-lavender {
+  --c: var(--hue-lavender);
+  --ci: var(--hue-lavender);
+}
+@utility c-pink {
+  --c: var(--hue-pink);
+  --ci: var(--hue-pink);
+}
+@utility c-flamingo {
+  --c: var(--hue-flamingo);
+  --ci: var(--hue-flamingo);
+}
+@utility c-sapphire {
+  --c: var(--hue-sapphire);
+  --ci: var(--hue-sapphire);
+}
+@utility c-mauve {
+  --c: var(--hue-mauve);
+  --ci: var(--hue-mauve);
+}
+@utility c-green {
+  --c: var(--hue-green);
+  --ci: var(--hue-green);
+}
+@utility c-yellow {
+  --c: var(--hue-yellow);
+  --ci: var(--hue-yellow);
+}
+@utility c-peach {
+  --c: var(--hue-peach);
+  --ci: var(--hue-peach);
+}
+@utility c-red {
+  --c: var(--hue-red);
+  --ci: var(--hue-red);
+}
+@utility c-good {
+  --c: var(--color-success);
+  --ci: var(--color-success);
+}
+@utility c-info {
+  --c: var(--color-info);
+  --ci: var(--color-info);
+}
+@utility c-idle {
+  --c: color-mix(in oklab, var(--color-base-content) 40%, transparent);
+  --ci: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+}
+@utility ink {
+  color: var(--ci, var(--color-base-content));
+}
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* A soft fill of the carrier behind ink icons and figures (stat figures, feed icons). */
+@utility tinted {
+  background: color-mix(in oklab, var(--c, var(--color-base-content)) 13%, var(--color-base-100));
+}
+
+/* One segmented bar: a fill per count, coloured by the carrier on it. */
+@utility segbar {
+  display: flex;
+  height: 0.375rem;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+}
+@utility segbar-seg {
+  display: block;
+  height: 100%;
+  background: var(--c, var(--color-success));
+}
+
+/* The activity feed: one row per event, an ask carries a left bar, the owner's own rows tint. */
+@utility feed-row {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+}
+@utility feed-icon {
+  margin-top: 2px;
+  display: inline-flex;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: var(--ci, color-mix(in oklab, var(--color-base-content) 72%, transparent));
+}
+.feed-row + .feed-row,
+.feed-row + .feed-burst,
+.feed-burst + .feed-row,
+.feed-burst + .feed-burst {
+  border-top: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
+}
+.feed-row.mine {
+  background: color-mix(in oklab, var(--color-primary) 5%, transparent);
+}
+.feed-row.is-ask::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.5rem;
+  left: 0;
+  width: 3px;
+  border-radius: 0 9999px 9999px 0;
+  background: var(--hue-mauve);
+}
+
+/* ── the shared package's class names (packages/ui, shared with Radar) ───────── */
+/* The toast, the dialog header, the code block and the markdown block emit these; they read the
+   tokens and components above instead of carrying styles of their own. */
+@layer components {
+  .text-muted {
+    color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+  }
+  .text-faint {
+    color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+  }
+  .border-line {
+    border-color: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+  }
+  .border-line\/60 {
+    border-color: color-mix(in oklab, var(--color-base-content) 6%, transparent);
+  }
+  .border-line2 {
+    border-color: color-mix(in oklab, var(--color-base-content) 16%, transparent);
+  }
+
+  .hint {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+  }
+
+  /* The shared toast's shell rides daisyUI's .toast; the tint comes from the carrier. */
+  .hr-toast {
+    pointer-events: auto;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.2),
+      0 12px 32px -12px rgb(0 0 0 / 0.45);
+  }
+  .hr-toast-good {
+    --c: var(--color-success);
+    --ci: var(--color-success);
+  }
+  .hr-toast-bad {
+    --c: var(--color-error);
+    --ci: var(--color-error);
+  }
+  .hr-toast-good,
+  .hr-toast-bad {
+    border: 1px solid color-mix(in oklab, var(--c) 34%, var(--color-base-100));
+    background: color-mix(in oklab, var(--c) 8%, var(--color-base-100));
+  }
+
+  /* The shared dialog's header row (its <dialog> rides daisyUI's modal). */
+  .dlg-h {
+    display: flex;
+    height: 3.25rem;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
+    padding-inline: 1rem;
+  }
+  .dlg-h h2 {
+    font-size: 0.9375rem;
+  }
+
+  /* A square icon button: daisyUI 5 spells it btn-square; the shared package says btn-icon. */
+  .btn-icon {
+    width: 2rem;
+    padding-inline: 0;
+  }
+
+  /* Markdown blocks and their marks. */
+  .prose-h {
+    font-size: 0.84375rem;
+    line-height: 1.625;
+    color: var(--color-base-content);
+    overflow-wrap: anywhere;
+  }
+  .prose-h p {
+    margin-block: 0.375rem;
+  }
+  .prose-h p:first-child {
+    margin-top: 0;
+  }
+  .prose-h p:last-child {
+    margin-bottom: 0;
+  }
+  .prose-h ul {
+    margin-block: 0.375rem;
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+  .prose-h ol {
+    margin-block: 0.375rem;
+    list-style: decimal;
+    padding-left: 1.25rem;
+  }
+  .prose-h li {
+    margin-block: 0.125rem;
+  }
+  .prose-h h2,
+  .prose-h h3,
+  .prose-h h4 {
+    margin-top: 1rem;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .prose-h a,
+  .md a {
+    color: var(--hue-blue);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .md code,
+  .prose-h code {
+    border-radius: 0.25rem;
+    border: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
+    background: color-mix(in oklab, var(--color-base-content) 6%, var(--color-base-100));
+    padding: 1px 0.25rem;
+    font-size: 0.88em;
+  }
+  .md mark,
+  .hit mark {
+    border-radius: 0.125rem;
+    background: color-mix(in oklab, var(--hue-yellow) 35%, transparent);
+    padding-inline: 0.125rem;
+    color: var(--color-base-content);
+  }
+
+  /* The shared code block and its line numbers. */
+  .code {
+    margin: 0;
+    overflow-x: auto;
+    background: color-mix(in oklab, var(--color-base-content) 6%, var(--color-base-100));
+    padding-block: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.65;
+    color: var(--color-base-content);
+    tab-size: 2;
+  }
+  .code .ln {
+    display: inline-block;
+    width: 2.5rem;
+    padding-right: 0.75rem;
+    text-align: right;
+    color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+    user-select: none;
+  }
+  .code .hc {
+    color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+    font-style: italic;
+  }
+  .code .hs {
+    color: var(--hue-green);
+  }
+  .code .hk {
+    color: var(--hue-mauve);
+  }
+  .code .hv {
+    color: var(--hue-blue);
+  }
+  .code .hn {
+    color: var(--hue-peach);
+  }
+  .code .hp {
+    color: var(--hue-teal);
+  }
+
+  /* The shared menu popup: daisyUI paints the items, this is the card around them. */
+  .menu.fixed {
+    z-index: 50;
+    min-width: 12rem;
+    border-radius: var(--radius-box);
+    border: 1px solid color-mix(in oklab, var(--color-base-content) 16%, transparent);
+    background: var(--color-base-100);
+    padding: 0.25rem;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.2),
+      0 18px 44px -12px rgb(0 0 0 / 0.5);
+  }
+
+  /* The shared toast row: daisyUI's .toast is a placement wrapper, this is the card in it. */
+  .hr-toast {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    border-radius: var(--radius-box);
+    padding-block: 0.375rem;
+    padding-inline: 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--color-base-content);
+    border: 1px solid color-mix(in oklab, var(--color-base-content) 16%, transparent);
+    background: var(--color-base-100);
+  }
+  .hr-toast.out {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  @media (min-width: 40rem) {
+    .hr-toast {
+      width: 24rem;
+    }
+  }
+
+  /* The shared dialog's element: centred, a panel, flex-column when open. */
+  .dlg {
+    margin: auto;
+    width: min(640px, calc(100vw - 24px));
+    max-height: 85dvh;
+    overflow: hidden;
+    border-radius: var(--radius-box);
+    border: 1px solid color-mix(in oklab, var(--color-base-content) 16%, transparent);
+    background: var(--color-base-100);
+    color: var(--color-base-content);
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.2),
+      0 18px 44px -12px rgb(0 0 0 / 0.5);
+  }
+  .dlg[open] {
+    display: flex;
+    flex-direction: column;
+  }
+  .dlg-top {
+    margin-block-start: 12dvh;
+    margin-block-end: auto;
+  }
+  dialog {
+    color: var(--color-base-content);
+  }
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.55);
+  }
+
+  /* Rows that expand in place: the chevron turns. */
+  .chev {
+    transition: transform 0.15s ease;
+  }
+  .row-open.open .chev,
+  .row-open[aria-selected="true"] .chev,
+  .row-open[aria-expanded="true"] .chev {
+    transform: rotate(90deg);
+  }
+
+  /* A row that just changed flashes once. */
+  .flash {
+    animation: flash 1.5s ease-out;
+  }
+
+  /* The board: a column is a well, a card is a panel; drag states follow the pointer. */
+  .board-col.over {
+    border-color: var(--color-primary);
+    background: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  }
+  .board-card {
+    border-radius: var(--radius-box);
+    border: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
+    background: var(--color-base-100);
+    padding: 0.625rem;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .board-card:hover {
+    border-color: color-mix(in oklab, var(--color-base-content) 16%, transparent);
+  }
+  .board-card.drag {
+    opacity: 0.5;
+  }
+
+  /* A folded burst opens into its events; the chevron on its summary turns with it. */
+  .feed-burst > summary {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+  }
+  .feed-burst > summary::-webkit-details-marker {
+    display: none;
+  }
+  .feed-burst[open] > summary .chev {
+    transform: rotate(90deg);
+  }
+}
+@keyframes flash {
+  from {
+    box-shadow: inset 2px 0 0 var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+  to {
+    box-shadow: inset 2px 0 0 transparent;
+    background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash {
+    animation: none;
+  }
+}
+
+/* ── the two SVG diagrams and the percentage ring: charts, not components ────── */
+.dgraph .ge {
+  fill: none;
+  stroke: color-mix(in oklab, var(--color-base-content) 16%, transparent);
+  stroke-width: 1.3;
+}
+.dgraph .ge.ok {
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+}
+.dgraph .ge.crit {
+  stroke: var(--color-primary);
+  stroke-width: 2.2;
+}
+.dgraph .gn {
+  cursor: pointer;
+}
+.dgraph .gn rect {
+  fill: var(--color-base-100);
+  stroke: color-mix(in oklab, var(--color-base-content) 16%, transparent);
+  stroke-width: 1;
+}
+.dgraph .gn.crit rect {
+  stroke: var(--color-primary);
+  stroke-width: 1.6;
+}
+.dgraph .gn .bar {
+  stroke: none;
+  fill: var(--c);
+}
+.dgraph .gn text {
+  fill: var(--color-base-content);
+  font-size: 12px;
+  font-family: var(--font-sans);
+}
+.dgraph .gn .gid {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+}
+.dgraph .gn .gow,
+.dgraph .gn .gx {
+  font-size: 10.5px;
+  fill: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+}
+.dgraph .gn:hover rect,
+.dgraph .gn:focus-visible rect {
+  stroke: var(--color-primary);
+  stroke-width: 2;
+}
+.dgraph .gn:focus-visible {
+  outline: none;
+}
+.dgraph.focus .gn {
+  opacity: 0.3;
+}
+.dgraph.focus .ge {
+  opacity: 0.15;
+}
+.dgraph.focus .gn.sel,
+.dgraph.focus .gn.up,
+.dgraph.focus .gn.down {
+  opacity: 1;
+}
+.dgraph.focus .gn.sel rect {
+  stroke: var(--color-primary);
+  stroke-width: 2.5;
+}
+.dgraph.focus .gn.up rect {
+  stroke: var(--hue-peach);
+}
+.dgraph.focus .gn.down rect {
+  stroke: var(--hue-sapphire);
+}
+.dgraph.focus .ge.hot {
+  opacity: 1;
+  stroke: var(--color-primary);
+  stroke-width: 1.8;
+}
+
+.pgraph .edge path {
+  fill: none;
+  stroke: color-mix(in oklab, var(--color-base-content) 16%, transparent);
+  stroke-width: 1.4;
+}
+.pgraph .edge text {
+  fill: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+  font-size: 10px;
+  font-family: var(--font-sans);
+}
+.pgraph .edge .pillbg {
+  fill: var(--color-base-100);
+  stroke: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+}
+.pgraph .node {
+  cursor: pointer;
+}
+.pgraph .node text {
+  fill: var(--color-base-content);
+  font-size: 12px;
+  font-family: var(--font-sans);
+}
+.pgraph .node text.k {
+  fill: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+  font-size: 10px;
+}
+.pgraph .node.sel rect {
+  stroke-width: 2.5;
+}
+
+.pct-ring {
+  --c: var(--color-success);
+  display: block;
+  flex-shrink: 0;
+}
+.pct-ring .track {
+  fill: none;
+  stroke: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+  stroke-width: 3.2;
+}
+.pct-ring .meter {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s ease-out;
+}
+.pct-ring text {
+  fill: var(--color-base-content);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 7.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* brand glow for the top-bar logo (hue carrier; neon lives only where the brief allows) */
+.logo-glow {
+  filter: drop-shadow(0 0 10px var(--color-primary));
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "../node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": ["src/**", "test/**", "*.ts", "*.json", "!coverage"]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 110
+  },
+  "linter": {
+    "rules": {
+      "preset": "recommended",
+      "suspicious": {
+        "noExplicitAny": "error"
+      },
+      "style": {
+        "noDefaultExport": "error",
+        "useImportType": "error",
+        "noNonNullAssertion": "error"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": {
+          "level": "error",
+          "options": {
+            "maxAllowedComplexity": 12
+          }
+        }
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["vitest.config.ts", "vite.config.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/app.css"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noInvalidPositionAtImportRule": "off"
+          },
+          "style": {
+            "noDescendingSpecificity": "off"
+          }
+        }
+      }
+    }
+  ],
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
+}

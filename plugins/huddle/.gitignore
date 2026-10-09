@@ -1,0 +1,16 @@
+# what a running Huddle writes: .agents/huddle/ (huddle.json, data/, seen/, pid, log),
+# the channel databases and their WAL files, the older settings file
+.agents/
+/data/
+*.db
+*.db-wal
+*.db-shm
+*.pem
+.huddle.json
+/seeds/
+# local extensions: extra repo views and scripts that stay on this machine
+/plugin/server/src/ext/local/
+/bin/local/
+node_modules/
+.DS_Store
+*.log

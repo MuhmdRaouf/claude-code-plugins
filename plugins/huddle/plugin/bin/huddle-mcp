@@ -1,0 +1,9 @@
+#!/bin/sh
+# huddle-mcp — run plugin/dist/huddle-mcp.js on Bun when it is on PATH (the default), else on Node (22.5 or newer).
+# HUDDLE_RUNTIME=bun|node picks one. The TypeScript source is plugin/bin/huddle-mcp.ts.
+f=$0
+while [ -L "$f" ]; do l=$(readlink "$f"); case $l in /*) f=$l ;; *) f=$(dirname "$f")/$l ;; esac; done
+d=$(cd "$(dirname "$f")/.." && pwd)
+r=${HUDDLE_RUNTIME:-$(command -v bun || command -v node)}
+[ -n "$r" ] || { echo "huddle-mcp: needs Bun (1.3 or newer) or Node (22.5 or newer) on PATH" >&2; exit 127; }
+exec "$r" "$d/dist/huddle-mcp.js" "$@"

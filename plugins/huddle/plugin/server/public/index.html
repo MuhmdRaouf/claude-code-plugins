@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- Huddle: the owner's control room. Channels where AI coding sessions (and their subagents)
+     work as one team. This page is only the boot shell: the theme goes on <html> before first
+     paint, the stylesheet and the one ES module the Preact app builds to load next, and the
+     #app node the app renders into. Everything else — the rail, the page headers, the drawers,
+     the composer — the app paints.
+     Routes: #/ · #/c/<ch>/{overview,today,inbox,team,work[/list|board|graph|map|repo/<view>],knowledge[/<id>],settings}
+     A drawer opens over any view: ?t=<task> (task drawer), ?s=<session> (session drawer).
+     Aliases (needs, live, plan, board, graph, review, kb, repo, t/<id>) redirect.
+     Styles: ui/src/app.css (Tailwind 4 + daisyUI 5, the shared mocha/latte themes) → vite build → app.css. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Huddle</title>
+<script>/* theme before first paint: the saved choice (System, Light or Dark), else the system's */
+try { const t = JSON.parse(localStorage.getItem("huddle:theme") || "null"); document.documentElement.dataset.theme = t === "light" || t === "dark" ? t : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch { document.documentElement.dataset.theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; }</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22 role=%22img%22 aria-label=%22Huddle%22%3E%3Cdefs%3E%3ClinearGradient id=%22hb%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23313244%22/%3E%3Cstop offset=%221%22 stop-color=%22%2311111b%22/%3E%3C/linearGradient%3E%3ClinearGradient id=%22hr%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23cba6f7%22/%3E%3Cstop offset=%221%22 stop-color=%22%2389b4fa%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x=%224%22 y=%224%22 width=%22120%22 height=%22120%22 rx=%2228%22 fill=%22url(%23hb)%22/%3E%3Crect x=%224.5%22 y=%224.5%22 width=%22119%22 height=%22119%22 rx=%2227.5%22 fill=%22none%22 stroke=%22%2345475a%22/%3E%3Ccircle cx=%2264%22 cy=%2266%22 r=%2230%22 fill=%22none%22 stroke=%22url(%23hr)%22 stroke-width=%225%22 stroke-dasharray=%2211 7%22 stroke-linecap=%22round%22 opacity=%22.9%22/%3E%3Ccircle cx=%2264%22 cy=%2266%22 r=%2211%22 fill=%22%23cba6f7%22/%3E%3Ccircle cx=%2264%22 cy=%2266%22 r=%224.5%22 fill=%22%231e1e2e%22/%3E%3Ccircle cx=%2264%22 cy=%2233%22 r=%2210%22 fill=%22%2389b4fa%22 stroke=%22%231e1e2e%22 stroke-width=%224%22/%3E%3Ccircle cx=%2235.4%22 cy=%2282.5%22 r=%2210%22 fill=%22%23a6e3a1%22 stroke=%22%231e1e2e%22 stroke-width=%224%22/%3E%3Ccircle cx=%2292.6%22 cy=%2282.5%22 r=%2210%22 fill=%22%23f5c2e7%22 stroke=%22%231e1e2e%22 stroke-width=%224%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div id="app"></div>
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>

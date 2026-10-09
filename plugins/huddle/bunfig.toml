@@ -1,0 +1,5 @@
+[test]
+# every server and client a test starts shares one root credential and a throwaway state dir (tests/env.ts)
+preload = ["./tests/env.ts"]
+# bun test runs the server suites only; the Preact UI under ui/ has its own Vitest run (bun run ui:test)
+root = "./tests"

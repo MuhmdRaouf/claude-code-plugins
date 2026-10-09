@@ -1,0 +1,83 @@
+#!/bin/bash
+# rehearse — three scripted sessions (and one subagent) work one channel on a throwaway Huddle,
+# showing the patterns end to end: tasks that wait on other sessions' tasks (task.ready), an
+# ask and its reply, a subagent that shares knowledge and leaves, one session pausing another,
+# and the owner's view. The owner holds the server's root credential and mints one invite; each
+# session joins with it and gets its own credential. Watch it live: the URL (a one-time login
+# link) is printed first. Takes about 20 s. Everything runs from plugin/dist/, as installed: on Bun
+# when it is on PATH, else on Node; HUDDLE_RUNTIME=node (or bun) picks one.
+#   bin/rehearse            run (server on a random free five-digit port, data in a temp dir, removed at the end)
+#   KEEP=1 bin/rehearse     keep the server up afterwards to look around
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+RT=${HUDDLE_RUNTIME:-$(command -v bun >/dev/null && echo bun || echo node)}
+DATA=$(mktemp -d); export HUDDLE_CHANNEL=rehearsal
+# the sessions keep their credentials here, not in the real ~/.local/state (plugin/bin/creds.ts)
+export XDG_STATE_HOME=$DATA/state HUDDLE_NO_PROJECT_CRED=1; unset HUDDLE_TOKEN HUDDLE_SESSION CLAUDE_CODE_SESSION_ID CLAUDE_PID CLAUDECODE
+# scripted sessions share one cwd: each keeps its own credential, none for the project
+# the throwaway server's root credential, held by the owner only (plugin/server/src/auth.ts)
+ROOTCRED=$(head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n')
+# no PORT in the environment: the server picks a random free five-digit one and names it in its first log line
+# node:sqlite needs a flag before Node 22.13 (as huddle up passes it, plugin/server/src/rt.ts)
+FLAGS=; [ "$RT" = bun ] || FLAGS=$("$RT" -p 'const [a, b] = process.versions.node.split(".").map(Number); a < 22 || (a === 22 && b < 13) ? "--experimental-sqlite --disable-warning=ExperimentalWarning" : ""')
+HUDDLE_DATA=$DATA HUDDLE_TOKEN=$ROOTCRED "$RT" $FLAGS "$ROOT/plugin/dist/server.js" >"$DATA/server.log" 2>&1 & SRV=$!
+trap '[ -n "${KEEP:-}" ] || { kill $SRV 2>/dev/null; wait $SRV 2>/dev/null; rm -rf "$DATA"; }' EXIT
+until PORT=$(sed -n 's|.* on http://127\.0\.0\.1:\([0-9]*\) .*|\1|p' "$DATA/server.log" | head -1); [ -n "$PORT" ] && curl -sf -o /dev/null "http://127.0.0.1:$PORT/health"; do
+  kill -0 $SRV 2>/dev/null || { cat "$DATA/server.log"; echo "server did not start (port busy? PORT=… bin/rehearse)"; exit 1; }; sleep 0.2; done
+export HUDDLE_URL=http://127.0.0.1:$PORT
+echo "runtime: $RT $("$RT" --version)"
+R="$RT $ROOT/plugin/dist/huddle.js"
+owner() { HUDDLE_TOKEN=$ROOTCRED HUDDLE_SESSION=owner HUDDLE_AS=owner $R "$@"; }
+echo "watch: $(owner open) (then #/c/rehearsal)"
+# each session is its own Claude session (HUDDLE_SESSION): it holds its own credential, its
+# subagents (<name>.<role>) act through it
+as() { local who=$1; shift; HUDDLE_SESSION=${who%%.*} HUDDLE_AS=$who $R "$@"; }
+say() { printf '  %-14s %s\n' "$1" "$2"; }
+JOIN=$(owner token create --print-join-command | head -1); T=${JOIN##* }
+say owner "invite ${T%%.*}.<secret>: ${JOIN% *} <invite> (one line for every session)"
+j() { python3 -c "import json,sys; d=json.load(sys.stdin); print(d$1)"; }
+
+as alpha ${JOIN#huddle } --role "builds the API (project api/)" >/dev/null 2>&1
+as beta  ${JOIN#huddle } --role "builds the client (project web/), needs the API" >/dev/null 2>&1
+as gamma ${JOIN#huddle } --role "writes the docs, needs both" >/dev/null 2>&1
+say owner "members: $(owner members | cut -d' ' -f1 | tr '\n' ' ')"
+as alpha new "Ship the /orders API" --id api >/dev/null
+as alpha new "Client for /orders" --id client --owner beta --after api >/dev/null
+as alpha new "Document orders end to end" --id docs --owner gamma --after api,client >/dev/null
+say plan "api (alpha) → client (beta) → docs (gamma)"
+
+# beta: its task waits on alpha's; `start` says so, `wait` sleeps until task.ready, `ask` blocks for the answer
+(
+  out=$(as beta start client | head -1); say beta "start client → ${out}"
+  ev=$(as beta wait task.ready --timeout 30); say beta "woken: $(echo "$ev" | j "['msg']")"
+  as beta ack "$(echo "$ev" | j "['seq']")" >/dev/null
+  as beta recall orders schema | sed 's/^/                 recall: /' | head -2
+  as beta start client >/dev/null
+  ans=$(as beta ask alpha "Is /orders paginated?"); say beta "asked alpha, answer: $ans"
+  sleep 1; out=$(as beta finish "client tests 12/12 green"); say beta "finish → released $(echo "$out" | j "['released']")"
+) & B=$!
+
+# gamma: waits on both through the dependency graph, never polls
+(
+  ev=$(as gamma wait task.ready --timeout 60); say gamma "woken: $(echo "$ev" | j "['msg']")"
+  as gamma ack "$(echo "$ev" | j "['seq']")" >/dev/null
+  as gamma start docs >/dev/null; sleep 1; as gamma finish "docs/orders.md written" >/dev/null; say gamma "docs done"
+) & G=$!
+
+# alpha: a subagent maps the schema and shares it; alpha works, is paused by the owner, finishes
+sleep 1
+as alpha join --as alpha.explore --role "maps the orders schema" >/dev/null
+as alpha.explore remember context "orders schema" "orders(id, customer_id, total_cents, created_at); index on created_at" --refs api/schema.sql --tags orders >/dev/null
+as alpha.explore leave "schema mapped: kb #1" >/dev/null; say alpha.explore "remembered the schema (kb #1) and left"
+as alpha start api >/dev/null
+curl -s -H "x-huddle-token: $ROOTCRED" -H content-type:application/json -X POST "$HUDDLE_URL/api/c/rehearsal/op/pause?as=owner" -d '{"target":"alpha","why":"hold: check the migration first"}' >/dev/null
+say owner "paused alpha"
+( sleep 2; curl -s -H "x-huddle-token: $ROOTCRED" -H content-type:application/json -X POST "$HUDDLE_URL/api/c/rehearsal/op/resume?as=owner" -d '{"target":"alpha"}' >/dev/null; say owner "resumed alpha" ) &
+t0=$(date +%s); as alpha gate >/dev/null; say alpha "gate held $(( $(date +%s) - t0 )) s while paused"
+out=$(as alpha finish "GET /orders 200, 30 contract tests green" --result "GET /orders?after=<id>&limit<=100, cursor-based"); say alpha "finish api → released $(echo "$out" | j "['released']")"
+ask=$(as alpha wait ask --timeout 30 || [ $? = 3 ]); seq=$(echo "$ask" | j "['seq']")
+as alpha reply "$seq" "Yes: cursor-based, ?after=<id>&limit<=100" >/dev/null; say alpha "answered beta"
+wait $B $G
+echo; echo "final:"; as alpha tasks | sed 's/^/  /'
+curl -s -H "x-huddle-token: $ROOTCRED" "$HUDDLE_URL/api/c/rehearsal" | python3 -c "import json,sys; s=json.load(sys.stdin)['stats']; print(f\"  {s['events']} events · {s['tasks']} tasks, {s['done']} done · {s['knowledge']} knowledge · {s['open_asks']} asks\")"
+echo "rehearsal passed"

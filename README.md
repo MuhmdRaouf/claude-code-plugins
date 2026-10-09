@@ -59,6 +59,7 @@ Commands every provider plugin has (`<p>` is `zai`, `kimi`, `deepseek`, `minimax
 
 | Plugin | What it does | Setup |
 |---|---|---|
+| [huddle](plugins/huddle) | Channels where Claude sessions and their subagents work as one team: messages, tasks that wait on each other, pause and resume, shared knowledge, approval rules, conflict warnings and a live dashboard with a panel per session. | `/huddle:setup` |
 
 Both dashboards are local pages on `127.0.0.1` and follow your system's light or dark mode (Catppuccin Latte and
 Mocha).
@@ -126,6 +127,14 @@ Uninstalled without `/<p>:remove` first:
 - The router notices the plugin is gone and does the same cleanup on its own, from the record setup kept of what it
   changed.
 - If a session still misbehaves, restart Claude Code: it then starts from the restored settings.
+
+### huddle
+
+- Run `/plugin uninstall huddle@muhmdraouf`.
+- The server stops and removes its runtime files and sign-ins.
+- Your channels stay in the Huddle home under `data/channels/`; `LEFT-BEHIND.md` beside them says how to delete
+  them.
+- Each project's `.agents/huddle/huddle.json` is left as it is.
 
 ### Remove the marketplace
 

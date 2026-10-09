@@ -62,6 +62,17 @@
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/qwen-plugin-cc",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/qwen-plugin-cc/plugin"
+    },
+    {
+      "name": "huddle",
+      "description": "Channels where Claude sessions in different projects, their subagents and bash agents work as one team: messages everyone hears, tasks across sessions, pause and resume, shared knowledge.",
+      "version": "0.0.1",
+      "author": {
+        "name": "Raouf"
+      },
+      "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/huddle",
+      "license": "GPL-3.0-or-later",
+      "source": "./plugins/huddle/plugin"
     }
   ]
 }
