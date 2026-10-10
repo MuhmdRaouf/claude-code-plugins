@@ -271,8 +271,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       # No Bun and no install: the committed plugin/dist/ under node — server, invites, events, tasks,
-      # knowledge search, the dashboard sign-in, SSE, the MCP bridge, the hooks and huddle up/down.
-      - run: node --test --test-concurrency=1 --test-reporter=spec tests/node/e2e.mjs tests/node/fresh-install.mjs
+      # knowledge search, the dashboard sign-in, SSE, the MCP bridge, the hooks and huddle up/down. flow.mjs
+      # runs the real slash commands and the dashboard browser; without a claude binary or a cached Chromium
+      # on a runner its claude and browser legs skip in seconds.
+      - run: node --test --test-concurrency=1 --test-reporter=spec tests/node/e2e.mjs tests/node/fresh-install.mjs tests/node/flow.mjs
       - run: bin/rehearse
         env:
           HUDDLE_RUNTIME: node

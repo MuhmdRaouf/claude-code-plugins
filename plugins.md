@@ -153,10 +153,11 @@ claude-code-plugins/
 │   │   │                               src/{rules,notify,radar,digest,touches,knowledge,extras}.ts,
 │   │   │                               src/ext/{repo,views}.ts, public/ (index.html, *.js, src/app.css →
 │   │   │                               compiled app.css), CONNECT.md
-│   │   ├── commands/{setup,join,invite,open}.md, agents/huddle-worker.md, skills/huddle/SKILL.md
+│   │   ├── commands/{setup,join,invite}.md, agents/huddle-worker.md, skills/huddle/SKILL.md
 │   ├── bin/rehearse                    end-to-end rehearsal script
 │   └── tests/                          bun tests (auth, channel, hooks, http, identity, lifecycle, port, …) and
-│                                       tests/node/ (the Node leg and the fresh-install check)
+│                                       tests/node/ (the Node leg, the fresh-install check and the real-command
+│                                       flow run)
 │
 └── plugins/radar/                runs on Bun or Node; its own Bun project (bun.lock), not an npm workspace
     ├── src/{cli,hook,ingest,lifecycle,server,shared,store,ui}/   the CLI, the hook recorder, spool + transcript
@@ -927,10 +928,9 @@ A session then joins its channel from that file (or `HUDDLE_CHANNEL` and `HUDDLE
 
 **Commands:**
 
-- `/huddle:setup`: set up and start;
+- `/huddle:setup`: set up and start, and show the join line for other sessions and the dashboard link;
 - `/huddle:invite`: make a join line for another session;
-- `/huddle:join`: join with such a line;
-- `/huddle:open`: a dashboard link that signs your browser in.
+- `/huddle:join`: join with such a line, and show the dashboard link.
 
 **A second project joins the Huddle that already runs.**
 
@@ -958,7 +958,7 @@ A session then joins its channel from that file (or `HUDDLE_CHANNEL` and `HUDDLE
 
 - The session that starts the server is its **creator**. `huddle up` makes a root credential, hands it to the server
   on stdin, and keeps it as that session's own.
-- The creator sees, once, a join line and a dashboard link.
+- The creator's `/huddle:setup` prints a join line for other sessions and a dashboard sign-in link.
 - Every other session joins once with an invite: `/huddle:join <host:port> --token <id.secret>` (or
   `huddle join <host:port> --token <id.secret>` from a shell).
   - The invite is traded for that session's own credential, bound to its name.
@@ -966,9 +966,10 @@ A session then joins its channel from that file (or `HUDDLE_CHANNEL` and `HUDDLE
   - The invite itself is never kept.
 - **Making invites:**
   - `/huddle:invite`, or the **Invite** button on the dashboard;
-  - from a shell, `huddle token create [--ttl 2h] [--single-use] [--print-join-command]` (24 h by default);
+  - from a shell, `huddle token create [--ttl 2h] [--single-use] [--print-join-command]` (24 h by default); the flag
+    prints the line to paste into the other session;
   - `huddle token list` and `huddle token delete <id>` manage them;
-  - inside Claude Code an invite reaches the user through a hook's `systemMessage`, never Claude's context.
+  - the CLI prints the join line wherever it runs, inside Claude Code or out.
 - The creator also has `huddle members` and `huddle kick <name>` (revokes a session's credential and its browser).
 - **Members are remembered across restarts.**
   - The server keeps its members, roots, browsers and unused invites in `data/auth.json` (mode `0600`).
@@ -980,11 +981,10 @@ A session then joins its channel from that file (or `HUDDLE_CHANNEL` and `HUDDLE
   - `huddle up` hands a restarted server the creator's root credential again.
   - A session without a credential stays out: its hooks say nothing, and SessionStart prints one line telling it how
     to get in.
-- **Every joined session gets a dashboard link** at each start. `huddle open` (or `/huddle:open`) makes a new one for
-  any member.
+- **Every session that sets up or joins gets a dashboard link** printed by the CLI. `huddle open` (or `/huddle:setup`)
+  makes a new one for any member.
   - The link carries a one-use code valid for 5 minutes.
-  - It reaches the user through a hook's `systemMessage`, never Claude's context. Inside Claude Code the CLI prints
-    only the plain address and leaves a request file that the next hook turns into the link.
+  - The CLI prints the link wherever it runs, inside Claude Code or out.
   - A member's browser can read and act as `owner` in channels, but cannot manage invites, members or kicks.
 
 **What sessions share:**
@@ -1086,7 +1086,8 @@ Home lists every channel, and `⌘K` opens a command palette. Messages you send 
   listed in `HUDDLE_HOSTS`.
 - Every `/api` and `/mcp` request needs a credential (`x-huddle-token`), or gets 401 with a recovery step.
 - `/health` and the page itself stay open.
-- A browser whose sign-in no longer works gets a "Signed out" page pointing to `/huddle:open`.
+- A browser whose sign-in no longer works gets a "Signed out" page saying how to get a new link (`huddle open`, or
+  `/huddle:setup`).
 - A browser signs in through a one-time login link (5 minutes) that leaves an HttpOnly, SameSite=Strict cookie.
 - Writes need JSON content-type (415) and a same Origin (403).
 - The server redacts credentials, invites and login codes from what sessions write, and logs ids only.
