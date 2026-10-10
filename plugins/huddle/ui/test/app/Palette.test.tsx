@@ -259,10 +259,10 @@ describe("buildItems", () => {
     expect(d.go).toHaveBeenCalledWith("#/c/other");
     find(items, "All channels").run();
     expect(d.go).toHaveBeenCalledWith("#/");
-    find(items, "Theme: light (Latte)").run();
-    expect(d.setTheme).toHaveBeenCalledWith("light");
-    find(items, "Theme: dark (Mocha)").run();
-    expect(d.setTheme).toHaveBeenCalledWith("dark");
+    find(items, "Theme: Latte (light)").run();
+    expect(d.setTheme).toHaveBeenCalledWith("latte");
+    find(items, "Theme: Mocha (dark)").run();
+    expect(d.setTheme).toHaveBeenCalledWith("mocha");
     find(items, "Theme: follow the system").run();
     expect(d.setTheme).toHaveBeenCalledWith("system");
     const bell = find(items, "Notify me of questions");
@@ -311,7 +311,7 @@ describe("paletteResults", () => {
       q: "latte",
       onTask,
     });
-    expect(out.map((x) => x.t)).toEqual(["Theme: light (Latte)"]);
+    expect(out.map((x) => x.t)).toEqual(["Theme: Latte (light)"]);
   });
 
   it("folds the matching tasks in, best match first, and runs them onto the drawer", () => {
@@ -431,7 +431,7 @@ describe("CmdPalette", () => {
     palette();
     const q = screen.getByLabelText("Search or run a command") as HTMLInputElement;
     fireEvent.input(q, { target: { value: "latte" } });
-    await waitFor(() => expect(screen.getByText("Theme: light (Latte)")).toBeDefined());
+    await waitFor(() => expect(screen.getByText("Theme: Latte (light)")).toBeDefined());
     expect(screen.queryByText("Answer web")).toBeNull();
     fireEvent.input(q, { target: { value: "zzzz" } });
     await waitFor(() => expect(screen.getByText(/Nothing matches/)).toBeDefined());
@@ -982,9 +982,9 @@ describe("palette actions through the dialog", () => {
     });
     expect(toggle).toHaveBeenCalled();
     expect(prefs.getItem("huddle:theme")).toBeNull(); // the theme items write on their own pick
-    fireEvent.click(screen.getByText("Theme: dark (Mocha)"));
+    fireEvent.click(screen.getByText("Theme: Mocha (dark)"));
     await flush();
-    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
-    expect(prefs.getItem("huddle:theme")).toBe('"dark"');
+    expect(document.documentElement.getAttribute("data-theme")).toBe("mocha");
+    expect(prefs.getItem("huddle:theme")).toBe('"mocha"');
   });
 });

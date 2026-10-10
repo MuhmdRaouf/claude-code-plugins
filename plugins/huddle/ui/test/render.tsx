@@ -42,6 +42,7 @@ export function renderHuddle(
     state: { ...initialHuddleState(), ...state },
     api,
     now,
+    updatedAt: now,
     go,
     act,
     toast,

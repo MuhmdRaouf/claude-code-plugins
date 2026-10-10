@@ -193,8 +193,14 @@ export type Radar = {
 /** The store's extras for one channel: approval requests plus Radar, when it runs. */
 export type Extras = { ch: string; approvals: Approval[]; obs: Radar | null };
 
-/** A row of GET /api/channels, for the channel switcher and the Home cards. */
-export type ChannelSummary = { name: string; title?: string };
+/** A row of GET /api/channels, for the channel switcher and the Home cards. The server also
+ *  carries each channel's online sessions and stats; the switcher reads the online count. */
+export type ChannelSummary = {
+  name: string;
+  title?: string;
+  sessions?: { name: string; state?: string }[];
+  stats?: { tasks?: number; done?: number; last?: number } & Record<string, unknown>;
+};
 
 /** The whole store state. Like core.js's S it is one object, mutated in place; views read
  *  fields fresh on every change notification. */

@@ -1,25 +1,24 @@
-// App.tsx — the shell: a full-height rail on the left (the logo and channel switcher on top, the
-// destinations with their counts as a daisyUI menu, the members with their live dots below, the
-// theme, help and version at the bottom), a daisyUI drawer that carries the same rail below the
-// lg breakpoint, and the main area: the shell paints every destination's PageIntro (icon, title,
-// one plain sentence on what the page shows, and the page's own actions) over the page the
-// `pages` registry names, whose content starts directly with its panels.
+// App.tsx — the shell: the glass top bar over the neon line (TopBar), the grouped destination
+// tabs, the channel rail beside the page (Rail; a drawer below lg), and every destination's
+// PageIntro (icon, title, one plain sentence on what the page shows, and the page's own actions)
+// over the page the `pages` registry names, whose content starts directly with its panels. The
+// signed-out and no-channel pages stand alone.
 
-import { type MenuItem, PopMenu } from "@muhmdraouf/ui/menu.tsx";
 import { PageIntro, Panel } from "@muhmdraouf/ui/page.tsx";
 import type { Stamp } from "@muhmdraouf/ui/time.ts";
 import type { ComponentChildren, ComponentType, JSX } from "preact";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import type { ComposeOptions } from "../compose/drafts.ts";
 import { Icon, type IconName, Logo } from "../icons.tsx";
-import { Avatar, Time } from "../kit.tsx";
-import { FIN, SSTM, STATM, sessionStatus, type Task, taskState } from "../status.ts";
+import { Time } from "../kit.tsx";
+import { FIN } from "../status.ts";
 import { readPref, writePref } from "../storage.ts";
-import type { HuddleState, LiveStatus, PlanStep } from "../store.ts";
+import type { HuddleState } from "../store.ts";
 import { useHuddle } from "./context.tsx";
 import { IntroCtx } from "./intro.tsx";
-import { channelHref, DESTS, type Dest, parseHash, pathOf, sessHref } from "./router.ts";
-import { applyTheme, currentTheme, setTheme, THEMES, type ThemePref } from "./theme.ts";
+import { Rail } from "./Rail.tsx";
+import { channelHref, type Dest, parseHash } from "./router.ts";
+import { TopBar } from "./TopBar.tsx";
 
 /** What a page registry holds: one component per destination, picked by name. */
 export type Pages = Record<string, ComponentType>;
@@ -87,11 +86,13 @@ const DEST_INTRO: Record<Dest, { icon: IconName; label: string; description: Com
   },
 };
 
-/** A board step as the status model reads it (status.ts's Task); an unnamed status counts as open. */
-const asTask = (s: PlanStep): Task => ({
-  status: s.status ?? "todo",
-  ...(s.blocked_by ? { blocked_by: s.blocked_by } : {}),
-});
+/** The three tab groups under the top bar: the channel's pages, the work pages, and the system's.
+ *  Radar's NAV_GROUPS, with Huddle's destinations. */
+const NAV_GROUPS: { label: string; tabs: Exclude<Dest, "home">[] }[] = [
+  { label: "Channel", tabs: ["overview", "today", "inbox", "team"] },
+  { label: "Work", tabs: ["work", "knowledge"] },
+  { label: "System", tabs: ["settings"] },
+];
 
 /** The Inbox badge over the paint's snapshot: the attention items plus the extras' needs — the
  *  same count the store's inboxCount() computes, read here from state alone. */
@@ -105,440 +106,76 @@ export function inboxOf(state: HuddleState): number {
   return att + needs;
 }
 
-/** Is this session the channel's orchestrator? */
-const isOrch = (name: string, state: HuddleState): boolean =>
-  !!name && state.info?.config?.orchestrator === name;
-
-/** The counts the rail labels read: the Inbox badge, the online sessions, the open tasks. */
+/** The counts the tabs read: the Inbox needs-you badge, the online sessions, the open tasks. */
 export type NavCounts = { n: number; sessions: number; open: number };
 
-/** The screen-reader tail of a rail entry: how much waits there. */
-function srLine(k: string, c: NavCounts): string {
-  if (k === "inbox") return c.n ? `, ${c.n} need${c.n === 1 ? "s" : ""} you` : ", all clear";
-  if (k === "team") return `, ${c.sessions} online`;
-  if (k === "work") return `, ${c.open} open tasks`;
-  return "";
+/** The count a tab carries: the Inbox's needs-you in error red, the Team's online sessions and
+ *  Work's open tasks in quiet grey; zero draws nothing. */
+function tabBadge(dest: Exclude<Dest, "home">, c: NavCounts): JSX.Element | null {
+  if (dest === "inbox") return c.n > 0 ? <span class="badge badge-error badge-sm tnum">{c.n}</span> : null;
+  const n = dest === "team" ? c.sessions : dest === "work" ? c.open : 0;
+  return n > 0 ? <span class="num badge badge-ghost badge-sm">{n}</span> : null;
 }
 
-/** The right-aligned count of a rail entry; a zero draws nothing. */
-function countBadge(k: string, c: NavCounts): JSX.Element | null {
-  if (k === "inbox")
-    return c.n ? (
-      <span class="badge badge-error badge-sm ml-auto" aria-hidden="true">
-        {c.n}
-      </span>
-    ) : null;
-  if (k === "team")
-    return c.sessions ? (
-      <span class="tnum muted ml-auto text-xs" aria-hidden="true">
-        {c.sessions}
-      </span>
-    ) : null;
-  if (k === "work")
-    return c.open ? (
-      <span class="tnum muted ml-auto text-xs" aria-hidden="true">
-        {c.open}
-      </span>
-    ) : null;
-  return null;
-}
-
-/** The live pill: a daisyUI badge with a status dot — pulsing green when live, amber while
- *  reconnecting, quiet while connecting. */
-export function LivePill({ live }: { live: LiveStatus }): JSX.Element {
-  const t =
-    live === "live"
-      ? "Live updates: on"
-      : live === "offline"
-        ? "Live updates: reconnecting"
-        : "Live updates: connecting";
-  const word = live === "live" ? "Live" : live === "offline" ? "Reconnecting" : "Connecting…";
-  const cls =
-    live === "live"
-      ? "badge badge-soft badge-success gap-1.5"
-      : live === "offline"
-        ? "badge badge-soft badge-warning gap-1.5"
-        : "badge badge-ghost gap-1.5";
-  const dot =
-    live === "live"
-      ? "status status-success animate-pulse"
-      : live === "offline"
-        ? "status status-warning"
-        : "status status-neutral";
-  return (
-    <span id="ldot" class={cls} role="img" aria-label={t} title={t}>
-      <span class={dot} aria-hidden="true" />
-      <span>{word}</span>
-    </span>
-  );
-}
-
-/** One segmented bar: done · doing · waiting · blocked · to do; a zero never draws. The label
- *  goes into the accessible name when it is wanted. */
-export function ProgressBar({
-  steps,
-  label = true,
-}: {
-  steps: readonly PlanStep[];
-  label?: boolean;
-}): JSX.Element {
-  const total = steps.length || 1;
-  const n = (k: "done" | "doing" | "waiting" | "blocked"): number =>
-    steps.filter((s) =>
-      k === "done" ? s.status !== undefined && FIN.has(s.status) : taskState(asTask(s)) === k,
-    ).length;
-  const seg = (
-    [
-      ["done", "c-good"],
-      ["doing", "c-yellow"],
-      ["waiting", "c-peach"],
-      ["blocked", "c-red"],
-    ] as const
-  )
-    .map(([k, cl]) => ({ k, cl, n: n(k) }))
-    .filter((x) => x.n > 0);
-  const txt = `${seg
-    .map((x) => `${x.n} ${x.k === "done" ? "done" : STATM[x.k].l.toLowerCase()}`)
-    .join(", ")}, ${steps.length} in all`;
-  return (
-    <div class="segbar" role="img" aria-label={`${label ? "Progress: " : ""}${txt}`} title={txt}>
-      {seg.map((x) => (
-        <i key={x.k} class={`segbar-seg ${x.cl}`} style={`width:${((x.n / total) * 100).toFixed(3)}%`} />
-      ))}
-    </div>
-  );
-}
-
-/** The member dot's daisyUI status colour: the session's derived status. Working glows. */
-function dotClass(status: string): string {
-  if (status === "working") return "status status-success neon-dot";
-  if (status === "waiting") return "status status-warning";
-  if (status === "blocked") return "status status-error";
-  if (status === "paused") return "status status-secondary";
-  return "status status-neutral";
-}
-
-/** The channel switcher: the channel's name on a button, the other channels and Home under it. */
-function ChannelSwitcher(): JSX.Element {
-  const { state, go } = useHuddle();
-  const [open, setOpen] = useState(false);
-  const [btn, setBtn] = useState<HTMLButtonElement | null>(null);
-  const chname = state.info?.config?.title || state.ch || "";
-  const chans = (state.channels ?? []).filter((c) => c.name !== state.ch);
-  const items: MenuItem[] = [
-    ...chans.map((c) => ({
-      label: c.title || c.name,
-      icon: <Icon name="hash" />,
-      run: () => go(channelHref(c.name)),
-    })),
-    { label: "All channels", icon: <Icon name="layers" />, run: () => go("#/") },
-  ];
-  return (
-    <span id="chbox" class="flex min-w-0 items-center gap-1.5">
-      <button
-        type="button"
-        ref={setBtn}
-        id="chbtn"
-        class="btn btn-ghost h-8 min-w-0 max-w-[44vw] gap-1.5 px-2 font-semibold sm:max-w-44"
-        aria-haspopup="menu"
-        aria-expanded="false"
-        onClick={() => setOpen(true)}
-      >
-        <span class="truncate">{chname}</span>
-        <svg
-          class="muted size-3.5 shrink-0"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          aria-hidden="true"
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
-      {open && btn ? <PopMenu anchor={btn} items={items} onClose={() => setOpen(false)} /> : null}
-    </span>
-  );
-}
-
-/** The theme menu's button and pop-up (the rail's bottom row and the mobile bar share it). */
-function ThemeMenu(): JSX.Element {
-  const [open, setOpen] = useState(false);
-  const [btn, setBtn] = useState<HTMLButtonElement | null>(null);
-  const [theme, setThemeState] = useState<ThemePref>(() => currentTheme(localStorage));
-
-  // the palette choice goes on <html> right away, the way index.html's inline script did at boot
-  useEffect(() => {
-    applyTheme(currentTheme(localStorage), window.matchMedia("(prefers-color-scheme: dark)").matches);
-  }, []);
-
-  // the palette follows the system while "System" is the choice
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const on = (): void => {
-      if (currentTheme(localStorage) === "system") applyTheme("system", mq.matches);
-    };
-    mq.addEventListener?.("change", on);
-    return () => mq.removeEventListener?.("change", on);
-  }, []);
-
-  const pick = (t: ThemePref): void => {
-    setTheme(localStorage, t, window.matchMedia("(prefers-color-scheme: dark)").matches);
-    setThemeState(t);
-  };
-
-  const row = THEMES.find((x) => x[0] === theme) ?? (["system", "System", "monitor"] as const);
-  const items: MenuItem[] = THEMES.map(([k, l, ic]) => ({
-    label: l,
-    icon: <Icon name={ic} />,
-    checked: theme === k,
-    run: () => pick(k),
-  }));
-  return (
-    <>
-      <button
-        type="button"
-        ref={setBtn}
-        id="theme"
-        class="btn btn-ghost btn-square btn-sm"
-        aria-haspopup="menu"
-        aria-expanded="false"
-        aria-label={`Theme: ${row[1]}`}
-        title={`Theme: ${row[1]}`}
-        onClick={() => setOpen(true)}
-      >
-        <Icon name={row[2]} />
-      </button>
-      {open && btn ? <PopMenu anchor={btn} items={items} onClose={() => setOpen(false)} /> : null}
-    </>
-  );
-}
-
-/** The rail: the channel switcher and live pill on top, the destinations as a daisyUI menu, the
- *  members with their live dots, and the plan's progress plus the theme row at the bottom. */
-function Rail({
+/** One tab: its icon, its label, the counts that follow it (the inbox needs-you badge, the team's
+ *  online sessions, the work open tasks), and the active tab's glow. */
+function ViewTab({
   dest,
-  c,
-  onCompose,
+  counts,
+  active,
   onNavigate,
-  onPalette,
-  onHelp,
+}: {
+  dest: Exclude<Dest, "home">;
+  counts: NavCounts;
+  active: boolean;
+  onNavigate?: (() => void) | undefined;
+}): JSX.Element {
+  const { state, go } = useHuddle();
+  const ch = state.ch ?? "";
+  const meta = DEST_INTRO[dest];
+  return (
+    <button
+      type="button"
+      role="tab"
+      data-dest={dest}
+      class={
+        active ? "tab tab-active h-10 gap-2 px-4 text-[0.9375rem]" : "tab h-10 gap-2 px-4 text-[0.9375rem]"
+      }
+      aria-selected={active ? "true" : "false"}
+      aria-current={active ? "page" : undefined}
+      onClick={() => {
+        go(channelHref(ch, `/${dest}`));
+        onNavigate?.();
+      }}
+    >
+      <Icon name={meta.icon} class="size-4.5" />
+      <span>{meta.label}</span>
+      {tabBadge(dest, counts)}
+    </button>
+  );
+}
+
+/** The rows of tab groups under the top bar: three daisyUI tabs boxes with a gap, the active tab
+ *  glowing. The ids are the destinations, the address moves by hash. */
+function ViewTabs({
+  dest,
+  counts,
+  onNavigate,
 }: {
   dest: Dest;
-  c: NavCounts;
-  onCompose?: ComposeOpen | undefined;
+  counts: NavCounts;
   onNavigate?: (() => void) | undefined;
-  onPalette?: (() => void) | undefined;
-  onHelp?: (() => void) | undefined;
 }): JSX.Element {
-  const { state } = useHuddle();
-  const ch = state.ch;
-  const steps = state.board?.steps ?? [];
-  const done = steps.filter((s) => s.status !== undefined && FIN.has(s.status)).length;
-  const tops = (state.sessions?.sessions ?? []).filter((s) => s.state !== "left" && !s.parent);
-  const p = pathOf(location.hash);
-  const byId = (id: string): Task | null => {
-    const s = state.byId.get(id);
-    return s ? asTask(s) : null;
-  };
-  const close = (): void => onNavigate?.();
-  const link = (href: string, current: boolean, children: ComponentChildren): JSX.Element => (
-    <a
-      href={href}
-      aria-current={current ? "page" : undefined}
-      onClick={close}
-      class={current ? "aura aura-glow aura-sm menu-active neon-text text-primary" : undefined}
-    >
-      {children}
-    </a>
-  );
   return (
-    <aside
-      id="side"
-      class="flex h-full min-h-0 w-80 shrink-0 flex-col gap-4 overflow-y-auto bg-base-200 p-4"
-      aria-label="Channel"
-    >
-      <div class="flex items-center gap-2 px-1">
-        <button
-          type="button"
-          class="btn btn-primary flex-1"
-          onClick={() => {
-            close();
-            onCompose?.();
-          }}
-          disabled={!onCompose}
-        >
-          <Icon name="msg" class="size-4" />
-          New message
-          <kbd class="kbd kbd-sm ml-1">C</kbd>
-        </button>
-        <button
-          type="button"
-          id="palbtn"
-          class="btn btn-ghost btn-square btn-sm"
-          aria-label="Search or run a command"
-          aria-keyshortcuts="Meta+K Control+K"
-          onClick={() => onPalette?.()}
-        >
-          <svg
-            class="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="7" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
-        </button>
-      </div>
-      <nav aria-label="Destinations">
-        <ul class="menu menu-lg w-full gap-0.5 p-0">
-          {link(
-            channelHref(ch ?? "", "/overview"),
-            dest === "overview",
-            <>
-              <Icon name="columns" />
-              Overview
-              <span class="sr-only">: the channel at a glance</span>
-            </>,
-          )}
-          {link(
-            channelHref(ch ?? "", "/today"),
-            dest === "today",
-            <>
-              <Icon name="clock" />
-              Today
-              <span class="sr-only">: what got done, per session</span>
-            </>,
-          )}
-          {DESTS.map(([k, l, ic]) =>
-            link(
-              channelHref(ch ?? "", `/${k}`),
-              dest === k,
-              <>
-                <span class={k === "inbox" && c.n ? "text-error" : ""}>
-                  <Icon name={ic} />
-                </span>
-                {l}
-                <span class="sr-only">{srLine(k, c)}</span>
-                {countBadge(k, c)}
-              </>,
-            ),
-          )}
-        </ul>
-      </nav>
-      {tops.length ? (
-        <section aria-labelledby="sb-team" class="min-h-0">
-          <h2 id="sb-team" class="menu-title px-1 pt-0">
-            Members
-          </h2>
-          <ul class="list w-full text-sm" aria-label="Members in the channel">
-            {tops.map((s) => {
-              const st = sessionStatus(s, byId);
-              const m = SSTM[st];
-              return (
-                <li key={s.name}>
-                  <a
-                    class="list-row items-center gap-2.5 py-1.5"
-                    href={sessHref(ch ?? "", p, s.name)}
-                    title={m.l}
-                    onClick={close}
-                  >
-                    <Avatar name={s.name} />
-                    <span class="min-w-0 flex-1 truncate text-base">{s.name}</span>
-                    <span class={`${dotClass(st)} shrink-0`} aria-hidden="true" />
-                    <span class="sr-only">: {m.l}</span>
-                    {isOrch(s.name, state) ? (
-                      <span class="muted shrink-0" title="Orchestrator">
-                        <Icon name="baton" class="size-3.5" />
-                        <span class="sr-only">, orchestrator</span>
-                      </span>
-                    ) : null}
-                    {s.holds_turn ? (
-                      <span class="muted shrink-0" title="Holds the turn">
-                        <Icon name="turn" class="size-3.5" />
-                        <span class="sr-only">, holds the turn</span>
-                      </span>
-                    ) : null}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ) : null}
-      <div class="mt-auto flex flex-col gap-3">
-        {steps.length ? (
-          <section class="flex flex-col gap-1.5 px-1" aria-label="Progress">
-            <ProgressBar steps={steps} />
-            <span class="hint tnum">
-              {done} of {steps.length} tasks done
-            </span>
-          </section>
-        ) : null}
-        <div class="flex items-center gap-1 border-t hairline pt-2">
-          <a
-            class="btn btn-ghost btn-square btn-sm"
-            href={channelHref(ch ?? "", "/settings")}
-            aria-label="Settings"
-            aria-current={dest === "settings" ? "page" : undefined}
-            onClick={close}
-          >
-            <Icon name="sliders" />
-          </a>
-          <button
-            type="button"
-            id="help"
-            class="btn btn-ghost btn-square btn-sm max-lg:hidden"
-            aria-label="Keyboard shortcuts"
-            aria-keyshortcuts="?"
-            onClick={() => onHelp?.()}
-          >
-            <svg
-              class="size-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <rect x="2" y="5" width="20" height="14" rx="2" />
-              <path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M18 13h.01M8 17h8M10 13h4" />
-            </svg>
-          </button>
-          <span class="flex-1" />
-          <VersionChip />
+    <div class="flex w-full flex-wrap gap-3 px-4 pt-4 sm:px-6" data-view-tabs="">
+      {NAV_GROUPS.map((group) => (
+        <div key={group.label} role="tablist" aria-label={group.label} class="tabs tabs-box">
+          {group.tabs.map((k) => (
+            <ViewTab key={k} dest={k} counts={counts} active={dest === k} onNavigate={onNavigate} />
+          ))}
         </div>
-      </div>
-    </aside>
-  );
-}
-
-/** Reads the server's version once for the rail's chip; "v0.0.1" stands in until it answers. */
-function VersionChip(): JSX.Element {
-  const [v, setV] = useState("v0.0.1");
-  useEffect(() => {
-    let on = true;
-    fetch("/health")
-      .then((r) => r.json())
-      .then((h: { version?: string }) => {
-        if (on && h.version) setV(`v${h.version}`);
-      })
-      .catch(() => {});
-    return () => {
-      on = false;
-    };
-  }, []);
-  return (
-    <span class="badge badge-ghost badge-sm tnum" id="ver">
-      {v}
-    </span>
+      ))}
+    </div>
   );
 }
 
@@ -633,8 +270,8 @@ function CopyButton({
   );
 }
 
-/** The page this browser gets when its sign-in has ended: how to get a new link, two copyable
- *  commands, the server's version. */
+/** The page this browser gets when its sign-in has ended: how to get a new link — /huddle:setup
+ *  in a Claude session, or `huddle open` in a terminal — and the server's version. */
 export function SignedOut(): JSX.Element {
   const [ver, setVer] = useState("Huddle");
   useEffect(() => {
@@ -671,17 +308,18 @@ export function SignedOut(): JSX.Element {
               </span>
             </div>
             <p class="text-sm muted">
-              Get a new sign-in link from any session in this huddle, then open it here.
+              Run <code>/huddle:setup</code> in any session of this huddle — or <code>huddle open</code> in a
+              terminal — for a new sign-in link, then open it here.
             </p>
-            <CmdField id="so-c" label="In a Claude session" cmd="/huddle:open" />
+            <CmdField id="so-c" label="In a Claude session" cmd="/huddle:setup" />
             <CmdField id="so-t" label="Or in a terminal" cmd="huddle open" />
             <CopyButton
-              text="/huddle:open"
+              text="/huddle:setup"
               done="Copied: paste it into a Claude session"
               class="btn btn-primary h-10 w-full text-sm"
             >
               <Icon name="copy" />
-              Copy /huddle:open
+              Copy /huddle:setup
             </CopyButton>
           </div>
         </Panel>
@@ -731,9 +369,9 @@ function introDescription(dest: Dest, state: HuddleState, ch: string | null, now
   return DEST_INTRO[dest].description;
 }
 
-/** The shell over the current hash: the rail (as a drawer below lg), the mobile bar, and the
- *  destination's page. `onCompose` opens the composer from the rail's button and the C key,
- *  `onPalette` the command palette from the rail's search and ⌘K, `onHelp` the shortcuts. */
+/** The shell over the current hash: the top bar, the grouped tabs, the rail (a drawer below lg)
+ *  and the destination's page. `onCompose` opens the composer from the C key, `onPalette` the
+ *  command palette from the bar's search key and ⌘K, `onHelp` the shortcuts. */
 export function App({
   pages,
   onCompose,
@@ -789,7 +427,8 @@ export function App({
   }, [n, chname, state.ch]);
 
   const steps = state.board?.steps ?? [];
-  const online = (state.sessions?.sessions ?? []).filter((s) => s.state !== "left").length;
+  const roster = state.sessions?.sessions ?? [];
+  const online = roster.filter((s) => s.state !== "left").length;
   const open = steps.filter((s) => !FIN.has(s.status ?? "todo")).length;
   const counts: NavCounts = { n, sessions: online, open };
   const ch = state.ch;
@@ -805,6 +444,8 @@ export function App({
     [route.dest],
   );
   const introActions = introActs && introActs.dest === route.dest ? introActs.render() : null;
+
+  const close = useCallback(() => setRailOpen(false), []);
 
   const body = Page ? <Page /> : route.dest === "home" ? null : <ComingSoon label={LABELS[route.dest]} />;
   const main = (
@@ -823,6 +464,7 @@ export function App({
     </main>
   );
 
+  // the channels page stands alone: no rail, no tabs
   if (!ch) {
     return <div class="flex h-dvh flex-col bg-base-300">{main}</div>;
   }
@@ -836,48 +478,23 @@ export function App({
         checked={railOpen}
         onChange={(e) => setRailOpen(e.currentTarget.checked)}
       />
-      <div class="drawer-content flex h-dvh min-h-0 flex-col bg-base-300">
-        {/* the top bar: brand, switcher, live pill, palette, theme, shortcuts — the rail keeps the destinations */}
-        <header class="navbar glass sticky top-0 z-30 h-16 shrink-0 rounded-none px-6">
-          <label
-            for="rail-drawer"
-            class="btn btn-ghost btn-square lg:hidden"
-            aria-label="Open the channel rail"
-          >
-            <svg
-              class="size-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              aria-hidden="true"
-            >
-              <path d="M3 6h18M3 12h18M3 18h18" />
-            </svg>
-          </label>
-          <a class="flex shrink-0 items-center gap-2" href="#/" aria-label="Huddle: all channels">
-            <Logo class="logo-glow size-10 shrink-0" />
-            <span class="text-xl font-semibold neon-text">Huddle</span>
-          </a>
-          <ChannelSwitcher />
-          <span class="flex-1" />
-          <LivePill live={state.live} />
-          <ThemeMenu />
-        </header>
-        <div class="neon-line shrink-0" aria-hidden="true" />
+      <div class="drawer-content flex h-dvh min-h-0 flex-col">
+        <TopBar
+          channel={chname ?? null}
+          online={online}
+          live={state.live}
+          inbox={n}
+          inboxHref={channelHref(ch, "/inbox")}
+          onPalette={onPalette}
+          onHelp={onHelp}
+          onNavigate={close}
+        />
+        <ViewTabs dest={route.dest} counts={counts} onNavigate={close} />
         {main}
       </div>
       <div class="drawer-side z-40">
         <label for="rail-drawer" aria-label="Close the channel rail" class="drawer-overlay" />
-        <Rail
-          dest={route.dest}
-          c={counts}
-          onCompose={onCompose}
-          onNavigate={() => setRailOpen(false)}
-          onPalette={onPalette}
-          onHelp={onHelp}
-        />
+        <Rail onHelp={onHelp} onNavigate={close} />
       </div>
     </div>
   );

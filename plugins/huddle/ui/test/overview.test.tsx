@@ -96,12 +96,18 @@ beforeEach(() => {
 });
 
 describe("Overview plan progress", () => {
-  it("shows the ring, the done count and the breakdown", () => {
+  it("shows the ring, the done count, the tally bar and the breakdown on one panel", () => {
     renderHuddle(<Overview />, state(), NOW, fetchF());
     expect(screen.getByRole("img", { name: "25% of the tasks done" })).not.toBeNull();
     expect(document.querySelector('[data-ov="done"]')?.textContent).toBe("1");
     expect(document.querySelector('[data-ov="total"]')?.textContent).toBe("4");
-    expect(document.querySelector('[data-ovtxt="sub"]')?.textContent).toBe("25% of the plan across 1 phase");
+    const panel = document.querySelector("#ovwrap section[aria-label='Plan progress']") as HTMLElement;
+    expect(panel?.textContent).toContain("25% of the plan across 1 phase");
+    // the plan's segmented bar across the top: done · doing · waiting · blocked draw, to do is zero
+    const bar = panel.querySelector(".segbar") as HTMLElement;
+    expect(bar.getAttribute("aria-label")).toContain("1 done");
+    expect(bar.getAttribute("aria-label")).toContain("4 in all");
+    expect(bar.querySelectorAll(".segbar-seg")).toHaveLength(4);
     expect(screen.getByText("Doing")).not.toBeNull();
     expect(screen.getByText("Waiting on others")).not.toBeNull();
     expect(screen.getByText("Blocked")).not.toBeNull();
@@ -125,10 +131,14 @@ describe("Overview plan progress", () => {
 });
 
 describe("Overview stats", () => {
-  it("counts the sessions, the questions, the knowledge and the events", () => {
+  it("counts the sessions, the open tasks, the questions, the knowledge and the events", () => {
     renderHuddle(<Overview />, state(), NOW, fetchF());
+    const cards = document.querySelector("[data-stat-cards]") as HTMLElement;
+    expect(cards.querySelectorAll(".stats")).toHaveLength(5);
     expect(screen.getByText("Sessions online")).not.toBeNull();
     expect(screen.getByText("1 top-level, 1 subagent")).not.toBeNull();
+    expect(screen.getByText("Open tasks")).not.toBeNull();
+    expect(screen.getByText("1 of 4 done")).not.toBeNull();
     expect(screen.getByText("Questions for you")).not.toBeNull();
     expect(screen.getByText("Waiting in your Inbox")).not.toBeNull();
     expect(screen.getByText("Entries the sessions share")).not.toBeNull();
@@ -261,13 +271,22 @@ describe("Overview conflicts", () => {
   });
 
   it("reads the window the server answered with", async () => {
-    renderHuddle(<Overview />, state(), NOW, fetchF({ window_min: 15, conflicts: [] }));
+    renderHuddle(
+      <Overview />,
+      state(),
+      NOW,
+      fetchF({
+        window_min: 15,
+        conflicts: [{ path: "src/app.ts", repo: "shoprepo", repo_name: "shop", sessions: [{ name: "owl" }] }],
+      }),
+    );
     await waitFor(() => expect(screen.getByText(/last 15 minutes/)).not.toBeNull());
   });
 
-  it("sits empty while nobody overlaps", async () => {
+  it("stays out when nobody overlaps", async () => {
     renderHuddle(<Overview />, state(), NOW, fetchF({ window_min: 30, conflicts: [] }));
-    await waitFor(() => expect(screen.getByText("No overlapping edits")).not.toBeNull());
+    await waitFor(() => expect(screen.queryByText("Conflicts")).toBeNull());
+    expect(screen.queryByText("No overlapping edits")).toBeNull();
   });
 
   it("reads again on every mount of the page", async () => {
@@ -321,6 +340,21 @@ describe("Overview activity", () => {
     expect(screen.getByRole("img", { name: "Events per minute over the last 1h" })).not.toBeNull();
     expect(readPref(st, "ovwin:dev", "15m")).toBe("1h");
     unmount();
+  });
+
+  it("draws the shared chart's themed pieces: grid, axis, fill and line", () => {
+    renderHuddle(<Overview />, state(), NOW, fetchF());
+    // the panel's own icon is an svg too; the chart is the one inside the chart's relative box
+    const svg = document.querySelector("section[aria-label='Activity'] div.relative svg") as SVGSVGElement;
+    expect(svg).not.toBeNull();
+    expect(svg.querySelector(".hr-chart-grid")).not.toBeNull();
+    // four grid values on the left, three time labels along the bottom, one slot per bin
+    const labels = [...svg.querySelectorAll(".hr-chart-axis")].map((t) => t.textContent ?? "");
+    expect(labels.filter(Boolean)).toHaveLength(7);
+    expect(labels.filter((l) => l.includes(":"))).toHaveLength(3);
+    expect(svg.textContent).toContain(":");
+    expect(svg.querySelector(".hr-chart-fill.grad")).not.toBeNull();
+    expect(svg.querySelector(".hr-chart-line")).not.toBeNull();
   });
 
   it("notes an empty window", () => {
@@ -397,7 +431,13 @@ describe("Overview helpers", () => {
     expect(values[13]).toBe(1);
     expect(values[12]).toBe(1);
     expect(values[0]).toBe(0);
-    expect(s.axis).toHaveLength(3);
+    // one axis slot per bin, the three time labels on the slots they name
+    expect(s.axis).toHaveLength(15);
+    expect(s.axis.filter(Boolean)).toHaveLength(3);
+    expect(s.axis[0]).not.toBe("");
+    expect(s.axis[7]).not.toBe("");
+    expect(s.axis[14]).not.toBe("");
+    expect(s.axis[1]).toBe("");
     expect(s.tipOf(13)[1]).toBe("1 event in the bin · 1/min");
     expect(s.tipOf(0)[1]).toBe("0 events in the bin · 0/min");
   });

@@ -1,6 +1,16 @@
 import { render, screen } from "@testing-library/preact";
 import { describe, expect, it } from "vitest";
-import { Avatar, Empty, Pill, SessionPill, Skeleton, Stat, StatusIcon, Time } from "../src/kit.tsx";
+import {
+  Avatar,
+  Empty,
+  Pill,
+  ProgressBar,
+  SessionPill,
+  Skeleton,
+  Stat,
+  StatusIcon,
+  Time,
+} from "../src/kit.tsx";
 import { avatarColor, type Session, type Task } from "../src/status.ts";
 
 const NOW = Date.parse("2026-10-08T12:00:00Z");
@@ -88,13 +98,16 @@ describe("SessionPill", () => {
 });
 
 describe("Avatar", () => {
-  it("initials the last dot segment and colours it from the name", () => {
+  it("initials the last dot segment, rings the disc in the name's hue", () => {
     render(<Avatar name="greta.sub" />);
     const av = screen.getByText("S");
-    expect(av.className).toBe("ink text-sm font-semibold");
-    const disc = av.closest(".avatar");
-    expect(disc?.className).toBe(`avatar avatar-placeholder ${avatarColor("greta.sub")}`);
-    expect(disc?.getAttribute("aria-hidden")).toBe("true");
+    expect(av.className).toBe("ink font-semibold text-sm");
+    expect(av.closest(".avatar")?.querySelector("div")?.className).toBe(
+      "size-8 rounded-full tinted ring-2 ring-[var(--c)]/55",
+    );
+    const wrap = av.closest(".avatar");
+    expect(wrap?.className).toBe(`avatar avatar-placeholder shrink-0 ${avatarColor("greta.sub")}`);
+    expect(wrap?.getAttribute("aria-hidden")).toBe("true");
   });
 
   it("renders the owner as a mauve Y, and goes small when asked", () => {
@@ -106,20 +119,65 @@ describe("Avatar", () => {
     );
     const avs = screen.getAllByText("Y");
     expect(avs.every((av) => av.closest(".avatar")?.className.includes("c-mauve"))).toBe(true);
-    expect(avs[0]?.closest(".avatar")?.querySelector("span span")?.className).toBe("w-6 rounded-full tinted");
-    expect(avs[1]?.closest(".avatar")?.querySelector("span span")?.className).toBe("w-8 rounded-full tinted");
+    expect(avs[0]?.closest(".avatar")?.querySelector("div")?.className).toBe(
+      "size-6 rounded-full tinted ring-2 ring-[var(--c)]/55",
+    );
+    expect(avs[0]?.closest(".avatar")?.querySelector("div span")?.className).toBe(
+      "ink font-semibold text-xs",
+    );
+    expect(avs[1]?.closest(".avatar")?.querySelector("div")?.className).toBe(
+      "size-8 rounded-full tinted ring-2 ring-[var(--c)]/55",
+    );
   });
 
   it("draws an empty disc for a name without a letter", () => {
     const { container } = render(<Avatar name="" />);
     const av = container.querySelector(".avatar");
     expect(av?.textContent).toBe("");
-    expect(av?.className).toBe(`avatar avatar-placeholder ${avatarColor("")}`);
+    expect(av?.className).toBe(`avatar avatar-placeholder shrink-0 ${avatarColor("")}`);
+  });
+});
+
+describe("ProgressBar", () => {
+  const steps = [
+    { id: "a", status: "done" as const },
+    { id: "b", status: "doing" as const },
+    { id: "c", status: "blocked" as const },
+    { id: "d" },
+  ];
+
+  it("draws one segment per non-zero state and speaks the tally", () => {
+    const { container } = render(<ProgressBar steps={steps} />);
+    const bar = container.querySelector(".segbar") as HTMLElement;
+    expect(bar.getAttribute("aria-label")).toContain("1 done");
+    expect(bar.getAttribute("aria-label")).toContain("1 doing");
+    expect(bar.getAttribute("aria-label")).toContain("1 blocked");
+    expect(bar.getAttribute("aria-label")).toContain("4 in all");
+    // done · doing · blocked draw; waiting and to do are zero and never draw
+    expect(bar.querySelectorAll(".segbar-seg")).toHaveLength(3);
+  });
+
+  it("skips the Progress prefix when label is off, and draws nothing for an empty plan", () => {
+    const labelled = render(<ProgressBar steps={[{ id: "a", status: "doing" as const }]} />);
+    expect((labelled.container.querySelector(".segbar") as HTMLElement).getAttribute("aria-label")).toContain(
+      "Progress:",
+    );
+    const { container } = render(<ProgressBar steps={[]} label={false} />);
+    const bar = container.querySelector(".segbar") as HTMLElement;
+    expect(bar.getAttribute("aria-label")).toBe(", 0 in all");
+    expect(bar.querySelectorAll(".segbar-seg")).toHaveLength(0);
+  });
+
+  it("reads a task's waits from blocked_by as waiting", () => {
+    const { container } = render(
+      <ProgressBar steps={[{ id: "a", status: "todo" as const, blocked_by: ["ghost"] }, { id: "b" }]} />,
+    );
+    expect(container.querySelector(".segbar-seg")?.className).toContain("c-peach");
   });
 });
 
 describe("Stat", () => {
-  it("lays out label, delta, tinted icon, value and subline", () => {
+  it("lays out a stats-panel card: quiet title, big figure, tinted icon, subline", () => {
     const { container } = render(
       <Stat
         icon="users"
@@ -130,10 +188,11 @@ describe("Stat", () => {
         delta={{ up: true, text: "+2" }}
       />,
     );
+    expect(container.querySelector(".stats.panel")).not.toBeNull();
     expect(screen.getByText("Members").className).toBe("min-w-0 flex-1 truncate");
     expect(screen.getByText("+2").className).toBe("badge badge-sm badge-success tnum");
     expect(container.querySelector(".stat-figure")?.className).toBe(
-      "stat-figure tinted ink inline-flex size-7 shrink-0 items-center justify-center rounded-lg c-green",
+      "stat-figure tinted ink inline-flex size-8 shrink-0 items-center justify-center rounded-lg c-green",
     );
     expect(container.querySelector(".stat-figure svg")).not.toBeNull();
     expect(screen.getByText("7")).not.toBeNull();
@@ -147,7 +206,7 @@ describe("Stat", () => {
     expect(screen.getByText("-1").className).toBe("badge badge-sm badge-error tnum");
     expect(screen.getByText("0")).not.toBeNull();
     expect(container.querySelector(".stat-figure")?.className).toBe(
-      "stat-figure tinted ink inline-flex size-7 shrink-0 items-center justify-center rounded-lg",
+      "stat-figure tinted ink inline-flex size-8 shrink-0 items-center justify-center rounded-lg",
     );
     expect(container.querySelector(".stat-desc")).toBeNull();
   });

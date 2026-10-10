@@ -1,11 +1,10 @@
-// App.test.tsx — the shell: the rail (switcher, menu, members, theme), the mobile drawer, the
-// counts, the live pill, the C key and the composer hand-off, the alias effects, the Coming soon
-// fallback, the no-channel card and the signed-out page.
+// App.test.tsx — the shell: the grouped destination tabs with their counts, the rail drawer
+// hand-off, the live pill in the bar, the C key and the composer hand-off, the alias effects,
+// the Coming soon fallback, the no-channel card and the signed-out page.
 import { act, render, screen } from "@testing-library/preact";
 import type { ComponentType } from "preact";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { App, LivePill, NoChannel, ProgressBar, SignedOut } from "../../src/app/App.tsx";
-import { type HuddleContextValue, HuddleProvider } from "../../src/app/context.tsx";
+import { App, inboxOf, NoChannel, SignedOut } from "../../src/app/App.tsx";
 import { IntroActions } from "../../src/app/intro.tsx";
 import type { ComposeOptions } from "../../src/compose/drafts.ts";
 import type { HuddleState } from "../../src/store.ts";
@@ -53,51 +52,43 @@ const nav = (hash: string): void => {
 };
 
 describe("chrome", () => {
-  it("renders the rail: logo, switcher, live pill, search and help placeholders, version", () => {
+  it("renders the top bar over the main area, with the rail beside it", () => {
     mountApp();
-    expect(screen.getByLabelText("Huddle: all channels").getAttribute("href")).toBe("#/");
+    expect(screen.getByLabelText("Huddle: all channels")).toBeDefined();
     expect(screen.getByLabelText("Search or run a command")).toBeDefined();
     expect(screen.getByLabelText("Keyboard shortcuts")).toBeDefined();
-    expect(screen.getByText("v0.0.1")).toBeDefined();
     expect(document.querySelector("#main")).not.toBeNull();
     expect(document.querySelector("#side")).not.toBeNull();
+    expect(document.querySelector("header .neon-line")).not.toBeNull();
   });
 
-  it("shows the server's version once /health answers", async () => {
-    mountApp();
-    await flush();
-    expect(screen.getByText("v1.2.3")).toBeDefined();
-  });
-
-  it("keeps the placeholder version when /health fails", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(() => Promise.reject(new Error("down"))),
+  it("names the channel and its online count in the bar", () => {
+    mountApp(
+      {},
+      makeState({
+        sessions: { sessions: [sess({ name: "api", state: "working" }), sess({ name: "web" })] },
+      }),
     );
-    mountApp();
-    await flush();
-    expect(screen.getByText("v0.0.1")).toBeDefined();
+    expect(screen.getAllByText("Checkout").length).toBeGreaterThanOrEqual(1);
+    expect(document.querySelector("[data-channel-word]")?.textContent).toContain("2");
   });
 
-  it("renders no rail on Home", () => {
+  it("renders no rail and no tabs on Home", () => {
     nav("#/");
     mountApp({}, makeState({ ch: null }));
     expect(document.querySelector("#side")).toBeNull();
+    expect(document.querySelector("[data-view-tabs]")).toBeNull();
     expect(document.querySelector("#main")).not.toBeNull();
   });
 
-  it("offers the composer from the rail and the C key", () => {
+  it("offers the composer from the C key", () => {
     const onCompose = vi.fn();
     nav("#/c/ch/inbox");
     mountApp({}, makeState(), onCompose);
     act(() => {
-      screen.getByText("New message").click();
-    });
-    expect(onCompose).toHaveBeenCalledTimes(1);
-    act(() => {
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "c" }));
     });
-    expect(onCompose).toHaveBeenCalledTimes(2);
+    expect(onCompose).toHaveBeenCalledTimes(1);
   });
 
   it("does not open the composer while the keystroke types into a field", () => {
@@ -111,268 +102,110 @@ describe("chrome", () => {
     });
     expect(onCompose).not.toHaveBeenCalled();
   });
-});
 
-describe("the rail menu", () => {
-  it("marks the current destination and links the others to the channel", () => {
-    nav("#/c/ch/inbox");
-    mountApp();
-    const current = document.querySelectorAll('#side a[aria-current="page"]');
-    expect(current.length).toBeGreaterThanOrEqual(1);
-    expect(current[0]?.textContent).toContain("Inbox");
-    const today = document.querySelector('#side a[href="#/c/ch/today"]');
-    expect(today?.getAttribute("aria-current")).toBeNull();
-    expect(document.querySelector('#side a[href="#/c/ch/team"]')).not.toBeNull();
-  });
-});
-
-describe("counts", () => {
-  const state = (): HuddleState =>
-    makeState({
-      attention: attention({
-        asks: [
-          { seq: 1, from: "api" },
-          { seq: 2, from: "web" },
-        ],
-        gates: [{ id: "t9" }],
-      }),
-      extras: { ch: "ch", approvals: [{ seq: 9, from: "api" }], obs: null },
-      board: {
-        steps: [
-          { id: "a", status: "todo" },
-          { id: "b", status: "doing" },
-          { id: "c", status: "done" },
-          { id: "d", status: "blocked" },
-        ],
-      },
-    });
-
-  it("counts the Inbox badge over attention plus extras, in the title and the rail", () => {
-    nav("#/c/ch/team");
-    mountApp({}, state());
-    expect(document.title).toBe("(4) Checkout · Huddle");
-    expect(screen.getAllByText(", 4 need you")[0]?.tagName).toBe("SPAN");
-    expect(document.querySelector('#side [aria-hidden="true"].badge')?.textContent).toBe("4");
-  });
-
-  it("reads an empty Inbox as all clear", () => {
-    nav("#/c/ch/inbox");
-    mountApp({}, makeState({ attention: attention({}) }));
-    expect(screen.getAllByText(", all clear")[0]?.textContent).toBe(", all clear");
-  });
-
-  it("pluralises the need: one session needs you", () => {
-    nav("#/c/ch/team");
-    mountApp({}, makeState({ attention: attention({ asks: [{ seq: 1, from: "api" }] }) }));
-    expect(screen.getAllByText(", 1 needs you")[0]).toBeDefined();
-  });
-
-  it("counts the online sessions and the open tasks", () => {
-    nav("#/c/ch/work");
-    mountApp(
-      {},
-      {
-        ...state(),
-        sessions: {
-          sessions: [
-            sess({ name: "api", state: "working" }),
-            sess({ name: "web" }),
-            sess({ name: "sub.api", parent: "api" }),
-            sess({ name: "gone", state: "left" }),
-          ],
-        },
-      },
-    );
-    expect(screen.getAllByText(", 3 online")[0]).toBeDefined();
-    expect(screen.getAllByText(", 3 open tasks")[0]).toBeDefined();
-    expect(document.title).toBe("(4) Checkout · Huddle");
-  });
-
-  it("lists the members with their status dots, orchestrator and turn marks", () => {
-    nav("#/c/ch/team");
-    mountApp(
-      {},
-      makeState({
-        info: { config: { title: "C", orchestrator: "api" } },
-        sessions: {
-          sessions: [
-            sess({ name: "api", state: "working" }),
-            sess({ name: "web", holds_turn: true }),
-            sess({ name: "kid", parent: "api" }),
-          ],
-        },
-      }),
-    );
-    const rows = [...document.querySelectorAll('#side section[aria-labelledby="sb-team"] a')];
-    expect(rows).toHaveLength(2);
-    expect(rows[0]?.textContent).toContain("api");
-    expect(rows[0]?.querySelector(".status")).not.toBeNull();
-    expect(rows[0]?.querySelector('[title="Orchestrator"]')).not.toBeNull();
-    expect(rows[1]?.querySelector('[title="Holds the turn"]')).not.toBeNull();
-    expect(rows[0]?.getAttribute("href")).toBe("#/c/ch/team?s=api");
-  });
-
-  it("shows the plan's progress bar and its tally", () => {
-    nav("#/c/ch/inbox");
-    mountApp({}, state());
-    const bar = document.querySelector("#side .segbar");
-    expect(bar?.getAttribute("aria-label")).toContain("1 done");
-    expect(bar?.getAttribute("aria-label")).toContain("4 in all");
-    // done · doing · blocked draw; the waiting segment is zero and never draws
-    expect(bar?.querySelectorAll(".segbar-seg")).toHaveLength(3);
-    expect(document.querySelector('#side section[aria-label="Progress"] .tnum')?.textContent).toBe(
-      "1 of 4 tasks done",
-    );
-  });
-
-  it("reads an unnamed task status as open", () => {
-    nav("#/c/ch/inbox");
-    mountApp(
-      {},
-      makeState({
-        board: { steps: [{ id: "a" }, { id: "b", status: "done" }] },
-      }),
-    );
-    expect(screen.getAllByText(", 1 open tasks")[0]).toBeDefined();
-    expect(document.querySelector('#side section[aria-label="Progress"] .tnum')?.textContent).toBe(
-      "1 of 2 tasks done",
-    );
-  });
-});
-
-describe("the live pill", () => {
-  it("shows connecting, live and reconnecting", () => {
-    const { rerender, container } = render(<LivePill live="connecting" />);
-    const pill = container.querySelector("#ldot") as HTMLElement;
-    expect(pill.className).toBe("badge badge-ghost gap-1.5");
-    expect(pill.getAttribute("aria-label")).toBe("Live updates: connecting");
-    expect(pill.textContent).toContain("Connecting…");
-    rerender(<LivePill live="live" />);
-    expect(pill.className).toBe("badge badge-soft badge-success gap-1.5");
-    expect(pill.getAttribute("title")).toBe("Live updates: on");
-    expect(pill.textContent).toContain("Live");
-    rerender(<LivePill live="offline" />);
-    expect(pill.className).toBe("badge badge-soft badge-warning gap-1.5");
-    expect(pill.getAttribute("aria-label")).toBe("Live updates: reconnecting");
-    expect(pill.textContent).toContain("Reconnecting");
-  });
-
-  it("mirrors the store's stream state in the rail", () => {
+  it("mirrors the store's stream state in the bar's live pill", () => {
     mountApp({}, makeState({ live: "live" }));
     expect(document.querySelector("#ldot")?.getAttribute("aria-label")).toBe("Live updates: on");
   });
 });
 
-describe("the theme menu", () => {
-  it("opens with the three choices, checks the current one, and keeps a pick", async () => {
+describe("the grouped tabs", () => {
+  it("lays the destinations out in three groups with icons", () => {
     mountApp();
+    const groups = [...document.querySelectorAll("[data-view-tabs] [role='tablist']")];
+    expect(groups.map((g) => g.getAttribute("aria-label"))).toEqual(["Channel", "Work", "System"]);
+    const tabs = [...document.querySelectorAll("[data-view-tabs] [role='tab']")];
+    expect(tabs.map((t) => t.getAttribute("data-dest"))).toEqual([
+      "overview",
+      "today",
+      "inbox",
+      "team",
+      "work",
+      "knowledge",
+      "settings",
+    ]);
+  });
+
+  it("marks the current destination and navigates by hash", () => {
+    nav("#/c/ch/inbox");
+    mountApp();
+    const current = document.querySelector("[data-view-tabs] [aria-current='page']");
+    expect(current?.getAttribute("data-dest")).toBe("inbox");
     act(() => {
-      (screen.getByLabelText("Theme: System") as HTMLButtonElement).click();
+      (document.querySelector("[data-dest='team']") as HTMLButtonElement).click();
+      window.dispatchEvent(new Event("hashchange"));
     });
-    const menu = document.querySelector('[role="menu"]') as HTMLElement;
-    expect(menu.textContent).toContain("System");
-    expect(menu.textContent).toContain("Light");
-    expect(menu.textContent).toContain("Dark");
-    expect(menu.querySelector('[aria-checked="true"]')?.textContent).toContain("System");
-    act(() => {
-      [...menu.querySelectorAll("button")].find((b) => b.textContent?.includes("Dark"))?.click();
-    });
-    expect(localStorage.getItem("huddle:theme")).toBe('"dark"');
-    expect(document.documentElement.dataset.theme).toBe("dark");
-    expect(screen.getByLabelText("Theme: Dark")).toBeDefined();
-    expect(document.querySelector('[role="menu"]')).toBeNull();
-  });
-
-  it("reopens on the kept choice after a reload", () => {
-    localStorage.setItem("huddle:theme", '"light"');
-    mountApp();
-    expect(screen.getByLabelText("Theme: Light")).toBeDefined();
-    expect(document.documentElement.dataset.theme).toBe("light");
-  });
-
-  it("follows the system while System is the choice", () => {
-    const mq = stubMatchMedia(false);
-    mountApp();
-    expect(document.documentElement.dataset.theme).toBe("light");
-    act(() => {
-      mq.fire();
-    });
-    // the fake has no way to flip matches mid-flight; a Light pick stops the system from mattering
-    expect(["light", "dark"]).toContain(document.documentElement.dataset.theme);
-  });
-
-  it("applies the system's dark palette when nothing is kept", () => {
-    stubMatchMedia(true);
-    mountApp();
-    expect(document.documentElement.dataset.theme).toBe("dark");
-  });
-});
-
-describe("the channel switcher", () => {
-  /** Mounts the shell whose channel list arrives through the shell's own loadChannels call, the
-   *  way the store's load lands: the loader writes the rows, the shell repaints on the change. */
-  function mountAppLoading(channels: { name: string; title?: string }[]) {
-    const state = makeState();
-    const loadChannels = vi.fn(async () => {
-      state.channels = channels.map((c) => ({ ...c }));
-    });
-    const ctx = makeCtx(state);
-    const tree = (c: HuddleContextValue = ctx) => (
-      <HuddleProvider value={c}>
-        <App pages={{}} loadChannels={loadChannels} />
-      </HuddleProvider>
+    expect(location.hash).toBe("#/c/ch/team");
+    expect(document.querySelector("[data-view-tabs] [aria-current='page']")?.getAttribute("data-dest")).toBe(
+      "team",
     );
-    const view = render(tree());
-    return { view, loadChannels, ctx, tree };
-  }
-
-  it("loads the channel list on boot and again when the open channel changes", async () => {
-    const { view, loadChannels, tree, ctx } = mountAppLoading([{ name: "lab", title: "Lab" }]);
-    await flush();
-    expect(loadChannels).toHaveBeenCalledTimes(1); // once per page load
-    // a second channel opens (a created one navigates here): the list is read again
-    const next = makeCtx(makeState({ ch: "lab" }));
-    view.rerender(tree(next));
-    expect(loadChannels).toHaveBeenCalledTimes(2);
-    expect(ctx.state.channels).toEqual([{ name: "lab", title: "Lab" }]);
   });
 
-  it("offers the other channels and Home, and navigates", async () => {
-    const { view, tree } = mountAppLoading([{ name: "ch" }, { name: "lab", title: "Lab" }]);
-    await flush();
-    view.rerender(tree()); // the load landed; the shell paints what the store now holds
-    act(() => {
-      (document.querySelector("#chbtn") as HTMLButtonElement).click();
-    });
-    const items = [...document.querySelectorAll('[role="menu"] button')] as HTMLButtonElement[];
-    expect(items.map((b) => b.textContent)).toEqual(["Lab", "All channels"]);
-    act(() => {
-      items[0]?.click();
-    });
-    expect(location.hash).toBe("#/c/lab");
+  it("counts what follows each tab: the inbox needs-you, the online sessions, the open tasks", () => {
+    nav("#/c/ch/overview");
+    mountApp(
+      {},
+      makeState({
+        attention: attention({
+          asks: [
+            { seq: 1, from: "api" },
+            { seq: 2, from: "web" },
+          ],
+        }),
+        extras: { ch: "ch", approvals: [{ seq: 9, from: "api" }], obs: null },
+        board: {
+          steps: [
+            { id: "a", status: "todo" },
+            { id: "b", status: "doing" },
+            { id: "c", status: "done" },
+          ],
+        },
+        sessions: {
+          sessions: [
+            sess({ name: "api", state: "working" }),
+            sess({ name: "web" }),
+            sess({ name: "sub", parent: "api" }),
+          ],
+        },
+      }),
+    );
+    const inbox = document.querySelector("[data-dest='inbox']");
+    expect(inbox?.querySelector(".badge-error")?.textContent).toBe("3");
+    expect(document.querySelector("[data-dest='team']")?.querySelector(".badge")?.textContent).toBe("3");
+    expect(document.querySelector("[data-dest='work']")?.querySelector(".badge")?.textContent).toBe("2");
+    expect(document.title).toBe("(3) Checkout · Huddle");
   });
 
-  it("goes Home from the menu", () => {
-    mountApp({}, makeState({ channels: [] }));
-    act(() => {
-      (document.querySelector("#chbtn") as HTMLButtonElement).click();
-    });
-    act(() => {
-      (
-        [...document.querySelectorAll('[role="menu"] button')].at(-1) as HTMLButtonElement | undefined
-      )?.click();
-    });
-    expect(location.hash).toBe("#/");
+  it("draws no badge when a count is zero", () => {
+    mountApp();
+    expect(document.querySelector("[data-dest='inbox'] .badge-error")).toBeNull();
+    expect(document.querySelector("[data-dest='team'] .badge")).toBeNull();
+    expect(document.querySelector("[data-dest='work'] .badge")).toBeNull();
   });
 
-  it("labels untitled channels in the switcher", async () => {
-    const { view, tree } = mountAppLoading([{ name: "bare" }]);
-    await flush();
-    view.rerender(tree());
-    act(() => {
-      (document.querySelector("#chbtn") as HTMLButtonElement).click();
+  it("keeps the inbox count out of another channel's extras", () => {
+    nav("#/c/ch/inbox");
+    mountApp(
+      {},
+      makeState({
+        attention: attention({ asks: [{ seq: 1, from: "api" }] }),
+        extras: { ch: "other", approvals: [{ seq: 1, from: "api" }], obs: null },
+      }),
+    );
+    expect(document.title).toBe("(1) Checkout · Huddle");
+  });
+
+  it("counts the inbox over the attention snapshot alone", () => {
+    const st = makeState({
+      attention: attention({
+        asks: [{ seq: 1, from: "api" }],
+        gates: [{ id: "t9" }],
+        paused: [{ name: "api" }],
+        blocked: [],
+      }),
     });
-    expect(document.querySelector('[role="menu"]')?.textContent).toContain("bare");
+    expect(inboxOf(st)).toBe(3);
+    expect(inboxOf(makeState({ attention: null, extras: null }))).toBe(0);
   });
 });
 
@@ -395,20 +228,16 @@ describe("alias effects and drawers", () => {
     mountApp({ work: () => <div>work page</div> });
     expect(screen.getByText("work page")).toBeDefined();
   });
+
+  it("follows the address bar when only the hash moves", () => {
+    mountApp({ inbox: () => <div>inbox page</div> });
+    expect(screen.queryByText("inbox page")).toBeNull();
+    nav("#/c/ch/inbox");
+    expect(screen.getByText("inbox page")).toBeDefined();
+  });
 });
 
 describe("the main area", () => {
-  it("renders the registered page for the destination", () => {
-    nav("#/c/ch/inbox");
-    mountApp({ inbox: () => <div>inbox page</div>, home: () => <div>home page</div> });
-    expect(screen.getByText("inbox page")).toBeDefined();
-    nav("#/");
-    act(() => {
-      window.dispatchEvent(new Event("hashchange"));
-    });
-    expect(screen.getByText("home page")).toBeDefined();
-  });
-
   it("paints the destination's PageIntro: icon tile, title and one plain sentence", () => {
     nav("#/c/ch/team");
     mountApp({ team: () => <div>team page</div> });
@@ -485,6 +314,35 @@ describe("the main area", () => {
     mountApp({}, makeState({ ch: null, attention: attention({ asks: [{ seq: 1, from: "api" }] }) }));
     expect(document.title).toBe("(1) Huddle");
   });
+
+  it("names the channel in the title when the config has no title", () => {
+    nav("#/c/ch/inbox");
+    mountApp({}, makeState({ info: null }));
+    expect(document.title).toBe("ch · Huddle");
+  });
+
+  it("paints the shell with the context's time", () => {
+    const ctx = makeCtx(makeState(), { now: NOW });
+    renderIn(<App pages={{}} />, ctx);
+    expect(document.querySelector("#main")).not.toBeNull();
+  });
+});
+
+describe("the rail drawer", () => {
+  it("mounts the rail with its drawer toggle, and the checkbox follows", () => {
+    nav("#/c/ch/inbox");
+    mountApp();
+    const box = document.querySelector("#rail-drawer") as HTMLInputElement;
+    expect(box).not.toBeNull();
+    expect(box.checked).toBe(false);
+  });
+
+  it("renders only the main area, no rail, over Home with no channel", () => {
+    nav("#/c/ch/inbox");
+    mountApp({}, makeState({ ch: null }));
+    expect(document.querySelector("#side")).toBeNull();
+    expect(document.querySelector("#main")).not.toBeNull();
+  });
 });
 
 describe("NoChannel and SignedOut", () => {
@@ -500,11 +358,19 @@ describe("NoChannel and SignedOut", () => {
     expect(screen.getByText("Signed out.")).toBeDefined();
     expect(screen.getByText("In a Claude session")).toBeDefined();
     expect(screen.getByText("Or in a terminal")).toBeDefined();
+    expect(screen.getAllByText("/huddle:setup").length).toBeGreaterThanOrEqual(2);
     await flush();
     expect(screen.getByText("Huddle v1.2.3")).toBeDefined();
   });
 
-  it("copies /huddle:open and flashes the button", async () => {
+  it("offers /huddle:setup, the command that replaced /huddle:open", () => {
+    render(<SignedOut />);
+    expect(screen.getByLabelText("Copy /huddle:setup")).toBeDefined();
+    expect(screen.queryByLabelText("Copy /huddle:open")).toBeNull();
+    expect(screen.queryByLabelText("Copy huddle:open")).toBeNull();
+  });
+
+  it("copies /huddle:setup and flashes the button", async () => {
     vi.useFakeTimers();
     const { writes } = stubClipboard();
     render(<SignedOut />);
@@ -514,7 +380,7 @@ describe("NoChannel and SignedOut", () => {
       big.click();
       await vi.advanceTimersByTimeAsync(0);
     });
-    expect(writes).toEqual(["/huddle:open"]);
+    expect(writes).toEqual(["/huddle:setup"]);
     expect(screen.getByText("Copied: paste it into a Claude session")).toBeDefined();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(1700);
@@ -523,7 +389,7 @@ describe("NoChannel and SignedOut", () => {
     vi.useRealTimers();
   });
 
-  it("copies a command field's command", async () => {
+  it("copies a command field's command", () => {
     const { writes } = stubClipboard();
     render(<SignedOut />);
     act(() => {
@@ -532,52 +398,13 @@ describe("NoChannel and SignedOut", () => {
     expect(writes).toEqual(["huddle open"]);
   });
 
-  it("stays quiet when the clipboard refuses", async () => {
+  it("stays quiet when the clipboard refuses", () => {
     stubClipboard(() => Promise.reject(new Error("no")));
     render(<SignedOut />);
     act(() => {
-      screen.getByLabelText("Copy /huddle:open").click();
+      screen.getByLabelText("Copy /huddle:setup").click();
     });
     expect(screen.queryByText(/Copied/)).toBeNull();
-  });
-});
-
-describe("the clock the shell paints", () => {
-  it("paints the shell with the context's time", () => {
-    const ctx = makeCtx(makeState(), { now: NOW });
-    renderIn(<App pages={{}} />, ctx);
-    expect(document.querySelector("#main")).not.toBeNull();
-  });
-});
-
-describe("branch corners", () => {
-  it("marks Overview and Today as current on their own pages", () => {
-    nav("#/c/ch/overview");
-    mountApp();
-    expect(document.querySelector('#side a[href="#/c/ch/overview"]')?.getAttribute("aria-current")).toBe(
-      "page",
-    );
-    nav("#/c/ch/today");
-    act(() => {
-      window.dispatchEvent(new Event("hashchange"));
-    });
-    expect(document.querySelector('#side a[href="#/c/ch/today"]')?.getAttribute("aria-current")).toBe("page");
-  });
-
-  it("names the channel in the title when the config has no title", () => {
-    nav("#/c/ch/inbox");
-    mountApp({}, makeState({ info: null }));
-    expect(document.title).toBe("ch · Huddle");
-  });
-
-  it("keeps the placeholder version when /health has no version", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(() => Promise.resolve({ json: () => Promise.resolve({}) })),
-    );
-    mountApp();
-    await flush();
-    expect(screen.getByText("v0.0.1")).toBeDefined();
   });
 
   it("keeps the sign-in page's name when /health has no version", async () => {
@@ -589,100 +416,5 @@ describe("branch corners", () => {
     await flush();
     expect(screen.queryByText(/Huddle v/)).toBeNull(); // no version: the bare name stays
     expect(document.querySelector("p.muted.text-center.text-xs")?.textContent).toBe("Huddle");
-  });
-
-  it("does not follow the system when a pick is kept", () => {
-    localStorage.setItem("huddle:theme", '"dark"');
-    const mq = stubMatchMedia(false);
-    mountApp();
-    expect(document.documentElement.dataset.theme).toBe("dark");
-    act(() => {
-      mq.fire();
-    });
-    expect(document.documentElement.dataset.theme).toBe("dark");
-  });
-
-  it("reads a task's waits from blocked_by and a missing lookup as open", () => {
-    nav("#/c/ch/inbox");
-    mountApp(
-      {},
-      makeState({
-        board: {
-          steps: [
-            { id: "a", status: "todo", blocked_by: ["ghost"] },
-            { id: "b", status: "todo" },
-          ],
-        },
-        sessions: { sessions: [sess({ name: "api", state: "working", step: "ghost" })] },
-      }),
-    );
-    // the waiting segment draws once blocked_by names an unfinished task
-    expect(document.querySelector("#side .segbar")).not.toBeNull();
-    expect(screen.getAllByText(": Working")[0]).toBeDefined();
-  });
-
-  it("draws a bar with a label and one without", () => {
-    mountApp({}, makeState({ board: { steps: [{ id: "a", status: "doing" }] } }));
-    const bar = document.querySelector("#side .segbar") as HTMLElement;
-    expect(bar.getAttribute("aria-label")).toContain("Progress:");
-  });
-
-  it("ignores another channel's extras in the badge", () => {
-    nav("#/c/ch/inbox");
-    mountApp(
-      {},
-      makeState({
-        attention: attention({ asks: [{ seq: 1, from: "api" }] }),
-        extras: { ch: "other", approvals: [{ seq: 1, from: "api" }], obs: null },
-      }),
-    );
-    // the other channel's extras are not counted; the ask is
-    expect(document.title).toBe("(1) Checkout · Huddle");
-  });
-
-  it("tolerates an attention snapshot with missing kinds", () => {
-    nav("#/c/ch/team");
-    mountApp({}, makeState({ attention: { gates: [{ id: "t9" }] } as never }));
-    expect(document.title).toBe("(1) Checkout · Huddle");
-  });
-});
-
-describe("progress bar edges", () => {
-  it("draws nothing for an empty plan and skips the Progress prefix when label is off", () => {
-    const { container } = render(<ProgressBar steps={[]} label={false} />);
-    const bar = container.querySelector(".segbar") as HTMLElement;
-    expect(bar.getAttribute("aria-label")).toBe(", 0 in all");
-    expect(bar.querySelectorAll(".segbar-seg")).toHaveLength(0);
-  });
-
-  it("looks a session's task up on the board when it is there", () => {
-    nav("#/c/ch/team");
-    mountApp(
-      {},
-      makeState({
-        board: { steps: [{ id: "a", status: "blocked" }] },
-        byId: new Map([["a", { id: "a", status: "blocked" as const }]]),
-        sessions: { sessions: [sess({ name: "api", state: "working", step: "a" })] },
-      }),
-    );
-    expect(screen.getAllByText(": Blocked")[0]).toBeDefined();
-  });
-});
-
-describe("route-driven rerenders", () => {
-  it("follows the address bar when only the hash moves", () => {
-    mountApp({ inbox: () => <div>inbox page</div> });
-    expect(screen.queryByText("inbox page")).toBeNull();
-    nav("#/c/ch/inbox");
-    expect(screen.getByText("inbox page")).toBeDefined();
-  });
-});
-
-describe("no channel in the store", () => {
-  it("renders only the main area, no rail, over an address naming a channel", () => {
-    nav("#/c/ch/inbox");
-    mountApp({}, makeState({ ch: null }));
-    expect(document.querySelector("#side")).toBeNull();
-    expect(document.querySelector("#main")).not.toBeNull();
   });
 });

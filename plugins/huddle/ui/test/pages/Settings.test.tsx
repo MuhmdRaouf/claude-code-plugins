@@ -314,15 +314,15 @@ describe("this browser", () => {
   it("keeps a theme pick and presses the segment buttons", async () => {
     mount();
     await flush();
-    const dark = [...document.querySelectorAll('[data-theme-set="dark"]')][0] as HTMLButtonElement;
-    expect(dark.getAttribute("aria-pressed")).toBe("false");
+    const mocha = [...document.querySelectorAll('[data-theme-set="mocha"]')][0] as HTMLButtonElement;
+    expect(mocha.getAttribute("aria-pressed")).toBe("false");
     await act(async () => {
-      dark.click();
+      mocha.click();
     });
     await flush();
-    expect(localStorage.getItem("huddle:theme")).toBe('"dark"');
-    expect(document.documentElement.dataset.theme).toBe("dark");
-    expect(dark.getAttribute("aria-pressed")).toBe("true");
+    expect(localStorage.getItem("huddle:theme")).toBe('"mocha"');
+    expect(document.documentElement.dataset.theme).toBe("mocha");
+    expect(mocha.getAttribute("aria-pressed")).toBe("true");
   });
 
   it("flips the notify switch and reads the browser's permission", async () => {
@@ -353,7 +353,7 @@ describe("this browser", () => {
   it("resets the per-viewer filters and toasts", async () => {
     localStorage.setItem("huddle:wfilter:ch", '"notes"');
     localStorage.setItem("huddle:wview:ch", '"board"');
-    localStorage.setItem("huddle:theme", '"dark"');
+    localStorage.setItem("huddle:theme", '"mocha"');
     localStorage.setItem("other:key", "1");
     const toast = vi.fn();
     renderIn(<Settings notify={notifyFake()} />, makeCtx(makeState(), { toast }));
@@ -364,7 +364,7 @@ describe("this browser", () => {
     await flush();
     expect(localStorage.getItem("huddle:wfilter:ch")).toBeNull();
     expect(localStorage.getItem("huddle:wview:ch")).toBeNull();
-    expect(localStorage.getItem("huddle:theme")).toBe('"dark"');
+    expect(localStorage.getItem("huddle:theme")).toBe('"mocha"');
     expect(localStorage.getItem("other:key")).toBe("1");
     expect(toast).toHaveBeenCalledWith("Filters reset");
   });

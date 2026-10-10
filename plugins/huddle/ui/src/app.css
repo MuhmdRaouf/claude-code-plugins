@@ -351,6 +351,56 @@
       0 18px 44px -12px rgb(0 0 0 / 0.5);
   }
 
+  /* The shared area chart (packages/ui/area-chart.tsx): the dashed grid, the quiet axis, the
+     themed fill and line, the crosshair and the tip card. --primary and --panel are the tokens
+     the component itself reads; they follow the theme's own colours. */
+  :root {
+    --primary: var(--color-primary);
+    --panel: var(--color-base-100);
+  }
+  .hr-chart-grid {
+    stroke: color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    stroke-dasharray: 3 4;
+  }
+  .hr-chart-axis {
+    fill: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+  }
+  .hr-chart-fill {
+    fill: color-mix(in oklab, var(--color-primary) 16%, transparent);
+  }
+  .hr-chart-fill.grad {
+    fill: url(#hr-chart-grad);
+  }
+  .hr-chart-line {
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-linecap: round;
+    stroke-width: 2;
+  }
+  .hr-chart-cross {
+    stroke: color-mix(in oklab, var(--color-base-content) 30%, transparent);
+    stroke-width: 1;
+  }
+  .hr-chart-tip {
+    border: 1px solid color-mix(in oklab, var(--color-base-content) 16%, transparent);
+    border-radius: var(--radius-field);
+    background: var(--color-base-100);
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.1rem;
+    color: var(--color-base-content);
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.2),
+      0 12px 32px -12px rgb(0 0 0 / 0.45);
+    pointer-events: none;
+  }
+  .hr-chart-tip p {
+    margin: 0;
+    white-space: nowrap;
+  }
+
   /* The shared toast row: daisyUI's .toast is a placement wrapper, this is the card in it. */
   .hr-toast {
     display: flex;
@@ -609,9 +659,4 @@
   font-weight: 600;
   font-size: 7.5px;
   font-variant-numeric: tabular-nums;
-}
-
-/* brand glow for the top-bar logo (hue carrier; neon lives only where the brief allows) */
-.logo-glow {
-  filter: drop-shadow(0 0 10px var(--color-primary));
 }

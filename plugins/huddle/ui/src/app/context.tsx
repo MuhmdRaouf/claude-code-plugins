@@ -19,6 +19,8 @@ export type HuddleContextValue = {
   api: Api;
   /** This paint's time; a component never reads the clock itself, so tests stay deterministic. */
   now: number;
+  /** When the store last changed (epoch ms): the rail footer's "updated Xs ago". */
+  updatedAt: number;
   /** Navigates: sets the hash, or re-routes when that hash is already the address (app.js go). */
   go(href: string): void;
   /** An owner action: POST /op/<name>?as=owner, toast the refusal, give the result or null

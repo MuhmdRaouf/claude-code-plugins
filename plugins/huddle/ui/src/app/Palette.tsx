@@ -264,8 +264,8 @@ function channelItems(d: PaletteDeps, ch: string | null): CmdItem[] {
 function settingItems(d: PaletteDeps): CmdItem[] {
   return [
     { g: "Settings", t: "Theme: follow the system", i: "monitor", run: () => d.setTheme("system") },
-    { g: "Settings", t: "Theme: light (Latte)", i: "sun", run: () => d.setTheme("light") },
-    { g: "Settings", t: "Theme: dark (Mocha)", i: "moon", run: () => d.setTheme("dark") },
+    { g: "Settings", t: "Theme: Latte (light)", i: "sun", run: () => d.setTheme("latte") },
+    { g: "Settings", t: "Theme: Mocha (dark)", i: "moon", run: () => d.setTheme("mocha") },
     {
       g: "Settings",
       t: d.notifyOn() ? "Stop notifying me of questions" : "Notify me of questions",

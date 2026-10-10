@@ -1,4 +1,5 @@
-// theme.test.ts — the palette choice: what is kept, how it resolves, and what lands on <html>.
+// theme.test.ts — the palette choice: what is kept, how it resolves, what lands on <html>, and
+// the migration of a choice kept under the old "dark"/"light" names.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { applyTheme, currentTheme, resolvedTheme, setTheme, THEMES } from "../../src/app/theme.ts";
 
@@ -18,50 +19,60 @@ afterEach(() => {
 });
 
 describe("THEMES", () => {
-  it("offers System, Light and Dark, in menu order, with their icons", () => {
+  it("offers System, Mocha and Latte, in menu order, with their icons", () => {
     expect(THEMES.map(([k, l, i]) => [k, l, i])).toEqual([
       ["system", "System", "monitor"],
-      ["light", "Light", "sun"],
-      ["dark", "Dark", "moon"],
+      ["mocha", "Mocha", "moon"],
+      ["latte", "Latte", "sun"],
     ]);
   });
 });
 
 describe("resolvedTheme", () => {
-  it("keeps an explicit choice and follows the system otherwise", () => {
-    expect(resolvedTheme("light", true)).toBe("light");
-    expect(resolvedTheme("dark", false)).toBe("dark");
-    expect(resolvedTheme("system", true)).toBe("dark");
-    expect(resolvedTheme("system", false)).toBe("light");
+  it("keeps an explicit palette and follows the system otherwise", () => {
+    expect(resolvedTheme("latte", true)).toBe("latte");
+    expect(resolvedTheme("mocha", false)).toBe("mocha");
+    expect(resolvedTheme("system", true)).toBe("mocha");
+    expect(resolvedTheme("system", false)).toBe("latte");
   });
 });
 
 describe("currentTheme", () => {
   it("reads the kept choice, falling back to System", () => {
     expect(currentTheme(store())).toBe("system");
-    expect(currentTheme(store({ "huddle:theme": '"dark"' }))).toBe("dark");
-    expect(currentTheme(store({ "huddle:theme": '"light"' }))).toBe("light");
+    expect(currentTheme(store({ "huddle:theme": '"mocha"' }))).toBe("mocha");
+    expect(currentTheme(store({ "huddle:theme": '"latte"' }))).toBe("latte");
+    expect(currentTheme(store({ "huddle:theme": '"system"' }))).toBe("system");
     expect(currentTheme(store({ "huddle:theme": "nonsense" }))).toBe("system");
+  });
+
+  it("migrates a legacy dark/light choice to mocha/latte in the same read", () => {
+    const dark = store({ "huddle:theme": '"dark"' });
+    expect(currentTheme(dark)).toBe("mocha");
+    expect(dark.getItem("huddle:theme")).toBe('"mocha"');
+    const light = store({ "huddle:theme": '"light"' });
+    expect(currentTheme(light)).toBe("latte");
+    expect(light.getItem("huddle:theme")).toBe('"latte"');
   });
 });
 
 describe("applyTheme / setTheme", () => {
-  it("puts the resolved palette on <html>", () => {
-    applyTheme("light", true);
-    expect(document.documentElement.dataset.theme).toBe("light");
-    applyTheme("dark", false);
-    expect(document.documentElement.dataset.theme).toBe("dark");
+  it("puts the shared theme's name on <html>", () => {
+    applyTheme("latte", true);
+    expect(document.documentElement.dataset.theme).toBe("latte");
+    applyTheme("mocha", false);
+    expect(document.documentElement.dataset.theme).toBe("mocha");
     applyTheme("system", true);
-    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(document.documentElement.dataset.theme).toBe("mocha");
     applyTheme("system", false);
-    expect(document.documentElement.dataset.theme).toBe("light");
+    expect(document.documentElement.dataset.theme).toBe("latte");
   });
 
   it("keeps the choice and applies it in one step", () => {
     const s = store();
-    setTheme(s, "dark", false);
-    expect(s.getItem("huddle:theme")).toBe('"dark"');
-    expect(document.documentElement.dataset.theme).toBe("dark");
+    setTheme(s, "mocha", false);
+    expect(s.getItem("huddle:theme")).toBe('"mocha"');
+    expect(document.documentElement.dataset.theme).toBe("mocha");
   });
 });
 

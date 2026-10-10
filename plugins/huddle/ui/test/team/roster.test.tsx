@@ -290,7 +290,7 @@ describe("Roster", () => {
     const nested = container.querySelector('ul[aria-label="Subagents of alpha"]');
     const kid = nested?.querySelector("button");
     expect(kid?.className).toContain("gap-2.5");
-    expect(kid?.querySelector(".avatar > span")?.className).toContain("w-6");
+    expect(kid?.querySelector(".avatar > div")?.className).toContain("size-6");
     expect(kid?.querySelector(".badge")?.className).toContain("badge-sm");
     expect(kid?.querySelector("b")?.textContent).toBe("one");
     const top = container.querySelector("ul:not([aria-label]) > li > button");

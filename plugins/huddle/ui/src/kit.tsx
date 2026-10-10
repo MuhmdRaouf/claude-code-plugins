@@ -1,10 +1,12 @@
 // kit.tsx — the small pieces every view is built from: status pills and icons, the session pill
-// with its reason, avatars, stat cards, empty states, the loading skeleton and relative times.
+// with its reason, avatars, stat cards, the plan's progress bar, empty states, the loading
+// skeleton and relative times.
 import { type Stamp, timeAgo } from "@muhmdraouf/ui/time.ts";
 import type { JSX } from "preact";
 import { Icon, type IconName } from "./icons.tsx";
 import {
   avatarColor,
+  FIN,
   type Session,
   SSTM,
   STATM,
@@ -13,8 +15,11 @@ import {
   sessionStatus,
   sessionWhy,
   statMeta,
+  type Task,
   type TaskLookup,
+  taskState,
 } from "./status.ts";
+import type { PlanStep } from "./store.ts";
 
 /** Status word → daisyUI badge tone; task states and session states share one table. */
 const HUE: Record<string, string> = {
@@ -79,17 +84,20 @@ export function SessionPill({
   );
 }
 
-/** A name as a coloured disc with the first letter of its last dot segment; the owner is mauve with a Y. */
+/** A name as a round avatar placeholder with the initial of its last dot segment, ringed in the
+ *  name's hue; the owner is mauve with a Y. */
 export function Avatar({ name, small = false }: { name: string; small?: boolean | undefined }): JSX.Element {
   const letter = (name.split(".").at(-1)?.at(0) ?? "").toUpperCase();
   return (
     <span
-      class={`avatar avatar-placeholder ${name === "owner" ? "c-mauve" : avatarColor(name)}`}
+      class={`avatar avatar-placeholder shrink-0 ${name === "owner" ? "c-mauve" : avatarColor(name)}`}
       aria-hidden="true"
     >
-      <span class={`${small ? "w-6" : "w-8"} rounded-full tinted`}>
-        <span class="ink text-sm font-semibold">{name === "owner" ? "Y" : letter}</span>
-      </span>
+      <div class={`${small ? "size-6" : "size-8"} rounded-full tinted ring-2 ring-[var(--c)]/55`}>
+        <span class={`ink font-semibold ${small ? "text-xs" : "text-sm"}`}>
+          {name === "owner" ? "Y" : letter}
+        </span>
+      </div>
     </span>
   );
 }
@@ -97,9 +105,53 @@ export function Avatar({ name, small = false }: { name: string; small?: boolean 
 /** A stat card's change marker: which way it points and its text. */
 export type StatDelta = { up: boolean; text: string };
 
+/** A board step as the status model reads it (status.ts's Task); an unnamed status counts as open. */
+const asTask = (s: PlanStep): Task => ({
+  status: s.status ?? "todo",
+  ...(s.blocked_by ? { blocked_by: s.blocked_by } : {}),
+});
+
+/** One segmented bar: done · doing · waiting · blocked · to do; a zero never draws. The label
+ *  goes into the accessible name when it is wanted. */
+export function ProgressBar({
+  steps,
+  label = true,
+}: {
+  steps: readonly PlanStep[];
+  label?: boolean;
+}): JSX.Element {
+  const total = steps.length || 1;
+  const n = (k: "done" | "doing" | "waiting" | "blocked"): number =>
+    steps.filter((s) =>
+      k === "done" ? s.status !== undefined && FIN.has(s.status) : taskState(asTask(s)) === k,
+    ).length;
+  const seg = (
+    [
+      ["done", "c-good"],
+      ["doing", "c-yellow"],
+      ["waiting", "c-peach"],
+      ["blocked", "c-red"],
+    ] as const
+  )
+    .map(([k, cl]) => ({ k, cl, n: n(k) }))
+    .filter((x) => x.n > 0);
+  const txt = `${seg
+    .map((x) => `${x.n} ${x.k === "done" ? "done" : STATM[x.k].l.toLowerCase()}`)
+    .join(", ")}, ${steps.length} in all`;
+  return (
+    <div class="segbar" role="img" aria-label={`${label ? "Progress: " : ""}${txt}`} title={txt}>
+      {seg.map((x) => (
+        <i key={x.k} class={`segbar-seg ${x.cl}`} style={`width:${((x.n / total) * 100).toFixed(3)}%`} />
+      ))}
+    </div>
+  );
+}
+
 // The legacy value carried data-count for hrCountUp's 300 ms tick (core.js hrStat); the shared
 // count-up has not moved to packages/ui yet, so the value shows directly.
-/** A daisyUI stat: muted title, tinted figure, the value, an optional delta and subline. */
+/** A Radar-style stat: a daisyUI `stats panel` card, its title quiet, its figure big and lined
+ *  up, the tinted icon beside it, an optional delta badge in the title row and a subline under
+ *  the value. */
 export function Stat({
   icon,
   tint = "",
@@ -116,22 +168,24 @@ export function Stat({
   delta?: StatDelta | null | undefined;
 }): JSX.Element {
   return (
-    <div class="stat panel px-4 py-3">
-      <span
-        class={`stat-figure tinted ink inline-flex size-7 shrink-0 items-center justify-center rounded-lg${tint ? ` ${tint}` : ""}`}
-      >
-        <Icon name={icon} />
-      </span>
-      <div class="stat-title flex min-w-0 items-center gap-2">
-        <span class="min-w-0 flex-1 truncate">{label}</span>
-        {delta ? (
-          <span class={`badge badge-sm ${delta.up ? "badge-success" : "badge-error"} tnum`}>
-            {delta.text}
-          </span>
-        ) : null}
+    <div class="stats panel w-full">
+      <div class="stat w-full p-5">
+        <span
+          class={`stat-figure tinted ink inline-flex size-8 shrink-0 items-center justify-center rounded-lg${tint ? ` ${tint}` : ""}`}
+        >
+          <Icon name={icon} />
+        </span>
+        <div class="stat-title flex min-w-0 items-center gap-2 text-sm font-normal text-base-content/65">
+          <span class="min-w-0 flex-1 truncate">{label}</span>
+          {delta ? (
+            <span class={`badge badge-sm ${delta.up ? "badge-success" : "badge-error"} tnum`}>
+              {delta.text}
+            </span>
+          ) : null}
+        </div>
+        <div class="stat-value num text-3xl font-semibold">{value}</div>
+        {sub ? <div class="stat-desc text-xs whitespace-normal">{sub}</div> : null}
       </div>
-      <div class="stat-value text-[28px] tnum">{value}</div>
-      {sub ? <div class="stat-desc">{sub}</div> : null}
     </div>
   );
 }

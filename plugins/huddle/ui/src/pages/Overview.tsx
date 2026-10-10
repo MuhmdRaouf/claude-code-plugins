@@ -12,7 +12,7 @@ import type { Api } from "../api.ts";
 import { useHuddle } from "../app/context.tsx";
 import { IntroActions } from "../app/intro.tsx";
 import { Icon } from "../icons.tsx";
-import { Avatar, Empty, Stat, Time } from "../kit.tsx";
+import { Avatar, Empty, ProgressBar, Stat, Time } from "../kit.tsx";
 import { Ring } from "../progress.tsx";
 import { FIN, type Task, type TaskState, taskState } from "../status.ts";
 import { readPref, type Storage, writePref } from "../storage.ts";
@@ -183,7 +183,9 @@ export function ovSeries(
   const mid = n >> 1;
   return {
     series: [{ values: per.map((c) => c / bm) }],
-    axis: [lab(0), lab(mid), lab(n - 1)],
+    // one slot per bin: the chart pins axis[i] over bin i, so the three time labels ride the
+    // slots they name and the in-between slots stay empty
+    axis: per.map((_, i) => (i === 0 || i === mid || i === n - 1 ? lab(i) : "")),
     tipOf: (i: number): readonly string[] => {
       const c = per[i] ?? 0;
       return [lab(i), `${c} event${c === 1 ? "" : "s"} in the bin · ${fmt(c / bm)}/min`];
@@ -230,17 +232,16 @@ function NeedsBanner({ state, ch, inboxHref }: { state: HuddleState; ch: string;
   );
 }
 
-/** The plan progress: the ring, the done count and the per-state breakdown (ovTopHTML's hero). */
-function PlanProgress({ v }: { v: OverviewValues }) {
+/** The plan progress: the ring, the done count and the per-state breakdown, on the shared panel
+ *  surface with the plan's segmented bar across the top (ovTopHTML's hero). */
+function PlanProgress({ v, steps }: { v: OverviewValues; steps: readonly PlanStep[] }) {
   return (
-    <Panel label="Plan progress">
-      <div class="flex flex-col gap-6 md:flex-row md:items-center md:gap-8">
-        <div class="flex items-center gap-5">
-          <Ring pct={v.pct} />
-          <div>
-            <h2 class="text-sm font-medium muted" id="ov-plan">
-              Plan progress
-            </h2>
+    <Panel icon={<Icon name="flag" />} title="Plan progress" meta={ovSub(v)} label="Plan progress">
+      <div class="flex flex-col gap-5">
+        {steps.length > 0 && <ProgressBar steps={steps} label={false} />}
+        <div class="flex flex-col gap-6 md:flex-row md:items-center md:gap-8">
+          <div class="flex items-center gap-5">
+            <Ring pct={v.pct} />
             <p class="flex items-baseline gap-1.5">
               <span class="text-[28px] font-semibold text-base-content tnum" data-ov="done">
                 {v.done}
@@ -249,24 +250,21 @@ function PlanProgress({ v }: { v: OverviewValues }) {
                 of <span data-ov="total">{v.total}</span> tasks done
               </span>
             </p>
-            <p class="text-sm muted" data-ovtxt="sub">
-              {ovSub(v)}
-            </p>
           </div>
-        </div>
-        <div class="grid min-w-0 flex-1 gap-3 sm:grid-cols-2 md:border-l hairline md:pl-8" data-ovrows>
-          {ovRows(v).map((r) => (
-            <div key={r.k} class={r.tint}>
-              <div class="flex items-center justify-between gap-3 text-sm">
-                <span class="muted">{r.l}</span>
-                <span class="font-medium tnum">{r.n}</span>
+          <div class="grid min-w-0 flex-1 gap-3 sm:grid-cols-2 md:border-l hairline md:pl-8" data-ovrows>
+            {ovRows(v).map((r) => (
+              <div key={r.k} class={r.tint}>
+                <div class="flex items-center justify-between gap-3 text-sm">
+                  <span class="muted">{r.l}</span>
+                  <span class="font-medium tnum">{r.n}</span>
+                </div>
+                <div class="segbar mt-1.5" role="img" aria-label={`${r.l}: ${r.n} of ${v.total}`}>
+                  <i class={`segbar-seg ${r.tint}`} style={`width:${r.pct}%`} />
+                </div>
+                <p class="mt-1 text-xs muted">{r.cap}</p>
               </div>
-              <div class="segbar mt-1.5" role="img" aria-label={`${r.l}: ${r.n} of ${v.total}`}>
-                <i class={`segbar-seg ${r.tint}`} style={`width:${r.pct}%`} />
-              </div>
-              <p class="mt-1 text-xs muted">{r.cap}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </Panel>
@@ -383,6 +381,7 @@ function ActivityCard({
   const s = ovSeries(state.timeline, win, now);
   return (
     <Panel
+      icon={<Icon name="activity" />}
       title="Activity"
       label="Activity"
       meta="Events per minute"
@@ -395,6 +394,7 @@ function ActivityCard({
         label={`Events per minute over the last ${win}`}
         note="No activity in this window"
         h={220}
+        class="w-full"
       />
     </Panel>
   );
@@ -474,12 +474,13 @@ export function Overview({ onCompose, prefs = localStorage, store }: OverviewPro
   const v = ovVals(state);
   const t = ovTexts(v);
   const ext = state.extras?.ch === ch ? state.extras : null;
+  const conflicts = conf?.conflicts ?? [];
   const pick = (k: Win): void => {
     writePref(prefs, `ovwin:${ch}`, k);
     setWin(k);
   };
   return (
-    <div class="flex min-w-0 flex-col gap-5" id="ovwrap">
+    <div class="grid min-w-0 gap-5" id="ovwrap">
       <IntroActions>
         {onCompose ? (
           <button type="button" id="ovmsg" class="btn" onClick={onCompose}>
@@ -488,15 +489,26 @@ export function Overview({ onCompose, prefs = localStorage, store }: OverviewPro
         ) : null}
       </IntroActions>
       <NeedsBanner state={state} ch={ch} inboxHref={api.channelHref(ch, "/inbox")} />
-      <PlanProgress v={v} />
-      <div class="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 xl:grid-cols-4">
+      <PlanProgress v={v} steps={state.board?.steps ?? []} />
+      <section
+        class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4"
+        aria-label="Overview numbers"
+        data-stat-cards=""
+      >
         <Stat icon="users" tint="c-lavender" label="Sessions online" value={v.live} sub={t.livesub} />
+        <Stat
+          icon="list"
+          tint="c-sapphire"
+          label="Open tasks"
+          value={v.total - v.done}
+          sub={`${v.done} of ${v.total} done`}
+        />
         <Stat icon="ask" tint="c-mauve" label="Questions for you" value={v.asks} sub={t.asksub} />
         <Stat icon="book" tint="c-info" label="Knowledge" value={v.kb} sub="Entries the sessions share" />
-        <Stat icon="activity" tint="c-sapphire" label="Events" value={v.ev} sub="Published in this channel" />
-      </div>
+        <Stat icon="activity" tint="c-peach" label="Events" value={v.ev} sub="Published in this channel" />
+      </section>
       {ext?.obs?.available ? <CostCard obs={ext.obs} ch={ch} api={api} /> : null}
-      <ConflictsCard conf={conf} now={now} />
+      {conflicts.length > 0 ? <ConflictsCard conf={conf} now={now} /> : null}
       <ActivityCard state={state} win={win} now={now} onWin={pick} />
     </div>
   );

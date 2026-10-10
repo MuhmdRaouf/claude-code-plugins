@@ -402,6 +402,7 @@ function paint(): void {
     state: store.getState(),
     api,
     now: Date.now(),
+    updatedAt,
     go,
     act,
     toast: (text, o) => toastFn(text, o),
@@ -416,7 +417,12 @@ function paint(): void {
   );
 }
 
-store.subscribe(() => paint());
+// every store change moves the rail footer's "updated Xs ago"; the 15 s repaint tick does not
+let updatedAt = Date.now();
+store.subscribe(() => {
+  updatedAt = Date.now();
+  paint();
+});
 window.addEventListener("hashchange", () => {
   void syncChannel();
   paint();

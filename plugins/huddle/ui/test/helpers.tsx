@@ -47,6 +47,7 @@ export function makeCtx(state: HuddleState, over: Partial<HuddleContextValue> = 
       channelHref: (ch, p) => `#/c/${ch}${p}`,
     },
     now: NOW,
+    updatedAt: NOW,
     go: (h) => {
       location.hash = h;
     },
