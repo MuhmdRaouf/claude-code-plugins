@@ -12,9 +12,7 @@
       "name": "zai-plugin-cc",
       "description": "Delegate bulk mechanical work to GLM (Z.ai); Claude orchestrates, verifies and reviews.",
       "version": "0.0.1",
-      "author": {
-        "name": "Raouf"
-      },
+      "author": { "name": "Raouf" },
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/zai-plugin-cc",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/zai-plugin-cc/plugin"
@@ -23,9 +21,7 @@
       "name": "kimi-plugin-cc",
       "description": "Delegate bulk mechanical work to Kimi (Moonshot AI); Claude orchestrates, verifies and reviews.",
       "version": "0.0.1",
-      "author": {
-        "name": "Raouf"
-      },
+      "author": { "name": "Raouf" },
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/kimi-plugin-cc",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/kimi-plugin-cc/plugin"
@@ -34,9 +30,7 @@
       "name": "deepseek-plugin-cc",
       "description": "Delegate bulk mechanical work to DeepSeek; Claude orchestrates, verifies and reviews.",
       "version": "0.0.1",
-      "author": {
-        "name": "Raouf"
-      },
+      "author": { "name": "Raouf" },
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/deepseek-plugin-cc",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/deepseek-plugin-cc/plugin"
@@ -45,9 +39,7 @@
       "name": "minimax-plugin-cc",
       "description": "Delegate bulk mechanical work to MiniMax; Claude orchestrates, verifies and reviews.",
       "version": "0.0.1",
-      "author": {
-        "name": "Raouf"
-      },
+      "author": { "name": "Raouf" },
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/minimax-plugin-cc",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/minimax-plugin-cc/plugin"
@@ -56,9 +48,7 @@
       "name": "qwen-plugin-cc",
       "description": "Delegate bulk mechanical work to Qwen (Alibaba Cloud); Claude orchestrates, verifies and reviews.",
       "version": "0.0.1",
-      "author": {
-        "name": "Raouf"
-      },
+      "author": { "name": "Raouf" },
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/qwen-plugin-cc",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/qwen-plugin-cc/plugin"
@@ -67,9 +57,7 @@
       "name": "huddle",
       "description": "Channels where Claude sessions in different projects, their subagents and bash agents work as one team: messages everyone hears, tasks across sessions, pause and resume, shared knowledge.",
       "version": "0.0.2",
-      "author": {
-        "name": "Raouf"
-      },
+      "author": { "name": "Raouf" },
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/huddle",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/huddle/plugin"
@@ -78,9 +66,7 @@
       "name": "radar",
       "description": "Live, token-free observability dashboard for Claude Code sessions: agents, subagents, requests, tokens and tools, on a random localhost port.",
       "version": "0.0.1",
-      "author": {
-        "name": "Raouf"
-      },
+      "author": { "name": "Raouf" },
       "homepage": "https://github.com/MuhmdRaouf/claude-code-plugins/tree/main/plugins/radar",
       "license": "GPL-3.0-or-later",
       "source": "./plugins/radar/plugin"
