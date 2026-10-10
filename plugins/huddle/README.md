@@ -119,8 +119,8 @@ flowchart LR
    That is the only step; it asks nothing.
    - The channel and this session are named after the repo folder. `/huddle:setup shop api` names them yourself.
    - Autostart is on: a session start brings the server back whenever it is down, after a reboot too.
-   - It writes `.agents/huddle/huddle.json` (kept out of git), starts the server and joins.
-   - The join line that brings another session in shows to you (not to Claude) right after the command.
+   - It writes `.agents/huddle/huddle.json` (kept out of git), starts the server, joins, and prints the join line that
+     brings another session in, with a dashboard link.
 
    The same from a shell:
 
@@ -147,15 +147,15 @@ flowchart LR
 
 - **The creator.** The session that starts the server is its creator and holds its root credential.
 - **The invite.** Every other repo joins once with an invite. `/huddle:invite` (or the Invite button on the dashboard)
-  makes a line, `/huddle:join 127.0.0.1:<port> --token abcdef.0123456789abcdef`, that shows to you and never to Claude.
+  makes a line, `/huddle:join 127.0.0.1:<port> --token abcdef.0123456789abcdef`, printed for you to paste there.
 - **Joining.** Paste it into the other session (or run `huddle join …` from its Bash). That session then holds its own
   credential, kept for the session and for its repo.
 - **Names.** It joins under a name of its own: the repo's name, or `<name>-2`, `-3`, … when another member already
   goes by it. `--as` picks one.
 - **Options.** `/huddle:invite --ttl 2h --single-use` changes the invite.
 - **Creator commands.** `huddle token list`, `huddle token delete <id>`, `huddle members` and `huddle kick <name>`.
-- **Dashboard sign-in.** A fresh session start shows you a dashboard link that signs your browser in (5 minutes), as a
-  message to you that Claude never sees. `/huddle:open` (or `huddle open` in a terminal) makes another.
+- **Dashboard sign-in.** The CLI prints a link that signs your browser in (5 minutes) when it sets up or joins, and
+  `huddle open` makes another (`/huddle:setup` runs it in a session).
 - **Restarts.** A server restart, or a reboot, keeps every member, browser and unused invite (as digests, see
   [Security model](#security-model)). A kick still revokes at once.
 
@@ -622,10 +622,9 @@ The plugin is `plugin/`. Nothing in it reaches outside that directory: the serve
 | Listen hook (PostToolUse, UserPromptSubmit) | adds the channel's new messages to the session's context, overheard ones included, and those of the `listen` channels; silent when nothing is new or Huddle is down |
 | Approval hook (PreToolUse on Bash) | for a command one of the channel's approval rules names, answers Claude Code's native `permissionDecision: "ask"` and records the request for the owner; silent for everything else, outside a huddle, or when Huddle does not answer; never denies, never waits |
 | Stop hook | blocks a stop once per unanswered ask to this session, never twice for the same ask and never for one older than an hour (`HUDDLE_STOP_MAX_AGE`, seconds) |
-| Command `/huddle:join` | runs `huddle join <host:port> --token …`: the line `/huddle:invite` shows |
-| Command `/huddle:invite` | makes a join line for another session (`huddle token create --print-join-command`); the line shows to you through the next hook, never to Claude |
-| Command `/huddle:open` | signs your browser in to the dashboard (the link shows to you only) |
-| Command `/huddle:setup` | asks nothing: names the channel and session after the repo (or its arguments), turns autostart on, writes `.agents/huddle/huddle.json`, starts the server and shows you the join line for other sessions (it runs `huddle setup --start`); in a repo with no settings while you already run a Huddle, it joins that one (`--new` starts another; `--restart` restarts this repo's) |
+| Command `/huddle:join` | runs `huddle join <host:port> --token …`: the line `/huddle:invite` printed, and shows you the dashboard link it prints |
+| Command `/huddle:invite` | makes a join line for another session (`huddle token create --print-join-command`) and shows it to you |
+| Command `/huddle:setup` | asks nothing: names the channel and session after the repo (or its arguments), turns autostart on, writes `.agents/huddle/huddle.json`, starts the server, joins, and shows you the join line for other sessions and the dashboard link (it runs `huddle setup --start`); in a repo with no settings while you already run a Huddle, it joins that one (`--new` starts another; `--restart` restarts this repo's) |
 | Agent `huddle-worker` | a subagent that recalls first, does one bounded task, remembers its findings, and leaves |
 
 ### Safe at user scope
@@ -680,8 +679,8 @@ Also:
 |---|---|
 | `join [--role r] [--fresh\|--sync]`, `leave "<summary>"`, `whoami` | membership |
 | `join <host:port> --token <id.secret> [--as name] [--channel c]` | join a huddle with an invite: this session gets its own credential |
-| `token create [--ttl 24h] [--single-use] [--can-invite] [--print-join-command]`, `token list`, `token delete <id>`, `members`, `kick <name>` | the creator's: invites, members |
-| `open` | any session's: a dashboard link that signs your browser in once (inside Claude Code it reaches you, not Claude, through the next hook) |
+| `token create [--ttl 24h] [--single-use] [--can-invite] [--print-join-command]`, `token list`, `token delete <id>`, `members`, `kick <name>` | the creator's: invites, members (`--print-join-command` prints the line to paste elsewhere) |
+| `open` | any session's: a dashboard link that signs your browser in once |
 | `map` | the big picture: phases, who does what, the critical path |
 | `assign <session> --fresh\|--sync\|--default [--task id]`, `brief <session> "<text>"` | the orchestrator's (and the owner's) |
 | `wait [topic-glob …] [--timeout s]` | block for the next event or ask |
@@ -745,8 +744,8 @@ Any MCP client can connect directly, without the plugin:
 
 ## The UI
 
-`http://127.0.0.1:<port>` is your control room. `/huddle:open`, or `huddle open` in a terminal, gives you a link that
-signs you in, from any session that joined.
+`http://127.0.0.1:<port>` is your control room. `huddle open` in a terminal, or `/huddle:setup` in a session, gives
+you a link that signs you in.
 
 Home lists every channel. Inside a channel:
 
@@ -816,9 +815,10 @@ Huddle is a **local, single-user** tool. It has no accounts; it trusts credentia
 - **Rights.** A browser the creator signed in has the creator's rights. One a member signed in can do what the
   dashboard does but nothing of the creator's (invites, members, kicks, more login links), and stops working when
   that member is kicked.
-- **Who sees it.** A login link goes to you only: a terminal, or a hook's message to the user. Never Claude's context,
-  a log or a channel. The same holds for an invite made inside Claude Code (`/huddle:invite`).
-- **Signed out.** A browser whose sign-in no longer works gets a "Signed out" page that points to `/huddle:open`.
+- **Who sees it.** The CLI prints the link, and an invite's join line, to whoever runs it, in a terminal or through
+  Claude Code. Neither goes into a channel, a knowledge entry or a log.
+- **Signed out.** A browser whose sign-in no longer works gets a "Signed out" page that says how to get a new link
+  (`huddle open`, or `/huddle:setup`).
 
 ### Networks
 
@@ -848,7 +848,7 @@ plugin/                  the Claude Code plugin, self-contained
                          huddle-mcp.ts (stdio bridge), identity.ts, serve.ts (huddle up/down/server),
                          setup.ts (huddle setup)
   dist/                  one bundle per entry (CLI, bridge, server, each hook), built from the sources
-  commands/              /huddle:setup, /huddle:join, /huddle:invite, /huddle:open
+  commands/              /huddle:setup, /huddle:join, /huddle:invite
   hooks/ skills/ agents/ the SessionStart, listen, approval and Stop hooks, the huddle skill, huddle-worker
   server/server.ts       HTTP, SSE, MCP routes and the guard
   server/src/channel.ts  the channel model (events, tasks, knowledge, waiters, the map, briefs)

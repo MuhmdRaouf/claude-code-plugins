@@ -8,7 +8,7 @@ import { dirname as dirname2, join as join3 } from "node:path";
 import { homedir as homedir2 } from "node:os";
 
 // plugin/bin/creds.ts
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
 import { homedir } from "node:os";
 import { join as join2 } from "node:path";
 import { createHash } from "node:crypto";
@@ -88,6 +88,10 @@ function projectKey(env2 = process.env) {
     d = projectDir(env2);
   } catch {
   }
+  try {
+    if (d) d = realpathSync(d);
+  } catch {
+  }
   return d ? `project-${createHash("sha1").update(d).digest("hex").slice(0, 16)}` : null;
 }
 var read = (f) => {
@@ -105,31 +109,6 @@ function loadCred(url, sid) {
     if (c && (!url || norm(c.url) === norm(url))) return c;
   }
   return null;
-}
-function takeLinkRequest(sid) {
-  let asked = false;
-  for (const k of sessionKeys(sid).filter((k2) => !k2.startsWith("project-"))) {
-    const f = join2(sessionsDir(), `${k}.link`);
-    try {
-      statSync(f);
-      asked = true;
-      rmSync(f, { force: true });
-    } catch {
-    }
-  }
-  return asked;
-}
-function takeInviteRequest(sid) {
-  let asked = null;
-  for (const k of sessionKeys(sid).filter((k2) => !k2.startsWith("project-"))) {
-    const f = join2(sessionsDir(), `${k}.invite`);
-    try {
-      asked ??= JSON.parse(readFileSync(f, "utf8")) ?? {};
-      rmSync(f, { force: true });
-    } catch {
-    }
-  }
-  return asked;
 }
 var tokenFor = (url, sid) => process.env.HUDDLE_TOKEN || loadCred(url, sid)?.credential || "";
 async function hfetch(url, init = {}, sid) {
@@ -279,25 +258,6 @@ function identity(sid) {
 var home_;
 var home = () => home_ ??= homeOf();
 var SERVER = entry("server");
-async function dashboard(url, sid, ms = 1500) {
-  try {
-    const r = await hfetch(`${url}/api/login`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}", signal: AbortSignal.timeout(ms) }, sid);
-    const j = r.ok ? await r.json() : null;
-    return j?.code ? `${url}/?code=${encodeURIComponent(j.code)}` : null;
-  } catch {
-    return null;
-  }
-}
-async function invite(url, o = {}, sid, ms = 5e3) {
-  try {
-    const r = await hfetch(`${url}/api/tokens`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(o), signal: AbortSignal.timeout(ms) }, sid);
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j.token) return { ok: false, error: j.error ?? `HTTP ${r.status}` };
-    return { ok: true, token: j.token, id: j.id, expires: j.expires, join: `huddle join ${new URL(url).host} --token ${j.token}` };
-  } catch (e) {
-    return { ok: false, error: e.message };
-  }
-}
 
 // plugin/bin/feed.ts
 import { mkdirSync as mkdirSync3, readdirSync as readdirSync2, readFileSync as readFileSync3, renameSync as renameSync3, rmSync as rmSync2, statSync as statSync3, writeFileSync as writeFileSync3 } from "node:fs";
@@ -370,12 +330,12 @@ ${lines.join("\n")}${older}`;
 }
 
 // plugin/bin/touch.ts
-import { existsSync as existsSync3, readFileSync as readFileSync4, realpathSync, statSync as statSync4 } from "node:fs";
+import { existsSync as existsSync3, readFileSync as readFileSync4, realpathSync as realpathSync2, statSync as statSync4 } from "node:fs";
 import { dirname as dirname3, isAbsolute, join as join4, relative, resolve, sep } from "node:path";
 var EDIT_TOOLS = /* @__PURE__ */ new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 var real = (p) => {
   try {
-    return realpathSync(p);
+    return realpathSync2(p);
   } catch {
     return p;
   }
@@ -485,19 +445,10 @@ await run("listen", async () => {
     if (w) await stdoutWrite(JSON.stringify({ hookSpecificOutput: { hookEventName: input.hook_event_name ?? "PostToolUse", additionalContext: w } }) + "\n");
     return;
   }
-  const asked = takeLinkRequest(input.session_id), wants = takeInviteRequest(input.session_id);
-  const [feedText, link, inv, warn] = await Promise.all([
+  const [feedText, warn] = await Promise.all([
     feed(id, home(), String(input.session_id ?? ""), { cli: "huddle" }),
-    asked ? dashboard(id.url, input.session_id, 1500) : null,
-    wants ? invite(id.url, wants, input.session_id, 1500) : null,
     warned
   ]);
   const text = [warn, feedText].filter(Boolean).join("\n\n");
-  const user = [];
-  if (asked) user.push(link ? `Huddle dashboard (signs your browser in once, within 5 min; expired? /huddle:open makes another): ${link}` : "Huddle: no dashboard link this time (the server did not answer, or this session has not joined); try /huddle:open again.");
-  if (inv) user.push(inv.ok ? `Huddle: to add another Claude session, paste into it: /huddle:join ${new URL(id.url).host} --token ${inv.token}  (${inv.expires ? `valid until ${inv.expires}` : "never expires"}${wants?.single_use ? ", single use" : ""})` : `Huddle: no invite this time (${inv.error}); try /huddle:invite again.`);
-  if (text || user.length) await stdoutWrite(JSON.stringify({
-    ...user.length ? { systemMessage: user.join("\n") } : {},
-    ...text ? { hookSpecificOutput: { hookEventName: input.hook_event_name ?? "PostToolUse", additionalContext: text } } : {}
-  }) + "\n");
+  if (text) await stdoutWrite(JSON.stringify({ hookSpecificOutput: { hookEventName: input.hook_event_name ?? "PostToolUse", additionalContext: text } }) + "\n");
 });

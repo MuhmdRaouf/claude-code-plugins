@@ -33,13 +33,14 @@ echo "watch: $(owner open) (then #/c/rehearsal)"
 # subagents (<name>.<role>) act through it
 as() { local who=$1; shift; HUDDLE_SESSION=${who%%.*} HUDDLE_AS=$who $R "$@"; }
 say() { printf '  %-14s %s\n' "$1" "$2"; }
-JOIN=$(owner token create --print-join-command | head -1); T=${JOIN##* }
-say owner "invite ${T%%.*}.<secret>: ${JOIN% *} <invite> (one line for every session)"
+JOIN=$(owner token create --print-join-command); JOIN=${JOIN#join: }; JOIN=${JOIN%% (*}
+T=${JOIN##*--token }
+say owner "invite ${T%%.*}.<secret>: $JOIN (one line for every session)"
 j() { python3 -c "import json,sys; d=json.load(sys.stdin); print(d$1)"; }
 
-as alpha ${JOIN#huddle } --role "builds the API (project api/)" >/dev/null 2>&1
-as beta  ${JOIN#huddle } --role "builds the client (project web/), needs the API" >/dev/null 2>&1
-as gamma ${JOIN#huddle } --role "writes the docs, needs both" >/dev/null 2>&1
+as alpha join ${JOIN#/huddle:join } --role "builds the API (project api/)" >/dev/null 2>&1
+as beta  join ${JOIN#/huddle:join } --role "builds the client (project web/), needs the API" >/dev/null 2>&1
+as gamma join ${JOIN#/huddle:join } --role "writes the docs, needs both" >/dev/null 2>&1
 say owner "members: $(owner members | cut -d' ' -f1 | tr '\n' ' ')"
 as alpha new "Ship the /orders API" --id api >/dev/null
 as alpha new "Client for /orders" --id client --owner beta --after api >/dev/null

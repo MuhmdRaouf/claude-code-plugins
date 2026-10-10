@@ -7,17 +7,14 @@
 // When nothing answers and autostart is on (HUDDLE_AUTOSTART, or "autostart": true in the file),
 // it starts the bundled server (`huddle up`) and joins; otherwise it says how to start it.
 // Being in a channel takes a credential (server/src/auth.ts), kept per session and per project
-// (bin/creds.ts), so the next session in a project that joined is in too. The session that starts a
-// brand-new Huddle gets, once, the join line for other sessions; a fresh session start (startup)
-// gets a dashboard link that signs the browser in. Both are secrets: they go to the user in
-// systemMessage only, never into Claude's context. A session that holds no credential gets one
-// line with the way back in, and stays out. Every start also puts the plugin's bin/ on the PATH
-// of the session's Bash commands (CLAUDE_ENV_FILE), so `huddle …` works there and in subagents.
-// The whole hook runs on a 3 s budget (each network wait takes what is left of it), so a slow or
-// mute Huddle costs the session start at most that; anything that fails ends in silence (quiet.ts).
+// (bin/creds.ts), so the next session in a project that joined is in too. A session that holds no
+// credential gets one line with the way back in, and stays out. Every start also puts the plugin's
+// bin/ on the PATH of the session's Bash commands (CLAUDE_ENV_FILE), so `huddle …` works there and
+// in subagents. The whole hook runs on a 3 s budget (each network wait takes what is left of it),
+// so a slow or mute Huddle costs the session start at most that; anything that fails ends in
+// silence (quiet.ts).
 import { identity, contextFor, hfetch } from "../bin/identity";
-import { up, home, invite, dashboard } from "../bin/serve";
-import { takeLinkRequest } from "../bin/creds";
+import { up, home } from "../bin/serve";
 import { feed } from "../bin/feed";
 import { run } from "./quiet";
 import { PLUGIN, sleep, stdinText, stdoutWrite } from "../server/src/rt";
@@ -35,7 +32,7 @@ await run("session-start", async () => {
   if (!CH || !ME) return;
   const context = contextFor(input.source, SETTING);
   const CLI = "huddle";
-  const out = (s: string, owner?: string) => stdoutWrite(JSON.stringify({ ...(owner ? { systemMessage: owner } : {}), hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: s } }) + "\n");
+  const out = (s: string) => stdoutWrite(JSON.stringify({ hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: s } }) + "\n");
   const join = async (ms: number) => {
     if (!URL_) throw new Error("no port yet"); // this project's server has never started
     const r = await hfetch(`${URL_}/api/c/${CH}/op/join?as=${encodeURIComponent(ME)}`, {
@@ -44,9 +41,9 @@ await run("session-start", async () => {
     return { status: r.status, ...(await r.json() as any) };
   };
   // with autostart, the first try leaves room to start the server and join it
-  let j: any = await join(Math.min(autostart ? 1000 : 2500, left())).catch(() => null), started = "", created = false;
+  let j: any = await join(Math.min(autostart ? 1000 : 2500, left())).catch(() => null), started = "";
   if (!j && autostart && left() > 300) {
-    const u = await up(URL_, left()); started = u.ok ? `Huddle started (port ${new URL(u.url).port})` : u.msg; created = !!u.first; URL_ = u.url; // a first start picks the port
+    const u = await up(URL_, left()); started = u.ok ? `Huddle started (port ${new URL(u.url).port})` : u.msg; URL_ = u.url; // a first start picks the port
     if (u.ok && left() > 50) j = await join(left()).catch(() => null);
   }
   if (!j) {
@@ -58,19 +55,7 @@ await run("session-start", async () => {
   } else {
     // from here on, hooks/listen.ts brings each new message into this session (the join shows the rest)
     await feed(identity(), home(), String(input.session_id ?? ""), { cli: CLI, start: true, ms: left() });
-    // the creator of a brand-new Huddle: once, the line that lets another session join (to the user only)
-    let invited = "", owner: string[] = [];
-    if (created) {
-      const inv = await invite(URL_, { channel: CH, description: "made at server start" }, undefined, left());
-      if (inv.ok) {
-        invited = " The user got a join line for other Claude sessions (valid 24 h; /huddle:invite makes more).";
-        owner.push(`Huddle: to add another Claude session, paste into it: /huddle:join ${new URL(URL_).host} --token ${inv.token}  (valid 24 h; /huddle:invite makes more)`);
-      }
-    }
-    // a fresh session start: a dashboard link for the user (a pending request is answered by it)
-    const asked = takeLinkRequest(input.session_id);
-    if ((asked || !input.source || input.source === "startup") && left() > 50) { const d = await dashboard(URL_, input.session_id, left()); if (d) owner.push(`Huddle dashboard (signs your browser in once, within 5 min; expired? /huddle:open makes another): ${d}`); }
-    await out(`You are in Huddle channel "${CH}" as "${ME}" (already joined: call status to refresh, join only to change your role).${started ? ` ${started}.` : ""}${invited} Use the huddle skill: tools mcp__plugin_huddle_huddle__*, or \`${CLI}\` from Bash (on PATH; subagents use it with HUDDLE_AS=${ME}.<role>). New messages in the channel${listen.length ? ` and in ${listen.join(", ")}` : ""} arrive in your context after each tool call, also those between other sessions (overheard: knowledge, not yours to answer). Joined just now:\n${j.text}`, owner.join("\n") || undefined);
+    await out(`You are in Huddle channel "${CH}" as "${ME}" (already joined: call status to refresh, join only to change your role).${started ? ` ${started}.` : ""} Use the huddle skill: tools mcp__plugin_huddle_huddle__*, or \`${CLI}\` from Bash (on PATH; subagents use it with HUDDLE_AS=${ME}.<role>). New messages in the channel${listen.length ? ` and in ${listen.join(", ")}` : ""} arrive in your context after each tool call, also those between other sessions (overheard: knowledge, not yours to answer). Joined just now:\n${j.text}`);
   }
 });
 

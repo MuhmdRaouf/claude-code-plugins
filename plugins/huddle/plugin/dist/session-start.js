@@ -8,7 +8,7 @@ import { dirname as dirname2, join as join3 } from "node:path";
 import { homedir as homedir2 } from "node:os";
 
 // plugin/bin/creds.ts
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
 import { homedir } from "node:os";
 import { join as join2 } from "node:path";
 import { createHash as createHash2 } from "node:crypto";
@@ -95,6 +95,10 @@ function projectKey(env2 = process.env) {
     d = projectDir(env2);
   } catch {
   }
+  try {
+    if (d) d = realpathSync(d);
+  } catch {
+  }
   return d ? `project-${createHash2("sha1").update(d).digest("hex").slice(0, 16)}` : null;
 }
 var read = (f) => {
@@ -132,19 +136,6 @@ function saveCred(c, sid) {
 }
 function forgetCred(sid) {
   for (const k of sessionKeys(sid)) rmSync(join2(sessionsDir(), `${k}.json`), { force: true });
-}
-function takeLinkRequest(sid) {
-  let asked = false;
-  for (const k of sessionKeys(sid).filter((k2) => !k2.startsWith("project-"))) {
-    const f = join2(sessionsDir(), `${k}.link`);
-    try {
-      statSync(f);
-      asked = true;
-      rmSync(f, { force: true });
-    } catch {
-    }
-  }
-  return asked;
 }
 var tokenFor = (url, sid) => process.env.HUDDLE_TOKEN || loadCred(url, sid)?.credential || "";
 async function hfetch(url, init = {}, sid) {
@@ -420,15 +411,6 @@ async function up(url, budgetMs = 35e3, sid) {
   if (child.exitCode !== null && !held?.root && loadCred(url.replace(/\/$/, ""), sid)?.credential === root) forgetCred(sid);
   return { ok: false, url, msg: `${said}Huddle did not come up at ${url}${child.exitCode === null ? ` within ${Math.round(budgetMs / 100) / 10} s (still starting)` : ""}; see ${LOG()}` };
 }
-async function dashboard(url, sid, ms = 1500) {
-  try {
-    const r = await hfetch(`${url}/api/login`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}", signal: AbortSignal.timeout(ms) }, sid);
-    const j = r.ok ? await r.json() : null;
-    return j?.code ? `${url}/?code=${encodeURIComponent(j.code)}` : null;
-  } catch {
-    return null;
-  }
-}
 var registryFile = () => `${dirname3(sessionsDir())}/servers.json`;
 function servers() {
   try {
@@ -447,16 +429,6 @@ function noteServer(home_2, e) {
     writeFileSync3(`${f}.${process.pid}.tmp`, JSON.stringify(all, null, 2));
     renameSync3(`${f}.${process.pid}.tmp`, f);
   } catch {
-  }
-}
-async function invite(url, o = {}, sid, ms = 5e3) {
-  try {
-    const r = await hfetch(`${url}/api/tokens`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(o), signal: AbortSignal.timeout(ms) }, sid);
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j.token) return { ok: false, error: j.error ?? `HTTP ${r.status}` };
-    return { ok: true, token: j.token, id: j.id, expires: j.expires, join: `huddle join ${new URL(url).host} --token ${j.token}` };
-  } catch (e) {
-    return { ok: false, error: e.message };
   }
 }
 
@@ -580,7 +552,7 @@ await run("session-start", async () => {
   if (!CH || !ME) return;
   const context = contextFor(input.source, SETTING);
   const CLI = "huddle";
-  const out = (s, owner) => stdoutWrite(JSON.stringify({ ...owner ? { systemMessage: owner } : {}, hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: s } }) + "\n");
+  const out = (s) => stdoutWrite(JSON.stringify({ hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: s } }) + "\n");
   const join4 = async (ms) => {
     if (!URL_) throw new Error("no port yet");
     const r = await hfetch(`${URL_}/api/c/${CH}/op/join?as=${encodeURIComponent(ME)}`, {
@@ -591,11 +563,10 @@ await run("session-start", async () => {
     });
     return { status: r.status, ...await r.json() };
   };
-  let j = await join4(Math.min(autostart ? 1e3 : 2500, left())).catch(() => null), started = "", created = false;
+  let j = await join4(Math.min(autostart ? 1e3 : 2500, left())).catch(() => null), started = "";
   if (!j && autostart && left() > 300) {
     const u = await up(URL_, left());
     started = u.ok ? `Huddle started (port ${new URL(u.url).port})` : u.msg;
-    created = !!u.first;
     URL_ = u.url;
     if (u.ok && left() > 50) j = await join4(left()).catch(() => null);
   }
@@ -607,21 +578,8 @@ await run("session-start", async () => {
     await out(`Huddle: joining channel ${CH} as ${ME} failed: ${j.error}. Tell the owner; do not work around it.`);
   } else {
     await feed(identity(), home(), String(input.session_id ?? ""), { cli: CLI, start: true, ms: left() });
-    let invited = "", owner = [];
-    if (created) {
-      const inv = await invite(URL_, { channel: CH, description: "made at server start" }, void 0, left());
-      if (inv.ok) {
-        invited = " The user got a join line for other Claude sessions (valid 24 h; /huddle:invite makes more).";
-        owner.push(`Huddle: to add another Claude session, paste into it: /huddle:join ${new URL(URL_).host} --token ${inv.token}  (valid 24 h; /huddle:invite makes more)`);
-      }
-    }
-    const asked = takeLinkRequest(input.session_id);
-    if ((asked || !input.source || input.source === "startup") && left() > 50) {
-      const d = await dashboard(URL_, input.session_id, left());
-      if (d) owner.push(`Huddle dashboard (signs your browser in once, within 5 min; expired? /huddle:open makes another): ${d}`);
-    }
-    await out(`You are in Huddle channel "${CH}" as "${ME}" (already joined: call status to refresh, join only to change your role).${started ? ` ${started}.` : ""}${invited} Use the huddle skill: tools mcp__plugin_huddle_huddle__*, or \`${CLI}\` from Bash (on PATH; subagents use it with HUDDLE_AS=${ME}.<role>). New messages in the channel${listen.length ? ` and in ${listen.join(", ")}` : ""} arrive in your context after each tool call, also those between other sessions (overheard: knowledge, not yours to answer). Joined just now:
-${j.text}`, owner.join("\n") || void 0);
+    await out(`You are in Huddle channel "${CH}" as "${ME}" (already joined: call status to refresh, join only to change your role).${started ? ` ${started}.` : ""} Use the huddle skill: tools mcp__plugin_huddle_huddle__*, or \`${CLI}\` from Bash (on PATH; subagents use it with HUDDLE_AS=${ME}.<role>). New messages in the channel${listen.length ? ` and in ${listen.join(", ")}` : ""} arrive in your context after each tool call, also those between other sessions (overheard: knowledge, not yours to answer). Joined just now:
+${j.text}`);
   }
 });
 function onPath() {

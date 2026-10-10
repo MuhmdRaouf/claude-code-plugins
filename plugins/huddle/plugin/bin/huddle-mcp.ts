@@ -15,6 +15,7 @@
 // and lists them all. stdout is the protocol; diagnostics go to stderr.
 import { identity, hfetch, slug } from "./identity";
 import { tokenFor, saveCred } from "./creds";
+import { dashboard } from "./serve";
 import { sleep } from "../server/src/rt";
 import { toolDefs } from "../server/src/ops";
 import { instructions, VERSION } from "../server/src/mcp";
@@ -71,7 +72,10 @@ async function outside(m: any): Promise<boolean> {
     await hfetch(`${URL_}/api/c/${CH}/op/join?as=${encodeURIComponent(ME)}`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}", signal: AbortSignal.timeout(CALL_MS) });
   } catch {}
   listedIn = null; write({ jsonrpc: "2.0", method: "notifications/tools/list_changed" });
-  return text(`joined ${url}, channel ${CH}, as ${ME}; this project's next sessions are in it too. Every Huddle tool is listed now: call status for the picture. (/huddle:open signs the user's browser in to the dashboard.)`);
+  // the user's sign-in link, like `huddle join` prints: whichever way the session joined, the command
+  // (/huddle:join) must be able to show it (commands/join.md shows the line it printed)
+  const link = await dashboard(URL_).catch(() => null);
+  return text(`joined ${url}, channel ${CH}, as ${ME}; this project's next sessions are in it too. Every Huddle tool is listed now: call status for the picture.${link ? `\ndashboard: ${link}   (signs your browser in once, within 5 min)` : " (huddle open, or /huddle:setup, prints the user a dashboard link that signs their browser in.)"}`);
 }
 function local(m: any): boolean {
   const ok = (result: unknown) => { if (m.id !== undefined) write({ jsonrpc: "2.0", id: m.id, result }); return true; };

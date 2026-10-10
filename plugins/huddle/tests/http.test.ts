@@ -222,6 +222,27 @@ test("huddle setup: everything in the project's .agents/huddle, kept out of git;
   } finally { cli("down"); }
 }, 60_000);
 
+test("huddle setup --start joins the channel itself and prints the join line and the dashboard link, also with CLAUDECODE=1", async () => {
+  const proj = mkdtempSync(`${tmpdir()}/huddle-repro-`), state = mkdtempSync(`${tmpdir()}/huddle-repro-state-`);
+  Bun.spawnSync(["git", "init", "-q"], { cwd: proj });
+  const env = { ...process.env, HUDDLE_TOKEN: "", HUDDLE_URL: "", HUDDLE_CHANNEL: "", HUDDLE_AS: "", HUDDLE_HOME: "", HUDDLE_DATA: "",
+    HUDDLE_NO_PROJECT_CRED: "", CLAUDE_PROJECT_DIR: proj, XDG_STATE_HOME: state, HUDDLE_SESSION: "s-1", CLAUDECODE: "1" };
+  const cli = (...a: string[]) => { const r = Bun.spawnSync(["bun", `${ROOT}/plugin/bin/huddle.ts`, ...a], { env, cwd: proj }); return { code: r.exitCode, out: r.stdout.toString(), err: r.stderr.toString() }; };
+  try {
+    const set = cli("setup", "--start");
+    expect(set.code, set.out + set.err).toBe(0);
+    const port = /Huddle started at http:\/\/127\.0\.0\.1:(\d+)/.exec(set.out)?.[1];
+    expect(port ?? "").toMatch(/^\d+$/);
+    expect(set.out).toMatch(new RegExp(`^join: +/huddle:join 127\\.0\\.0\\.1:${port} --token [a-z0-9]{6}\\.[a-z0-9]{16}   \\(valid`, "m")); // a fresh invite, printed
+    const d = new RegExp(`^dashboard: (http://127\\.0\\.0\\.1:${port}/\\?code=\\S+)`, "m").exec(set.out);
+    expect(d).not.toBeNull();                                  // a fresh sign-in link, printed
+    expect((await fetch(d![1]!, { redirect: "manual" })).status).toBe(303); // the code signs a browser in
+    const st = cli("status");
+    expect(st.code, st.out + st.err).toBe(0);                  // the channel exists: setup joined it
+    expect(st.out).toContain("you are ");
+  } finally { cli("down"); }
+}, 60_000);
+
 test("huddle listen streams every message from the others as JSON lines, and replays from --after", async () => {
   await op("l1", "join", "a"); await op("l1", "join", "b"); await op("l1", "join", "c");
   const env = { ...process.env, HUDDLE_URL: U, HUDDLE_CHANNEL: "l1", HUDDLE_AS: "b" };
@@ -357,6 +378,13 @@ const session = (state: string, sid: string, env: Record<string, string> = {}) =
     HUDDLE_HOME: `${state}/home`, CLAUDE_PROJECT_DIR: state, XDG_STATE_HOME: state, HUDDLE_SESSION: sid, ...env }, cwd: state });
   return { code: r.exitCode, out: r.stdout.toString(), err: r.stderr.toString() };
 };
+// the /huddle:join line a command printed, as `huddle` arguments ("join", host, "--token", t), and the token in it
+const joinArgs = (out: string): string[] => {
+  const m = /\/huddle:join (\S+) --token (\S+)/.exec(out);
+  if (!m) throw new Error(`no join line in the output: ${out}`);
+  return ["join", m[1]!, "--token", m[2]!];
+};
+const tokenOf = (out: string): string => /--token ([a-z0-9]{6}\.[a-z0-9]{16})/.exec(out)![1]!;
 
 test("the API and MCP answer only a credential; /health and the page stay open; a wrong token is a 401", async () => {
   const s = await authServer("root-a-very-long-credential");
@@ -388,12 +416,11 @@ test("an invite from the creator lets another session join under its own name; k
     expect(owner("join").code).toBe(0);
     const made = owner("token", "create", "--print-join-command");
     expect(made.code).toBe(0);
-    const line = made.out.split("\n")[0];
-    expect(line).toMatch(new RegExp(`^huddle join 127\\.0\\.0\\.1:${s.port} --token [a-z0-9]{6}\\.[a-z0-9]{16}$`));
-    expect(made.out).toContain(`/huddle:join 127.0.0.1:${s.port} --token`);
-    const token = line.split(" ").pop()!, id = token.split(".")[0];
+    expect(made.out).toMatch(/^join: \/huddle:join 127\.0\.0\.1:\d+ --token [a-z0-9]{6}\.[a-z0-9]{16}   \(valid/m);
+    const token = tokenOf(made.out), id = token.split(".")[0];
+    expect(made.out).toContain(`/huddle:join 127.0.0.1:${s.port} --token ${token}`);
     expect(b("send", "hello").code).toBe(2);                  // not in a huddle yet
-    const joined = b(...line.split(" ").slice(1), "--as", "dev");
+    const joined = b(...joinArgs(made.out), "--as", "dev");
     expect(joined.code, joined.err).toBe(0);
     expect(joined.out).toContain("you are dev");               // the invite's channel, joined
     // its own credential, per session, 0600; never the invite
@@ -420,7 +447,7 @@ test("an invite from the creator lets another session join under its own name; k
     expect(owner("kick", "dev").code).toBe(0);
     expect(b("send", "still here?")).toMatchObject({ code: 2, err: expect.stringContaining("not in this huddle") });
     expect(owner("token", "delete", id).code).toBe(0);
-    expect(b(...line.split(" ").slice(1), "--as", "dev").code).toBe(2); // a revoked invite
+    expect(b(...joinArgs(made.out), "--as", "dev").code).toBe(2); // a revoked invite
     expect(owner("token", "list").out).toContain("no tokens");
   } finally { s.p.kill(); await s.p.exited; }
 }, 60_000);
@@ -448,10 +475,10 @@ test("every member signs its own browser in; that browser runs the dashboard but
   const b = session(mkdtempSync(`${tmpdir()}/huddle-b-`), "s-b"), out = session(mkdtempSync(`${tmpdir()}/huddle-x-`), "s-x", { HUDDLE_URL: s.u });
   try {
     expect(owner("join").code).toBe(0);
-    const line = owner("token", "create", "--print-join-command").out.split("\n")[0];
-    const joined = b(...line.split(" ").slice(1), "--as", "dev");
+    const made = owner("token", "create", "--print-join-command");
+    const joined = b(...joinArgs(made.out), "--as", "dev");
     expect(joined.code, joined.err).toBe(0);
-    expect(joined.err).toMatch(new RegExp(`dashboard http://127\\.0\\.0\\.1:${s.port}/\\?code=`)); // on a terminal: the link itself
+    expect(joined.err).toMatch(new RegExp(`dashboard: http://127\\.0\\.0\\.1:${s.port}/\\?code=`)); // the link itself, printed for the user
     const opened = b("open");
     expect(opened.code, opened.err).toBe(0);
     const code = /\?code=([^\s]+)/.exec(opened.out)![1];
@@ -487,7 +514,7 @@ test("every member signs its own browser in; that browser runs the dashboard but
   } finally { s.p.kill(); await s.p.exited; }
 }, 60_000);
 
-test("inside Claude Code a login code never reaches Claude: join and open leave a request, the next hook shows the link to the user", async () => {
+test("inside Claude Code the join and open print the dashboard link themselves, and the hook carries no systemMessage", async () => {
   const root = "root-for-the-claude-story", s = await authServer(root);
   const owner = session(mkdtempSync(`${tmpdir()}/huddle-own-`), "s-owner", { HUDDLE_TOKEN: root, HUDDLE_URL: s.u, HUDDLE_CHANNEL: "team", HUDDLE_AS: "lead" });
   const stateB = mkdtempSync(`${tmpdir()}/huddle-b-`), b = session(stateB, "s-b", { CLAUDECODE: "1" });
@@ -500,24 +527,19 @@ test("inside Claude Code a login code never reaches Claude: join and open leave 
   };
   try {
     expect(owner("join").code).toBe(0);
-    const line = owner("token", "create", "--print-join-command").out.split("\n")[0];
-    const joined = b(...line.split(" ").slice(1), "--as", "dev");
+    const line = owner("token", "create", "--print-join-command").out;
+    const joined = b(...joinArgs(line), "--as", "dev");
     expect(joined.code, joined.err).toBe(0);
-    expect(joined.out + joined.err).not.toContain("code=");    // what Claude reads: the address, no code
-    expect(joined.err).toContain(`dashboard ${s.u}`);
-    expect(existsSync(`${stateB}/huddle/sessions/s-b.link`)).toBe(true);
-    const first = await hook();                                // PostToolUse, right after that command
-    expect(first.systemMessage).toMatch(new RegExp(`Huddle dashboard .*${s.u}/\\?code=`));
-    expect(JSON.stringify(first.hookSpecificOutput ?? {})).not.toContain("code=");
-    expect(existsSync(`${stateB}/huddle/sessions/s-b.link`)).toBe(false);
-    expect((await hook()).systemMessage).toBeUndefined();      // once per request
-    const code = /\?code=(\S+)/.exec(first.systemMessage)![1];
+    const code = /\?code=(\S+)/.exec(joined.err)![1];          // the link, printed to Claude's output too
     expect((await fetch(`${s.u}/?code=${code}`, { redirect: "manual" })).status).toBe(303);
-    const opened = b("open");                                  // /huddle:open
+    const first = await hook();                                // PostToolUse, right after that command
+    expect(first.systemMessage).toBeUndefined();               // no link or token through a hook any more
+    expect(JSON.stringify(first)).not.toContain("--token");
+    expect((await hook()).systemMessage).toBeUndefined();
+    const opened = b("open");                                  // /huddle:setup's other way in: huddle open
     expect(opened.code, opened.err).toBe(0);
-    expect(opened.out).not.toContain("code=");
-    expect(opened.out).toContain(s.u);
-    expect((await hook()).systemMessage).toMatch(/\?code=/);
+    expect(opened.out).toMatch(/\?code=/);
+    expect((await hook()).systemMessage).toBeUndefined();
   } finally { s.p.kill(); await s.p.exited; }
 }, 60_000);
 
@@ -529,23 +551,23 @@ test("huddle up makes its session the creator; a restart keeps every member, bro
   try {
     const up = a("up");
     expect(up.code, up.err).toBe(0);
-    const line = up.out.split("\n").find(l => l.startsWith("join:"))!.slice(6).trim().split("   ")[0];
-    expect(line).toMatch(new RegExp(`^huddle join 127\\.0\\.0\\.1:${port} --token [a-z0-9]{6}\\.[a-z0-9]{16}$`));
-    expect(up.out).toMatch(new RegExp(`UI: +http://127\\.0\\.0\\.1:${port}/\\?code=`));
+    expect(up.out).toMatch(new RegExp(`^join: +/huddle:join 127\\.0\\.0\\.1:${port} --token [a-z0-9]{6}\\.[a-z0-9]{16}`, "m"));
+    expect(up.out).toMatch(new RegExp(`^dashboard: http://127\\.0\\.0\\.1:${port}/\\?code=\\S+`, "m"));
     expect(JSON.parse(readFileSync(`${stateA}/huddle/sessions/s-a.json`, "utf8")).root).toBe(true);
     expect(readdirSync(`${stateA}/huddle`).sort()).toEqual(["servers.json", "sessions"]); // no shared token file
     expect(a("join").code).toBe(0);
     const login = /\?code=(\S+)/.exec(a("open").out)![1];
     const cookie = String((await fetch(`${u}/?code=${login}`, { redirect: "manual" })).headers.get("set-cookie")).split(";")[0];
-    expect(b(...line.split(" ").slice(1), "--as", "dev").code).toBe(0);
+    const line = joinArgs(up.out);
+    expect(b(...line, "--as", "dev").code).toBe(0);
     expect(b("send", "before").code).toBe(0);
-    const spare = a("token", "create", "--print-join-command").out.split("\n")[0];
-    const gone = a("token", "create", "--print-join-command", "--ttl", "1").out.split("\n")[0];
+    const spare = joinArgs(a("token", "create", "--print-join-command").out);
+    const gone = joinArgs(a("token", "create", "--print-join-command", "--ttl", "1").out);
     // what the server keeps: digests, 0600, no secret
     const auth = `${stateA}/home/data/auth.json`;
     expect(statSync(auth).mode & 0o777).toBe(0o600);
     const kept = readFileSync(auth, "utf8"), credB = JSON.parse(readFileSync(`${stateB}/huddle/sessions/s-b.json`, "utf8")).credential;
-    for (const secret of [credB, line.split(" ").pop()!.split(".")[1], spare.split(" ").pop()!.split(".")[1], JSON.parse(readFileSync(`${stateA}/huddle/sessions/s-a.json`, "utf8")).credential])
+    for (const secret of [credB, tokenOf(up.out).split(".")[1], tokenOf(spare.join(" ")).split(".")[1], JSON.parse(readFileSync(`${stateA}/huddle/sessions/s-a.json`, "utf8")).credential])
       expect(kept).not.toContain(secret);
     expect(a("down").code).toBe(0);
     await Bun.sleep(1100);                                     // the one-second invite runs out
@@ -554,8 +576,8 @@ test("huddle up makes its session the creator; a restart keeps every member, bro
     expect(a("send", "after").code).toBe(0);
     expect(b("send", "after").code).toBe(0);                   // a member stays in across the restart
     expect((await fetch(`${u}/api/channels`, { headers: { cookie } })).status).toBe(200); // so does a browser
-    expect(c(...spare.split(" ").slice(1), "--as", "late").code).toBe(0);  // an unused invite still works
-    expect(c(...gone.split(" ").slice(1), "--as", "later").code).toBe(2);  // an expired one does not
+    expect(c(...spare, "--as", "late").code).toBe(0);          // an unused invite still works
+    expect(c(...gone, "--as", "later").code).toBe(2);          // an expired one does not
     expect(a("kick", "dev").code).toBe(0);
     expect(b("send", "still?")).toMatchObject({ code: 2, err: expect.stringContaining("/huddle:invite") }); // a kick revokes, with a way back
     expect(a("down").code).toBe(0);
@@ -591,9 +613,9 @@ test("a project's credential: the next Claude session in a project that joined i
   const owner = session(mkdtempSync(`${tmpdir()}/huddle-own-`), "s-owner", { HUDDLE_TOKEN: root, HUDDLE_URL: s.u, HUDDLE_CHANNEL: "team", HUDDLE_AS: "lead" });
   try {
     expect(owner("join").code).toBe(0);
-    const line = owner("token", "create", "--print-join-command").out.split("\n")[0];
+    const made = owner("token", "create", "--print-join-command");
     const first = sess(projA, "a-1");
-    const joined = first(...line.split(" ").slice(1));
+    const joined = first(...joinArgs(made.out));
     expect(joined.code, joined.err).toBe(0);
     expect(joined.err).toContain("joined channel team (the invite's); this project's file named mine");
     expect(joined.out).toContain("channel team");
@@ -606,7 +628,7 @@ test("a project's credential: the next Claude session in a project that joined i
   } finally { s.p.kill(); await s.p.exited; }
 }, 60_000);
 
-test("/huddle:invite inside Claude Code: the CLI says the line comes to the user, the next hook shows it there and never to Claude", async () => {
+test("/huddle:invite inside Claude Code prints the join line itself, and the hook carries no systemMessage", async () => {
   const root = "root-for-the-invite-in-claude", s = await authServer(root);
   const state = mkdtempSync(`${tmpdir()}/huddle-ic-`);
   const owner = session(state, "s-owner", { HUDDLE_TOKEN: root, HUDDLE_URL: s.u, HUDDLE_CHANNEL: "team", HUDDLE_AS: "lead", CLAUDECODE: "1" });
@@ -621,15 +643,12 @@ test("/huddle:invite inside Claude Code: the CLI says the line comes to the user
     expect(owner("join").code).toBe(0);
     const made = owner("token", "create", "--print-join-command", "--single-use");
     expect(made.code, made.err).toBe(0);
-    expect(made.out + made.err).not.toMatch(/[a-z0-9]{6}\.[a-z0-9]{16}/); // what Claude reads: no token
-    expect(made.out).toContain("shows to the user");
+    expect(made.out).toContain(`/huddle:join 127.0.0.1:${s.port} --token ${tokenOf(made.out)}`); // printed, not hidden
+    expect(made.out).toMatch(/^join: \/huddle:join \S+ --token [a-z0-9]{6}\.[a-z0-9]{16}   \(valid .*single use\)$/m);
     const h = await hook();
-    expect(h.systemMessage).toMatch(new RegExp(`/huddle:join 127\\.0\\.0\\.1:${s.port} --token [a-z0-9]{6}\\.[a-z0-9]{16}.*single use`));
-    expect(JSON.stringify(h.hookSpecificOutput ?? {})).not.toContain("--token");
-    expect((await hook()).systemMessage).toBeUndefined();     // once per request
-    const token = /--token (\S+)/.exec(h.systemMessage)![1];
+    expect(h.systemMessage).toBeUndefined();                   // no invite through a hook any more
     const b = session(mkdtempSync(`${tmpdir()}/huddle-icb-`), "s-b");
-    expect(b("join", `127.0.0.1:${s.port}`, "--token", token, "--as", "dev").code).toBe(0);
+    expect(b(...joinArgs(made.out), "--as", "dev").code).toBe(0);
     expect(readFileSync(`${ROOT}/plugin/commands/invite.md`, "utf8")).toContain('"${CLAUDE_PLUGIN_ROOT}/bin/huddle" token create --print-join-command $ARGUMENTS');
   } finally { s.p.kill(); await s.p.exited; }
 }, 60_000);
@@ -669,7 +688,7 @@ test("a browser without a working sign-in gets a Signed out answer; a session ge
   try {
     const browser = await fetch(`${s.u}/api/channels`, { headers: { cookie: `huddle_session_${s.port}=stale` } });
     expect(browser.status).toBe(401);
-    expect(await browser.json()).toMatchObject({ signin: true, error: expect.stringContaining("/huddle:open") });
+    expect(await browser.json()).toMatchObject({ signin: true, error: expect.stringContaining("huddle open") });
     const sess = await (await fetch(`${s.u}/api/channels`, { headers: { "x-huddle-token": "stale" } })).json() as any;
     expect(sess.signin).toBeUndefined();
     expect(sess.error).toContain("/huddle:invite");
@@ -677,7 +696,7 @@ test("a browser without a working sign-in gets a Signed out answer; a session ge
     expect(page.status).toBe(401);
     expect(page.headers.get("content-type")).toContain("text/html");
     const html = await page.text();
-    expect(html).toContain("Signed out"); expect(html).toContain("/huddle:open");
+    expect(html).toContain("Signed out"); expect(html).toContain("huddle open"); expect(html).toContain("/huddle:setup");
     expect(readFileSync(`${ROOT}/plugin/server/public/app.js`, "utf8")).toContain("Signed out");
   } finally { s.p.kill(); await s.p.exited; }
 }, 40_000);

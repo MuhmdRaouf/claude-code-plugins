@@ -39,7 +39,7 @@ test("the first huddle up picks a random port and saves it; the next start reuse
     expect(inRange(port)).toBe(true); expect(port_auto).toBe(true);
     expect(first.out).toContain(`picked port ${port}`);
     expect(first.out).toContain(`started at http://127.0.0.1:${port}`);
-    expect(first.out).toMatch(new RegExp(`join: +huddle join 127\\.0\\.0\\.1:${port} --token`));
+    expect(first.out).toMatch(new RegExp(`join: +/huddle:join 127\\.0\\.0\\.1:${port} --token`));
     expect(run("server").out).toContain(`up at http://127.0.0.1:${port}`);
     expect(who(home)).toMatchObject({ url: `http://127.0.0.1:${port}`, source: "saved" });
     expect(run("down").code).toBe(0);

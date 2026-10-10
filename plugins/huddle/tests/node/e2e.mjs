@@ -74,13 +74,13 @@ test("the server runs under node, from dist, with its version", async () => {
 test("members join with the creator's invite and get their own credentials", () => {
   const inv = owner(["token", "create", "--print-join-command"]);
   assert.equal(inv.code, 0, inv.err);
-  const line = inv.out.split("\n")[0];
-  assert.match(line, /^huddle join 127\.0\.0\.1:\d+ --token [a-z0-9]{6}\.[a-z0-9]+$/);
-  const [, , host, , token] = line.split(" ");
+  assert.match(inv.out, /^join: \/huddle:join 127\.0\.0\.1:\d+ --token [a-z0-9]{6}\.[a-z0-9]+/m);
+  const [, host, token] = /\/huddle:join (\S+) --token (\S+)/.exec(inv.out);
   for (const who of ["alpha", "beta"]) {
     const r = cli(who, ["join", host, "--token", token, "--as", who, "--channel", "nodeleg"], { HUDDLE_URL: "" });
     assert.equal(r.code, 0, r.err);
     assert.match(r.err, new RegExp(`joined ${URL_.replace(/\./g, "\\.")} as ${who}`));
+    assert.match(r.err, /dashboard: http:\/\/127\.0\.0\.1:\d+\/\?code=/, "the join prints the dashboard link itself");
     assert.ok(existsSync(`${STATE}/huddle/sessions/${who}.json`));
   }
   assert.match(owner(["members"]).out, /alpha[\s\S]*beta/);
@@ -224,7 +224,10 @@ test("hooks under node: session start joins, listen brings new messages, stop bl
   assert.match(s.hookSpecificOutput.additionalContext, /You are in Huddle channel "nodeleg" as "beta"/);
   assert.match(s.hookSpecificOutput.additionalContext, /`huddle` from Bash \(on PATH/); // the CLI it names: on PATH, no long path
   assert.equal(readFileSync(envFile, "utf8"), `export PATH="${ROOT}/plugin/bin:$PATH"\n`); // through CLAUDE_ENV_FILE, once
-  assert.match(s.systemMessage, new RegExp(`Huddle dashboard .*http://127\\.0\\.0\\.1:${PORT}/\\?code=`));
+  assert.equal(s.systemMessage, undefined, "no join line or sign-in link through a hook");
+  const link = cli("beta", ["open"]);                          // the user gets the link from the CLI
+  assert.equal(link.code, 0, link.err);
+  assert.match(link.out, new RegExp(`dashboard: http://127\\.0\\.0\\.1:${PORT}/\\?code=`));
   assert.equal(cli("alpha", ["send", "beta", "a note after your start"]).code, 0);
   const listen = hook("PostToolUse", { session_id: "beta", hook_event_name: "PostToolUse" }, { HUDDLE_AS: "beta" });
   assert.equal(listen.code, 0, listen.err);

@@ -35,10 +35,10 @@
 //   huddle join <host:port> --token <id.secret> [--as name] [--channel c]   join a huddle with an invite: this
 //                                            session gets its own credential (kept per session, never the invite)
 //   huddle token create [--ttl 24h|0] [--single-use] [--can-invite] [--print-join-command] | token list | token delete <id>
+//                                            (--print-join-command prints the join: line to paste into the other session)
 //   huddle members | kick <name>            who holds a credential; revoke one (the creator only)
 //   huddle open                             a dashboard link that signs your browser in once (5 min), for any session
-//                                            that joined; inside Claude Code it reaches you through the next hook,
-//                                            never Claude's context (/huddle:open)
+//                                            that joined
 //   huddle up [--port n] | down | server   run the server bundled with the plugin (files in .agents/huddle/; its
 //                                            port is random per project, saved there, and shown by up and server)
 //   huddle setup [show] [--port n] [--autostart|--no-autostart] [--listen a,b] [--no-notify] [--start] [--channel c --as s]   set up this machine and project
@@ -86,11 +86,11 @@ if (cmd === "up" || cmd === "down" || cmd === "server") {
   const r: { ok: boolean; msg: string; created?: boolean; url?: string } = await (cmd === "up" ? S.up : cmd === "down" ? S.down : S.info)(URL_);
   if (r.url) URL_ = r.url;
   (r.ok ? console.log : console.error)(r.msg);
-  if (r.created) { // the creator: the join line for other sessions, and the dashboard
+  if (r.created) { // the creator: the line another session pastes in, and the dashboard link
     const inv = await S.joinLine(URL_, { channel: CH || undefined, description: "made by huddle up" });
-    if (inv.ok) console.log(inv.claude ? `join:  the line another Claude session pastes ${inv.line}` : `join:  huddle join ${inv.line.slice("/huddle:join ".length)}   (valid 24 h; in a Claude session: ${inv.line})`);
-    const d = await S.dashboardFor(URL_);
-    if (d) console.log(`UI:    ${d}`);
+    if (inv.ok) console.log(`join:  ${inv.line}   (valid ${inv.expires ? `until ${inv.expires}` : "forever"})`);
+    const d = await S.dashboard(URL_);
+    if (d) console.log(`dashboard: ${d}`);
   }
   process.exit(r.ok ? 0 : cmd === "down" ? 2 : 5);
 }
@@ -115,16 +115,15 @@ if (cmd === "token") {
     if (!URL_) die(NO_PORT, 5);
     const o = { ttl: opt.ttl === undefined ? undefined : seconds(opt.ttl), single_use: !!opt.single_use, can_invite: !!opt.can_invite,
       channel: CH || undefined, description: typeof opt.description === "string" ? opt.description : undefined };
-    if (opt.print_join_command && S.inClaude()) { // /huddle:invite: the line goes to the user, not to Claude
+    if (opt.print_join_command) { // the line another Claude session pastes in, printed for the user wherever this runs
       const l = await S.joinLine(URL_, o);
       if (!l.ok) die(l.error);
-      console.log(`invite made for channel ${CH || "(the joiner's)"}: the /huddle:join line ${l.line}`);
+      console.log(`join: ${l.line}   (valid ${l.expires ? `until ${l.expires}` : "forever"}${o.single_use ? ", single use" : ""})`);
       process.exit(0);
     }
     const inv = await S.invite(URL_, o);
     if (!inv.ok) die(inv.error);
-    if (opt.print_join_command) console.log(`${inv.join}\n# in another Claude session: /huddle:join ${inv.join.slice("huddle join ".length)}`);
-    else console.log(`${inv.token}  (id ${inv.id}, expires ${inv.expires ?? "never"})`);
+    console.log(`${inv.token}  (id ${inv.id}, expires ${inv.expires ?? "never"})`);
   } else if (sub === "list") {
     const l = await admin("GET", "/api/tokens") as any[];
     console.log(l.length ? l.map(t => `${t.id}  expires ${t.expires ?? "never"}  ${t.single_use ? "single-use" : "multi-use"}  uses ${t.uses}${t.can_invite ? "  can-invite" : ""}${t.channel ? `  channel ${t.channel}` : ""}${t.description ? `  ${t.description}` : ""}`).join("\n") : "no tokens");
@@ -142,9 +141,9 @@ if (cmd === "members") {
 if (cmd === "kick") { const n = pos[0] ?? die("kick <name>"); await admin("DELETE", `/api/members/${encodeURIComponent(n)}`); console.log(`${n} kicked: its credential no longer works`); process.exit(0); }
 if (cmd === "open") {
   if (!URL_) die(NO_PORT, 5);
-  const d = await (await import("./serve")).dashboardFor(URL_);
+  const d = await (await import("./serve")).dashboard(URL_);
   if (!d) die("this session is not in a huddle here: join with the command its owner gives you (/huddle:join <host:port> --token …)");
-  console.log(`dashboard: ${d}`); process.exit(0);
+  console.log(`dashboard: ${d}   (signs your browser in once, within 5 min)`); process.exit(0);
 }
 // join a huddle with an invite: `huddle join <host:port> --token <id>.<secret>`; this session then
 // holds its own credential (creds.ts) and joins the invite's channel (or --channel, or its own)
@@ -171,8 +170,8 @@ if (cmd === "join" && (opt.token || /^(https?:\/\/)?[\w.-]+:\d+\/?$/.test(pos[0]
   saveCred({ url, channel, as: name, credential: j.credential });
   console.error(`huddle: joined ${url} as ${name}; this project's next sessions are in it too (the invite is not kept)`);
   URL_ = url; CH = channel; ME = name; delete opt.token; delete opt.name;
-  const d = await (await import("./serve")).dashboardFor(url);
-  if (d) console.error(`huddle: dashboard ${d}`);
+  const d = await (await import("./serve")).dashboard(url);
+  if (d) console.error(`dashboard: ${d}   (signs your browser in once, within 5 min)`);
 }
 if (cmd === "whoami") { console.log(JSON.stringify(ID)); process.exit(0); }
 if (!CH || !ME) die("not in a huddle: in a session that is in one, run /huddle:invite and paste its join line here (/huddle:join …); or run /huddle:setup to start one");

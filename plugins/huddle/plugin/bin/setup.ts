@@ -18,7 +18,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { FILE, LEGACY, findConfig, mainCheckout, identity, savedPort, savePort, slug } from "./identity";
-import { home, dataDir, keepOutOfGit, pidOf, up, down, info, joinLine, dashboardFor, servers, healthy } from "./serve";
+import { home, dataDir, keepOutOfGit, pidOf, up, down, info, joinLine, dashboard, servers, healthy } from "./serve";
 import { loadCred, projectCred, saveCred } from "./creds";
 import { HEADER } from "../server/src/auth";
 import { Notifier } from "../server/src/notify";
@@ -80,11 +80,12 @@ export async function setup(sub: string | undefined, o: Opts, url: string): Prom
     if (o.start) {
       const r = await up(url); say(r.msg); if (!r.ok) return 5;
       url = r.url;
-      if (r.created) { // this session started it: the line for other sessions, and the dashboard
-        const inv = await joinLine(url, { channel: next.channel, description: "made by huddle setup" });
-        if (inv.ok) say(inv.claude ? `join:     the line to paste into another Claude session ${inv.line}` : `join:     ${inv.line}   (paste into another Claude session; valid 24 h)`);
-        const d = await dashboardFor(url); if (d) say(`UI:       ${d}`);
-      }
+      await enter(url, next.channel, next.as); // this session is in now, so the channel exists: huddle status answers
+      // the line another Claude session pastes in, and the dashboard link, printed for the user
+      // (the server is localhost-only; nothing here is kept from Claude), started or not
+      const inv = await joinLine(url, { channel: next.channel, description: "made by huddle setup" });
+      if (inv.ok) say(`join:     ${inv.line}   (valid ${inv.expires ? `until ${inv.expires}` : "forever"})`);
+      const d = await dashboard(url); if (d) say(`dashboard: ${d}`);
     }
     else if (!(await info(url)).ok) say("start it with: huddle up");
     return 0;
@@ -92,6 +93,15 @@ export async function setup(sub: string | undefined, o: Opts, url: string): Prom
     if (e instanceof SetupError) { console.error(`huddle setup: ${e.message}`); return 2; }
     throw e;
   }
+}
+
+// this session joins its channel now, so the channel exists before the next session start (the
+// hooks join then): `huddle status` answers right after setup, also from a plain terminal
+async function enter(url: string, channel: string, as: string): Promise<void> {
+  const me = identity();
+  await hfetch(`${url}/api/c/${me.channel || channel}/op/join?as=${encodeURIComponent(me.as || as)}`, {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ ...(me.role ? { role: me.role } : {}), task: "set up" }), signal: AbortSignal.timeout(5000) }).catch(() => {});
 }
 
 // another Huddle of this user, alive: join it (null: none, go on and start this project's own)
@@ -124,7 +134,7 @@ async function joinRunning(o: Opts): Promise<number | null> {
   await fetch(`${e.url}/api/c/${channel}/op/join?as=${encodeURIComponent(j.name)}`, { method: "POST", headers: { "content-type": "application/json", [HEADER]: j.credential },
     body: JSON.stringify({ role: o.role, task: "set up" }), signal: AbortSignal.timeout(5000) }).catch(() => {});
   say(`Joined the Huddle that already runs for ${where}: ${e.url}, channel ${channel}, as ${j.name}. This project's sessions are in it from now on (no second Huddle started; /huddle:setup --new starts a separate one).`);
-  const d = await dashboardFor(e.url); if (d) say(`UI:       ${d}`);
+  const d = await dashboard(e.url); if (d) say(`dashboard: ${d}`);
   return 0;
 }
 

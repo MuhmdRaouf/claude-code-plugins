@@ -76,7 +76,7 @@ var init_rt = __esm({
 });
 
 // plugin/bin/creds.ts
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
 import { homedir } from "node:os";
 import { join as join2 } from "node:path";
 import { createHash as createHash2 } from "node:crypto";
@@ -93,6 +93,10 @@ function projectKey(env2 = process.env) {
   let d = null;
   try {
     d = projectDir(env2);
+  } catch {
+  }
+  try {
+    if (d) d = realpathSync(d);
   } catch {
   }
   return d ? `project-${createHash2("sha1").update(d).digest("hex").slice(0, 16)}` : null;
@@ -125,18 +129,12 @@ function forgetCred(sid) {
   for (const k of sessionKeys(sid)) rmSync(join2(sessionsDir(), `${k}.json`), { force: true });
 }
 function projectCred(dir, url) {
+  try {
+    dir = realpathSync(dir);
+  } catch {
+  }
   const c = read(join2(sessionsDir(), `project-${createHash2("sha1").update(dir).digest("hex").slice(0, 16)}.json`));
   return c && (!url || norm(c.url) === norm(url)) ? c : null;
-}
-function requestLink(sid) {
-  const dir = sessionsDir();
-  mkdirSync(dir, { recursive: true, mode: 448 });
-  for (const k of sessionKeys(sid).filter((k2) => !k2.startsWith("project-"))) writeFileSync(join2(dir, `${k}.link`), "", { mode: 384 });
-}
-function requestInvite(o, sid) {
-  const dir = sessionsDir();
-  mkdirSync(dir, { recursive: true, mode: 448 });
-  for (const k of sessionKeys(sid).filter((k2) => !k2.startsWith("project-"))) writeFileSync(join2(dir, `${k}.invite`), JSON.stringify(o), { mode: 384 });
 }
 async function hfetch(url, init = {}, sid) {
   const base = new URL(url).origin;
@@ -343,12 +341,10 @@ var init_port = __esm({
 var serve_exports = {};
 __export(serve_exports, {
   dashboard: () => dashboard,
-  dashboardFor: () => dashboardFor,
   dataDir: () => dataDir,
   down: () => down,
   healthy: () => healthy,
   home: () => home,
-  inClaude: () => inClaude,
   info: () => info,
   invite: () => invite,
   joinLine: () => joinLine,
@@ -477,8 +473,8 @@ data: ${dataDesc()}
 log:  ${LOG()}` };
   const pid = pidOf(), ok = await healthy(url);
   const who = pid ? `pid ${pid}, started by huddle up` : ok ? "not started by huddle up" : "";
-  const link = ok && !inClaude() ? await dashboard(url, sid) : null;
-  const hint = link ? "  (signs you in once, for 5 minutes)" : ok && inClaude() ? "  (to sign your browser in: /huddle:open)" : "";
+  const link = ok ? await dashboard(url, sid) : null;
+  const hint = link ? "  (signs you in once, for 5 minutes)" : "";
   return { ok, msg: `Huddle is ${ok ? "up" : "down"} at ${url}${who ? ` (${who})` : ""}
 UI:   ${link ?? url}${hint}
 data: ${dataDesc()}
@@ -493,34 +489,9 @@ async function dashboard(url, sid, ms = 1500) {
     return null;
   }
 }
-async function dashboardFor(url, sid) {
-  if (!inClaude()) {
-    const d = await dashboard(url, sid);
-    return d && `${d}   (signs your browser in once, within 5 min)`;
-  }
-  try {
-    if (!(await hfetch(`${url}/api/whoami`, { signal: AbortSignal.timeout(1500) }, sid)).ok) return null;
-  } catch {
-    return null;
-  }
-  requestLink(sid);
-  return `${url}   (your sign-in link shows to you, not to Claude, right after this command; /huddle:open makes another)`;
-}
-async function joinLine(url, o, sid) {
-  if (!inClaude()) {
-    const inv = await invite(url, o, sid);
-    return inv.ok ? { ok: true, claude: false, line: `/huddle:join ${inv.join.slice("huddle join ".length)}` } : inv;
-  }
-  try {
-    const r = await hfetch(`${url}/api/whoami`, { signal: AbortSignal.timeout(1500) }, sid);
-    const w = r.ok ? await r.json() : null;
-    if (!w) return { ok: false, error: "this session is not in this huddle" };
-    if (!w.invite) return { ok: false, error: "this session may not invite: only the session that started Huddle (or one invited with --can-invite) can" };
-  } catch {
-    return { ok: false, error: `Huddle unreachable at ${url}` };
-  }
-  requestInvite(o, sid);
-  return { ok: true, claude: true, line: "shows to the user (not to you) right after this command, from the plugin's hook; /huddle:invite makes another" };
+async function joinLine(url, o = {}, sid) {
+  const inv = await invite(url, o, sid);
+  return inv.ok ? { ok: true, expires: inv.expires, line: `/huddle:join ${inv.join.slice("huddle join ".length)}` } : inv;
 }
 function servers() {
   try {
@@ -551,7 +522,7 @@ async function invite(url, o = {}, sid, ms = 5e3) {
     return { ok: false, error: e.message };
   }
 }
-var home_, home, dataDir, PID, LOG, SERVER, dataDesc, LOOPBACK, pidOf, inClaude, registryFile;
+var home_, home, dataDir, PID, LOG, SERVER, dataDesc, LOOPBACK, pidOf, registryFile;
 var init_serve = __esm({
   "plugin/bin/serve.ts"() {
     init_identity();
@@ -567,7 +538,6 @@ var init_serve = __esm({
     dataDesc = () => `${dataDir()}/channels`;
     LOOPBACK = /* @__PURE__ */ new Set(["127.0.0.1", "localhost"]);
     pidOf = () => runningPid(home());
-    inClaude = () => process.env.CLAUDECODE === "1" && !process.stdout.isTTY;
     registryFile = () => `${dirname3(sessionsDir())}/servers.json`;
   }
 });
@@ -750,12 +720,11 @@ async function setup(sub, o, url) {
       say(r.msg);
       if (!r.ok) return 5;
       url = r.url;
-      if (r.created) {
-        const inv = await joinLine(url, { channel: next.channel, description: "made by huddle setup" });
-        if (inv.ok) say(inv.claude ? `join:     the line to paste into another Claude session ${inv.line}` : `join:     ${inv.line}   (paste into another Claude session; valid 24 h)`);
-        const d = await dashboardFor(url);
-        if (d) say(`UI:       ${d}`);
-      }
+      await enter(url, next.channel, next.as);
+      const inv = await joinLine(url, { channel: next.channel, description: "made by huddle setup" });
+      if (inv.ok) say(`join:     ${inv.line}   (valid ${inv.expires ? `until ${inv.expires}` : "forever"})`);
+      const d = await dashboard(url);
+      if (d) say(`dashboard: ${d}`);
     } else if (!(await info(url)).ok) say("start it with: huddle up");
     return 0;
   } catch (e) {
@@ -765,6 +734,16 @@ async function setup(sub, o, url) {
     }
     throw e;
   }
+}
+async function enter(url, channel, as) {
+  const me = identity();
+  await hfetch(`${url}/api/c/${me.channel || channel}/op/join?as=${encodeURIComponent(me.as || as)}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ ...me.role ? { role: me.role } : {}, task: "set up" }),
+    signal: AbortSignal.timeout(5e3)
+  }).catch(() => {
+  });
 }
 async function joinRunning(o) {
   const mine = home();
@@ -815,8 +794,8 @@ async function joinRunning(o) {
   }).catch(() => {
   });
   say(`Joined the Huddle that already runs for ${where}: ${e.url}, channel ${channel}, as ${j.name}. This project's sessions are in it from now on (no second Huddle started; /huddle:setup --new starts a separate one).`);
-  const d = await dashboardFor(e.url);
-  if (d) say(`UI:       ${d}`);
+  const d = await dashboard(e.url);
+  if (d) say(`dashboard: ${d}`);
   return 0;
 }
 async function notify(on, url) {
@@ -903,9 +882,9 @@ if (cmd === "up" || cmd === "down" || cmd === "server") {
   (r.ok ? console.log : console.error)(r.msg);
   if (r.created) {
     const inv = await S.joinLine(URL_, { channel: CH || void 0, description: "made by huddle up" });
-    if (inv.ok) console.log(inv.claude ? `join:  the line another Claude session pastes ${inv.line}` : `join:  huddle join ${inv.line.slice("/huddle:join ".length)}   (valid 24 h; in a Claude session: ${inv.line})`);
-    const d = await S.dashboardFor(URL_);
-    if (d) console.log(`UI:    ${d}`);
+    if (inv.ok) console.log(`join:  ${inv.line}   (valid ${inv.expires ? `until ${inv.expires}` : "forever"})`);
+    const d = await S.dashboard(URL_);
+    if (d) console.log(`dashboard: ${d}`);
   }
   process.exit(r.ok ? 0 : cmd === "down" ? 2 : 5);
 }
@@ -932,17 +911,15 @@ if (cmd === "token") {
       channel: CH || void 0,
       description: typeof opt.description === "string" ? opt.description : void 0
     };
-    if (opt.print_join_command && S.inClaude()) {
+    if (opt.print_join_command) {
       const l = await S.joinLine(URL_, o);
       if (!l.ok) die(l.error);
-      console.log(`invite made for channel ${CH || "(the joiner's)"}: the /huddle:join line ${l.line}`);
+      console.log(`join: ${l.line}   (valid ${l.expires ? `until ${l.expires}` : "forever"}${o.single_use ? ", single use" : ""})`);
       process.exit(0);
     }
     const inv = await S.invite(URL_, o);
     if (!inv.ok) die(inv.error);
-    if (opt.print_join_command) console.log(`${inv.join}
-# in another Claude session: /huddle:join ${inv.join.slice("huddle join ".length)}`);
-    else console.log(`${inv.token}  (id ${inv.id}, expires ${inv.expires ?? "never"})`);
+    console.log(`${inv.token}  (id ${inv.id}, expires ${inv.expires ?? "never"})`);
   } else if (sub === "list") {
     const l = await admin("GET", "/api/tokens");
     console.log(l.length ? l.map((t) => `${t.id}  expires ${t.expires ?? "never"}  ${t.single_use ? "single-use" : "multi-use"}  uses ${t.uses}${t.can_invite ? "  can-invite" : ""}${t.channel ? `  channel ${t.channel}` : ""}${t.description ? `  ${t.description}` : ""}`).join("\n") : "no tokens");
@@ -966,9 +943,9 @@ if (cmd === "kick") {
 }
 if (cmd === "open") {
   if (!URL_) die(NO_PORT, 5);
-  const d = await (await Promise.resolve().then(() => (init_serve(), serve_exports))).dashboardFor(URL_);
+  const d = await (await Promise.resolve().then(() => (init_serve(), serve_exports))).dashboard(URL_);
   if (!d) die("this session is not in a huddle here: join with the command its owner gives you (/huddle:join <host:port> --token \u2026)");
-  console.log(`dashboard: ${d}`);
+  console.log(`dashboard: ${d}   (signs your browser in once, within 5 min)`);
   process.exit(0);
 }
 if (cmd === "join" && (opt.token || /^(https?:\/\/)?[\w.-]+:\d+\/?$/.test(pos[0] ?? ""))) {
@@ -996,8 +973,8 @@ if (cmd === "join" && (opt.token || /^(https?:\/\/)?[\w.-]+:\d+\/?$/.test(pos[0]
   ME = name;
   delete opt.token;
   delete opt.name;
-  const d = await (await Promise.resolve().then(() => (init_serve(), serve_exports))).dashboardFor(url);
-  if (d) console.error(`huddle: dashboard ${d}`);
+  const d = await (await Promise.resolve().then(() => (init_serve(), serve_exports))).dashboard(url);
+  if (d) console.error(`dashboard: ${d}   (signs your browser in once, within 5 min)`);
 }
 if (cmd === "whoami") {
   console.log(JSON.stringify(ID));

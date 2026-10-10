@@ -5,7 +5,7 @@
 // a Huddle that is down, slow (accepts and never answers), answers garbage, or with odd env; the
 // block cases run against the real server.
 import { test, expect, beforeAll, afterAll } from "bun:test";
-import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Subprocess } from "bun";
@@ -236,38 +236,45 @@ test("a session without a credential stays outside: one line at session start, s
   }
 }, 30_000);
 
-test("a joined member sees a dashboard link when a session starts, as a message to the user, never in Claude's context", async () => {
+test("a joined member's session start carries no systemMessage; huddle open prints the link", async () => {
   const inv = await (await fetch(`${U}/api/tokens`, { method: "POST", headers: { ...H, "content-type": "application/json" }, body: JSON.stringify({ channel: "hooks" }) })).json() as any;
   const j = await (await fetch(`${U}/api/join`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ token: inv.token, name: "member" }) })).json() as any;
   const state = mkdtempSync(`${tmpdir()}/huddle-member-`);
   mkdirSync(`${state}/huddle/sessions`, { recursive: true });
   writeFileSync(`${state}/huddle/sessions/s-mem.json`, JSON.stringify({ url: U, channel: "hooks", as: "member", credential: j.credential }));
   const env = { HUDDLE_URL: U, HUDDLE_CHANNEL: "hooks", HUDDLE_AS: "member", HUDDLE_TOKEN: "", XDG_STATE_HOME: state };
-  const quiet = await run("session-start.ts", { source: "resume", session_id: "s-mem" }, env); // a resume or /clear: no new link
+  const quiet = await run("session-start.ts", { source: "resume", session_id: "s-mem" }, env);
   expect(JSON.parse(quiet.stdout).hookSpecificOutput.additionalContext).toContain('as "member"');
   expect(JSON.parse(quiet.stdout).systemMessage).toBeUndefined();
-  for (const source of ["startup"]) {
-    const r = await run("session-start.ts", { source, session_id: "s-mem" }, env);
-    expect(r.exitCode, source).toBe(0);
-    const out = JSON.parse(r.stdout), ctx: string = out.hookSpecificOutput.additionalContext;
-    expect(ctx, source).toContain('You are in Huddle channel "hooks" as "member"');
-    expect(out.systemMessage, source).toMatch(new RegExp(`Huddle dashboard .*${U}/\\?code=\\S+`));
-    expect(out.systemMessage, source).toContain("/huddle:open");
-    expect(ctx, source).not.toContain("code=");
-    expect(ctx, source).not.toContain(j.credential);
-    const code = /\?code=(\S+)/.exec(out.systemMessage)![1];
-    expect((await fetch(`${U}/?code=${code}`, { redirect: "manual" })).status, source).toBe(303); // it signs a browser in
-  }
+  const r = await run("session-start.ts", { source: "startup", session_id: "s-mem" }, env);
+  expect(r.exitCode).toBe(0);
+  const out = JSON.parse(r.stdout), ctx: string = out.hookSpecificOutput.additionalContext;
+  expect(ctx).toContain('You are in Huddle channel "hooks" as "member"');
+  expect(out.systemMessage).toBeUndefined();                    // no link or invite through a hook any more
+  expect(ctx).not.toContain(j.credential);
+  // the user gets the link from the CLI instead, and it signs a browser in
+  const open = Bun.spawnSync(["bun", `${ROOT}/plugin/bin/huddle.ts`, "open"], { env: { ...process.env, HUDDLE_URL: U, HUDDLE_CHANNEL: "hooks", HUDDLE_AS: "member", HUDDLE_TOKEN: "", XDG_STATE_HOME: state, HUDDLE_SESSION: "s-mem" }, cwd: state });
+  expect(open.exitCode).toBe(0);
+  const said = open.stdout.toString();
+  expect(said).toMatch(new RegExp(`dashboard: ${U}/\\?code=\\S+`));
+  const code = /\?code=(\S+)/.exec(said)![1];
+  expect((await fetch(`${U}/?code=${code}`, { redirect: "manual" })).status).toBe(303);
 }, 30_000);
 
-test("/huddle:open runs huddle open and never asks for the code", async () => {
-  const md = readFileSync(`${ROOT}/plugin/commands/open.md`, "utf8");
-  expect(md).toMatch(/^---\ndescription: .+\nallowed-tools: Bash\n---\n/);
-  expect(md).toContain('"${CLAUDE_PLUGIN_ROOT}/bin/huddle" open');
-  expect(readFileSync(`${ROOT}/plugin/commands/join.md`, "utf8")).toContain("/huddle:open");
+test("three commands run the CLI and show its join and dashboard lines verbatim; /huddle:open is gone", async () => {
+  expect(existsSync(`${ROOT}/plugin/commands/open.md`)).toBe(false);
+  expect(readdirSync(`${ROOT}/plugin/commands`).sort()).toEqual(["invite.md", "join.md", "setup.md"]);
+  for (const c of ["setup.md", "invite.md", "join.md"]) {
+    const md = readFileSync(`${ROOT}/plugin/commands/${c}`, "utf8");
+    expect(md, c).toMatch(/^---\ndescription: .+\n(argument-hint: .+\n)?allowed-tools: Bash\n---\n/);
+    expect(md, c).toContain('"${CLAUDE_PLUGIN_ROOT}/bin/huddle"');
+    expect(md, c).toContain("verbatim");                        // the lines are shown as the CLI printed them
+    expect(md.toLowerCase(), c).not.toMatch(/a secret|not to claude|claude never sees|never reaches you|only you see|shows to the user/);
+  }
+  for (const h of ["listen.ts", "session-start.ts"]) expect(readFileSync(`${ROOT}/plugin/hooks/${h}`, "utf8"), h).not.toContain("systemMessage");
 });
 
-test("the session that starts Huddle holds its root credential and sees, once, the join command and a dashboard link", async () => {
+test("the session that starts Huddle holds its root credential, and the hook carries no join line or link", async () => {
   const port = await freePort(), u = `http://127.0.0.1:${port}`, state = mkdtempSync(`${tmpdir()}/huddle-creator-`);
   const env = { HUDDLE_URL: u, HUDDLE_CHANNEL: "made", HUDDLE_AS: "boss", HUDDLE_AUTOSTART: "1", HUDDLE_TOKEN: "", XDG_STATE_HOME: state };
   const r = await run("session-start.ts", { source: "startup", session_id: "s-boss" }, env);
@@ -277,25 +284,24 @@ test("the session that starts Huddle holds its root credential and sees, once, t
     const out = JSON.parse(r.stdout);
     const ctx: string = out.hookSpecificOutput.additionalContext;
     expect(ctx).toContain('You are in Huddle channel "made" as "boss"');
-    const m = new RegExp(`/huddle:join 127\\.0\\.0\\.1:${port} --token ([a-z0-9]{6}\\.[a-z0-9]{16})`).exec(out.systemMessage);
-    expect(m).not.toBeNull();                                   // the owner sees it, to paste elsewhere
-    expect(ctx).not.toContain(m![1]);                           // Claude never does
-    expect(ctx).not.toContain("--token");
-    expect(out.systemMessage).toMatch(new RegExp(`Huddle dashboard .*http://127\\.0\\.0\\.1:${port}/\\?code=`));
-    // the session's credential is the root one, kept 0600 in a 0700 dir; the invite is not kept
+    expect(out.systemMessage).toBeUndefined();                  // no invite or sign-in link through the hook
+    expect(r.stdout).not.toContain("--token");
+    expect(r.stdout).not.toContain("?code=");
+    // the session's credential is the root one, kept 0600 in a 0700 dir; no invite is kept
     const dir = `${state}/huddle/sessions`;
     expect(statSync(dir).mode & 0o777).toBe(0o700);
     const file = `${dir}/s-boss.json`;
     expect(statSync(file).mode & 0o777).toBe(0o600);
     const cred = JSON.parse(readFileSync(file, "utf8"));
     expect(cred).toMatchObject({ url: u, channel: "made", as: "boss", root: true });
-    expect(readFileSync(file, "utf8")).not.toContain(m![1].split(".")[1]);
-    // the invite lets another session in, under its own name
-    const j = await (await fetch(`${u}/api/join`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ token: m![1], name: "dev" }) })).json() as any;
+    // the creator mints the invite itself (huddle setup prints the line; here, over the API)
+    const inv = await (await fetch(`${u}/api/tokens`, { method: "POST", headers: { "content-type": "application/json", "x-huddle-token": cred.credential }, body: JSON.stringify({ channel: "made" }) })).json() as any;
+    const j = await (await fetch(`${u}/api/join`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ token: inv.token, name: "dev" }) })).json() as any;
     expect(j).toMatchObject({ name: "dev", channel: "made" });
-    // a later start of the same session joins quietly: no new invite
+    // a later start of the same session joins quietly
     const again = await run("session-start.ts", { source: "resume", session_id: "s-boss" }, env);
     expect(JSON.parse(again.stdout).hookSpecificOutput.additionalContext).not.toContain("/huddle:join");
+    expect(JSON.parse(again.stdout).systemMessage).toBeUndefined();
   } finally { if (pid) try { process.kill(pid, "SIGTERM"); } catch {} }
 }, 30_000);
 

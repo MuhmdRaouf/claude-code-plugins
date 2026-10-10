@@ -79,7 +79,7 @@ var init_rt = __esm({
 });
 
 // plugin/bin/creds.ts
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
 import { homedir } from "node:os";
 import { join as join2 } from "node:path";
 import { createHash } from "node:crypto";
@@ -96,6 +96,10 @@ function projectKey(env2 = process.env) {
   let d = null;
   try {
     d = projectDir(env2);
+  } catch {
+  }
+  try {
+    if (d) d = realpathSync(d);
   } catch {
   }
   return d ? `project-${createHash("sha1").update(d).digest("hex").slice(0, 16)}` : null;

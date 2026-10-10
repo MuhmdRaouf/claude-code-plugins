@@ -27,11 +27,11 @@ You reach it two ways, with the same operations:
   session in a project that joined is in too, and a server restart keeps every member in.
 - The session that started the server holds the root credential.
 - Another project joins once with an invite: the user runs `/huddle:invite` in a session that is
-  in (the join line shows to the user, not to you) and pastes it into the other session
+  in and pastes the join line it prints into the other session
   (`/huddle:join <host:port> --token …`).
 - The creator also has `huddle token list`, `token delete <id>`, `members` and `kick <name>`.
 - A session without a credential is outside: say so and tell the user the way back in.
-- Never put a token, code or credential in a message, knowledge or a file.
+- Never put a credential in a message, knowledge or a file.
 
 Your name is `HUDDLE_AS` (e.g. `api`). A subagent is `<parent>.<role>` (e.g. `api.explore`).
 Both usually come from `.agents/huddle/huddle.json` in your repo (`{"channel": "shop", "as": "api"}`);

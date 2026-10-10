@@ -8,7 +8,7 @@ import { dirname as dirname2, join as join3 } from "node:path";
 import { homedir as homedir2 } from "node:os";
 
 // plugin/bin/creds.ts
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
 import { homedir } from "node:os";
 import { join as join2 } from "node:path";
 import { createHash } from "node:crypto";
@@ -29,6 +29,8 @@ function pluginRoot() {
   return join(dirname(SELF), BUNDLED ? ".." : "../..");
 }
 var PLUGIN = pluginRoot();
+var SOURCES = { huddle: "bin/huddle.ts", "huddle-mcp": "bin/huddle-mcp.ts", server: "server/server.ts" };
+var entry = (name) => join(PLUGIN, BUNDLED ? `dist/${name}.js` : SOURCES[name]);
 var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function fetchUntimed(url, init = {}) {
   if (isBun) return fetch(url, { ...init, timeout: false });
@@ -74,6 +76,10 @@ function projectKey(env2 = process.env) {
   let d = null;
   try {
     d = projectDir(env2);
+  } catch {
+  }
+  try {
+    if (d) d = realpathSync(d);
   } catch {
   }
   return d ? `project-${createHash("sha1").update(d).digest("hex").slice(0, 16)}` : null;
@@ -254,6 +260,18 @@ function identity(sid) {
     autostart: ["1", "true"].includes(String(env("HUDDLE_AUTOSTART") ?? c.autostart ?? "").toLowerCase()),
     file: found?.file
   };
+}
+
+// plugin/bin/serve.ts
+var SERVER = entry("server");
+async function dashboard(url, sid, ms = 1500) {
+  try {
+    const r = await hfetch(`${url}/api/login`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}", signal: AbortSignal.timeout(ms) }, sid);
+    const j = r.ok ? await r.json() : null;
+    return j?.code ? `${url}/?code=${encodeURIComponent(j.code)}` : null;
+  } catch {
+    return null;
+  }
 }
 
 // plugin/server/src/knowledge.ts
@@ -1146,7 +1164,9 @@ async function outside(m) {
   }
   listedIn = null;
   write({ jsonrpc: "2.0", method: "notifications/tools/list_changed" });
-  return text(`joined ${url}, channel ${CH}, as ${ME}; this project's next sessions are in it too. Every Huddle tool is listed now: call status for the picture. (/huddle:open signs the user's browser in to the dashboard.)`);
+  const link = await dashboard(URL_).catch(() => null);
+  return text(`joined ${url}, channel ${CH}, as ${ME}; this project's next sessions are in it too. Every Huddle tool is listed now: call status for the picture.${link ? `
+dashboard: ${link}   (signs your browser in once, within 5 min)` : " (huddle open, or /huddle:setup, prints the user a dashboard link that signs their browser in.)"}`);
 }
 function local2(m) {
   const ok = (result) => {

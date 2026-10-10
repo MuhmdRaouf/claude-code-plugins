@@ -17,7 +17,7 @@ import { spawn } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { homeOf, mainCheckout, identity, hfetch, runningPid, savedPort, savePort, local } from "./identity";
-import { loadCred, saveCred, forgetCred, requestLink, requestInvite, sessionsDir, type InviteAsk } from "./creds";
+import { loadCred, saveCred, forgetCred, sessionsDir } from "./creds";
 import { credential } from "../server/src/auth";
 import { portFree, randomPort } from "../server/src/port";
 import { entry, runtimeArgs, sleep } from "../server/src/rt";
@@ -145,16 +145,16 @@ export async function info(url: string, sid?: string): Promise<Result> {
   if (!url) return { ok: false, msg: `Huddle has no port here yet: huddle up picks a random five-digit one and saves it in ${home()}/huddle.json\ndata: ${dataDesc()}\nlog:  ${LOG()}` };
   const pid = pidOf(), ok = await healthy(url);
   const who = pid ? `pid ${pid}, started by huddle up` : ok ? "not started by huddle up" : "";
-  const link = ok && !inClaude() ? await dashboard(url, sid) : null; // inside Claude, a code would land in its context
-  const hint = link ? "  (signs you in once, for 5 minutes)" : ok && inClaude() ? "  (to sign your browser in: /huddle:open)" : "";
+  const link = ok ? await dashboard(url, sid) : null;
+  const hint = link ? "  (signs you in once, for 5 minutes)" : "";
   return { ok, msg: `Huddle is ${ok ? "up" : "down"} at ${url}${who ? ` (${who})` : ""}\nUI:   ${link ?? url}${hint}\ndata: ${dataDesc()}\nlog:  ${LOG()}` };
 }
 
 // the dashboard link that signs a browser in: a one-time login code, which any session holding a
 // credential gets for itself (the creator's browser has its rights; a member's has no admin
-// rights, server/src/auth.ts); null for a session that has not joined. The code is a secret: it
-// goes to the user (a terminal, or a hook's systemMessage), never into Claude's context
-export const inClaude = () => process.env.CLAUDECODE === "1" && !process.stdout.isTTY; // Claude Code's Bash tool: its output is Claude's context
+// rights, server/src/auth.ts); null for a session that has not joined. The server is localhost-only
+// and the code only signs a browser in for five minutes, so the CLI prints the link wherever it
+// runs; it is not kept from Claude
 export async function dashboard(url: string, sid?: string, ms = 1500): Promise<string | null> {
   try {
     const r = await hfetch(`${url}/api/login`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}", signal: AbortSignal.timeout(ms) }, sid);
@@ -163,32 +163,12 @@ export async function dashboard(url: string, sid?: string, ms = 1500): Promise<s
   } catch { return null; }
 }
 
-// the dashboard for the user: on a terminal, the link itself; inside Claude Code, the plain address,
-// and a request that the next hook show the link to the user (creds.ts requestLink); null when
-// this session may not sign a browser in (it has not joined)
-export async function dashboardFor(url: string, sid?: string): Promise<string | null> {
-  if (!inClaude()) { const d = await dashboard(url, sid); return d && `${d}   (signs your browser in once, within 5 min)`; }
-  try { if (!(await hfetch(`${url}/api/whoami`, { signal: AbortSignal.timeout(1500) }, sid)).ok) return null; } catch { return null; }
-  requestLink(sid);
-  return `${url}   (your sign-in link shows to you, not to Claude, right after this command; /huddle:open makes another)`;
-}
-
-// The join line for another session, as this caller may see it. On a terminal: the line itself.
-// Inside Claude Code: an invite is a secret, so a request the next hook answers (creds.ts
-// requestInvite) and a note that says so; the line reaches the user, never Claude.
-export async function joinLine(url: string, o: InviteAsk, sid?: string): Promise<{ ok: true; line: string; claude: boolean } | { ok: false; error: string }> {
-  if (!inClaude()) {
-    const inv = await invite(url, o, sid);
-    return inv.ok ? { ok: true, claude: false, line: `/huddle:join ${inv.join.slice("huddle join ".length)}` } : inv;
-  }
-  try {
-    const r = await hfetch(`${url}/api/whoami`, { signal: AbortSignal.timeout(1500) }, sid);
-    const w = r.ok ? await r.json() as any : null;
-    if (!w) return { ok: false, error: "this session is not in this huddle" };
-    if (!w.invite) return { ok: false, error: "this session may not invite: only the session that started Huddle (or one invited with --can-invite) can" };
-  } catch { return { ok: false, error: `Huddle unreachable at ${url}` }; }
-  requestInvite(o, sid);
-  return { ok: true, claude: true, line: "shows to the user (not to you) right after this command, from the plugin's hook; /huddle:invite makes another" };
+// a fresh invite and the line another Claude session pastes in to join with it
+// (/huddle:join <host:port> --token <id.secret>), printed for the user wherever the CLI runs
+export async function joinLine(url: string, o: { ttl?: number; single_use?: boolean; can_invite?: boolean; channel?: string; description?: string } = {}, sid?: string):
+  Promise<{ ok: true; line: string; expires: string | null } | { ok: false; error: string }> {
+  const inv = await invite(url, o, sid);
+  return inv.ok ? { ok: true, expires: inv.expires, line: `/huddle:join ${inv.join.slice("huddle join ".length)}` } : inv;
 }
 
 // the servers this user runs (`huddle up` notes each): setup looks here before it starts a second one

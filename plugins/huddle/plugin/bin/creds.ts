@@ -10,7 +10,7 @@
 // needing a new invite. Same OS user, same 0600 directory: no new secret on disk.
 // HUDDLE_TOKEN overrides it all (a root credential for scripts and tests). A credential is only
 // ever sent to the url it was issued by. Reads never throw: no file means no credential.
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync, chmodSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
@@ -32,13 +32,16 @@ export function sessionKeys(sid?: string, env = process.env): string[] {
   return [...new Set(ks)];
 }
 // the project's key: its main checkout (identity.ts sets the resolver: no import cycle), else
-// CLAUDE_PROJECT_DIR; none outside a project
+// CLAUDE_PROJECT_DIR; none outside a project. The dir is resolved first: the same checkout reached
+// through two spellings of one path (a symlinked /var, a bind mount, /tmp) must hash to one key, or
+// a session of the project cannot see the credential another session of it saved.
 let projectDir: (env: NodeJS.ProcessEnv) => string | null = env => env.CLAUDE_PROJECT_DIR || null;
 export const setProjectDir = (f: typeof projectDir) => { projectDir = f; };
 export function projectKey(env = process.env): string | null {
   if (env.HUDDLE_NO_PROJECT_CRED === "1") return null;
   let d: string | null = null;
   try { d = projectDir(env); } catch {}
+  try { if (d) d = realpathSync(d); } catch {}
   return d ? `project-${createHash("sha1").update(d).digest("hex").slice(0, 16)}` : null;
 }
 
@@ -75,46 +78,9 @@ export function forgetCred(sid?: string): void {
 }
 // a credential kept under another project's key (setup joins a Huddle this user already runs)
 export function projectCred(dir: string, url?: string): Cred | null {
+  try { dir = realpathSync(dir); } catch {}
   const c = read(join(sessionsDir(), `project-${createHash("sha1").update(dir).digest("hex").slice(0, 16)}.json`));
   return c && (!url || norm(c.url) === norm(url)) ? c : null;
-}
-
-// A dashboard link for the user, never for Claude: a login code is a secret, so a session that
-// asks for one from inside Claude Code (`huddle open`, or `huddle join … --token` that just joined)
-// leaves a request here (<key>.link, empty, 0600), and the next hook of the session
-// (hooks/listen.ts, after that very tool call) mints the code and shows the link in its
-// systemMessage, which the user sees and Claude does not
-export function requestLink(sid?: string): void {
-  const dir = sessionsDir();
-  mkdirSync(dir, { recursive: true, mode: 0o700 });
-  for (const k of sessionKeys(sid).filter(k => !k.startsWith("project-"))) writeFileSync(join(dir, `${k}.link`), "", { mode: 0o600 });
-}
-// was a link asked for? (and the request is gone)
-export function takeLinkRequest(sid?: string): boolean {
-  let asked = false;
-  for (const k of sessionKeys(sid).filter(k => !k.startsWith("project-"))) {
-    const f = join(sessionsDir(), `${k}.link`);
-    try { statSync(f); asked = true; rmSync(f, { force: true }); } catch {}
-  }
-  return asked;
-}
-
-// An invite for the user, never for Claude, the same way: `huddle token create --print-join-command`
-// inside Claude Code (/huddle:invite) leaves the invite's options here (<key>.invite, 0600, no
-// secret in it), and the next hook mints the invite and shows its join line in systemMessage
-export type InviteAsk = { ttl?: number; single_use?: boolean; can_invite?: boolean; channel?: string; description?: string };
-export function requestInvite(o: InviteAsk, sid?: string): void {
-  const dir = sessionsDir();
-  mkdirSync(dir, { recursive: true, mode: 0o700 });
-  for (const k of sessionKeys(sid).filter(k => !k.startsWith("project-"))) writeFileSync(join(dir, `${k}.invite`), JSON.stringify(o), { mode: 0o600 });
-}
-export function takeInviteRequest(sid?: string): InviteAsk | null {
-  let asked: InviteAsk | null = null;
-  for (const k of sessionKeys(sid).filter(k => !k.startsWith("project-"))) {
-    const f = join(sessionsDir(), `${k}.invite`);
-    try { asked ??= JSON.parse(readFileSync(f, "utf8")) ?? {}; rmSync(f, { force: true }); } catch {}
-  }
-  return asked;
 }
 
 // the credential to send to url: HUDDLE_TOKEN, else this session's for that url, else none

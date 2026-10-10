@@ -3531,7 +3531,7 @@ async function fontRoute(path) {
   }
 }
 var SESSION_401 = "not in this huddle: this session holds no credential for it. In a session that is in it, run /huddle:invite and paste the join line it shows into this session (/huddle:join \u2026)";
-var SIGNED_OUT = "This browser is not signed in to Huddle (its sign-in ended, or the link expired). Run /huddle:open in any Claude session in this huddle, or `huddle open` in a terminal, and open the new link.";
+var SIGNED_OUT = "This browser is not signed in to Huddle (its sign-in ended, or the link expired). Run `huddle open` in a terminal of this project, or /huddle:setup in a Claude session there, and open the new link.";
 var LOGO_SVG = `<svg viewBox="0 0 26 26" width="36" height="36" aria-hidden="true"><path d="M5 17 Q13 2 21 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.2 2.2" opacity=".75"/><circle cx="13" cy="9.6" r="2.4" fill="currentColor"/><rect x="2.5" y="17" width="5" height="6" rx="2.5" fill="currentColor"/><rect x="18.5" y="17" width="5" height="6" rx="2.5" fill="currentColor"/></svg>`;
 var signedOutPage = () => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Huddle: signed out</title>
 <script>try{const t=JSON.parse(localStorage.getItem("huddle:theme")||"null");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch{}</script>
@@ -3554,7 +3554,7 @@ footer{text-align:center;font-size:12px;color:var(--faint)}
 <body><main><div class="head"><span class="logo">${LOGO_SVG}</span><h1>Huddle</h1><p class="sub">Sign in to see your channels and sessions</p></div>
 <section class="card"><div class="note" role="status"><i aria-hidden="true">!</i><p><b>Signed out.</b> <span>This sign-in link was used or has expired: each link signs in one browser, once.</span></p></div>
 <p class="muted">Get a new link from any session in this huddle, then open it here.</p>
-<div><div class="lab">In a Claude session</div><div class="field">/huddle:open</div></div>
+<div><div class="lab">In a Claude session</div><div class="field">/huddle:setup</div></div>
 <div><div class="lab">Or in a terminal</div><div class="field">huddle open</div></div></section>
 <footer>Huddle v${VERSION2}</footer></main></body></html>`;
 var streams = /* @__PURE__ */ new Set();
@@ -3645,7 +3645,7 @@ async function adminRoute(req, path, me) {
   m = /^\/api\/members\/([a-z][a-z0-9_-]{0,31})$/.exec(path);
   if (m && req.method === "DELETE") return rootOnly() ?? (AUTH.kick(m[1]) ? json({ kicked: m[1] }) : json({ error: `no member ${m[1]}` }, 404));
   if (path === "/api/login" && req.method === "POST") {
-    if (me.browser) return json({ error: "a browser does not sign in other browsers: huddle open (or /huddle:open) in a session" }, 403);
+    if (me.browser) return json({ error: "a browser does not sign in other browsers: run huddle open (or /huddle:setup) in a session" }, 403);
     return json({ code: AUTH.loginCode(me.root ? null : me.name), expires_in: 300 });
   }
   return null;

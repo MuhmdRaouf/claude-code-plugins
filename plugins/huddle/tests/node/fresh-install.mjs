@@ -67,7 +67,7 @@ for (const rt of RUNTIMES) test(`a fresh install works after /huddle:setup alone
   };
   // a command's CLI line (commands/*.md name it as "${CLAUDE_PLUGIN_ROOT}/bin/huddle")
   const CLI = '"${CLAUDE_PLUGIN_ROOT}/bin/huddle"';
-  for (const c of ["setup", "join", "open", "invite"]) assert.match(readFileSync(join(PLUGIN, `commands/${c}.md`), "utf8"), /"\$\{CLAUDE_PLUGIN_ROOT\}\/bin\/huddle"/);
+  for (const c of ["setup", "join", "invite"]) assert.match(readFileSync(join(PLUGIN, `commands/${c}.md`), "utf8"), /"\$\{CLAUDE_PLUGIN_ROOT\}\/bin\/huddle"/);
   const huddle = (args, s) => sh(`${CLI} ${args}`, s, { bash: true });
 
   // the MCP server, as .mcp.json starts it
@@ -96,31 +96,32 @@ for (const rt of RUNTIMES) test(`a fresh install works after /huddle:setup alone
     assert.deepEqual(pre[2].result.tools.map(t => t.name), ["status", "join"], "tools/list answers before setup, with two tools");
     assert.match(pre[3].result.content[0].text, /\/huddle:setup/);
 
-    // 2. /huddle:setup: no questions, no files to write; the line for another session reaches the user, not Claude
+    // 2. /huddle:setup: no questions, no files to write; the join line and the dashboard link are printed to Claude's
+    //    output, for the user to paste or open (the server is localhost-only)
     const setup = huddle("setup --start", A);
     assert.equal(setup.code, 0, setup.out + setup.err);
     const cfg = JSON.parse(readFileSync(join(PROJ, ".agents/huddle/huddle.json"), "utf8"));
     assert.deepEqual([cfg.channel, cfg.as, cfg.autostart], ["my-shop-app", "my-shop-app", true]);
     assert.ok(Number.isInteger(cfg.port) && cfg.port >= 10000, "a random five-digit port, saved");
-    assert.match(setup.out, /^join: .*shows to the user/m);
-    assert.doesNotMatch(setup.out + setup.err, /--token|code=/, "inside Claude Code no invite or sign-in code reaches Claude's context");
-    assert.match(setup.out, /^UI: +http:\/\/127\.0\.0\.1:\d+ /m);
+    const inv = /\/huddle:join (127\.0\.0\.1:\d+) --token (\S+)/.exec(setup.out);
+    assert.ok(inv, `setup printed the join line: ${setup.out}`);
+    assert.match(setup.out, /^join: +\/huddle:join 127\.0\.0\.1:\d+ --token \S+ +\(valid /m);
+    assert.match(setup.out, /^dashboard: http:\/\/127\.0\.0\.1:\d+\/\?code=\S+/m);
     assert.match(readFileSync(join(PROJ, ".git/info/exclude"), "utf8"), /^\.agents\/huddle\/$/m);
-    const after = hook("PostToolUse", A);                     // right after the command: to the user
-    const inv = /\/huddle:join (127\.0\.0\.1:\d+) --token (\S+)/.exec(after?.systemMessage ?? "");
-    assert.ok(inv, `the user got the join line: ${JSON.stringify(after)}`);
-    assert.match(after.systemMessage, /\?code=/, "and the dashboard link");
-    assert.doesNotMatch(JSON.stringify(after.hookSpecificOutput ?? {}), /--token|code=/);
+    const after = hook("PostToolUse", A);                     // right after the command
+    assert.equal(after?.systemMessage, undefined, "no join line or link through a hook");
     const join_ = huddle("join", A);
     assert.equal(join_.code, 0, join_.err);
     assert.match(join_.out, /you are my-shop-app/);
 
-    // 3. the creator's next session start: in the channel, a dashboard link for the user only
+    // 3. the creator's next session start: in the channel, and the link comes from huddle open
     const ss = hook("SessionStart", A, { source: "startup" });
     assert.match(ss.hookSpecificOutput.additionalContext, /You are in Huddle channel "my-shop-app" as "my-shop-app"/);
-    const link = /(http:\/\/127\.0\.0\.1:\d+)\/\?code=([\w-]+)/.exec(ss.systemMessage ?? "");
-    assert.ok(link, `the user gets a sign-in link: ${JSON.stringify(ss)}`);
-    assert.doesNotMatch(ss.hookSpecificOutput.additionalContext, /code=|--token/);
+    assert.equal(ss.systemMessage, undefined, "no sign-in link through the hook");
+    const openA = huddle("open", A);
+    assert.equal(openA.code, 0, openA.err);
+    const link = /(http:\/\/127\.0\.0\.1:\d+)\/\?code=([\w-]+)/.exec(openA.out);
+    assert.ok(link, `huddle open printed a sign-in link: ${openA.out}`);
     const login = await fetch(`${link[1]}/?code=${link[2]}`, { redirect: "manual" });
     const cookie = (login.headers.get("set-cookie") ?? "").split(";")[0];
     assert.ok(cookie, "the code signs the browser in");
@@ -146,24 +147,24 @@ for (const rt of RUNTIMES) test(`a fresh install works after /huddle:setup alone
     assert.equal(jc.code, 0, jc.err);
     assert.match(jc.out, /you are web-client/);
     assert.match(jc.out, /others: my-shop-app/);
-    assert.doesNotMatch(jc.out + jc.err, /code=/);
+    assert.match(jc.err, /dashboard: http:\/\/127\.0\.0\.1:\d+\/\?code=/, "the join prints the dashboard link itself");
     const mineC = await mcp(C2, ["status"]);                  // a later session of that project, by MCP
     assert.match(mineC[3].result.content[0].text, /you are web-client/);
     assert.equal(huddle('send "hello from the second project"', C).code, 0);
     const heard = hook("PostToolUse", A);
     assert.match(JSON.stringify(heard), /hello from the second project/, "the creator hears the second project");
     const linkC = hook("PostToolUse", C);
-    assert.match(linkC?.systemMessage ?? "", /\?code=/, "the joiner's dashboard link reaches the user");
-    // /huddle:open: the plain address for Claude, the link through the next hook
+    assert.equal(linkC?.systemMessage, undefined, "no link through a hook");
+    // huddle open prints the link itself
     const open = huddle("open", C);
     assert.equal(open.code, 0, open.err);
-    assert.doesNotMatch(open.out, /code=/);
-    assert.match(hook("PostToolUse", C)?.systemMessage ?? "", /\?code=/);
-    // /huddle:invite: the next line, to the user only
+    assert.match(open.out, /\?code=/);
+    assert.equal(hook("PostToolUse", C)?.systemMessage, undefined);
+    // /huddle:invite: the next line, printed to Claude's output for the user to paste
     const more = huddle("token create --print-join-command", A);
     assert.equal(more.code, 0, more.err);
-    assert.doesNotMatch(more.out + more.err, /--token/);
-    assert.match(hook("PostToolUse", A)?.systemMessage ?? "", /\/huddle:join 127\.0\.0\.1:\d+ --token /);
+    assert.match(more.out, /\/huddle:join 127\.0\.0\.1:\d+ --token /);
+    assert.equal(hook("PostToolUse", A)?.systemMessage, undefined);
     assert.equal(hook("Stop", C), null);
     assert.equal(hook("Stop", A), null);
 
@@ -174,7 +175,7 @@ for (const rt of RUNTIMES) test(`a fresh install works after /huddle:setup alone
     await until(() => { try { process.kill(pid, 0); return false; } catch { return true; } });
     const back = hook("SessionStart", A, { source: "startup" });
     assert.match(back.hookSpecificOutput.additionalContext, /You are in Huddle channel "my-shop-app"/);
-    assert.doesNotMatch(back.systemMessage ?? "", /--token/, "no fresh join line: members are remembered");
+    assert.equal(back.systemMessage, undefined, "no join line or link through a hook: members are remembered");
     const backC = hook("SessionStart", { ...session("sess-c3", 40005), proj: PROJ2 }, { source: "startup" });
     assert.match(backC.hookSpecificOutput.additionalContext, /You are in Huddle channel "my-shop-app" as "web-client"/);
   } finally {
