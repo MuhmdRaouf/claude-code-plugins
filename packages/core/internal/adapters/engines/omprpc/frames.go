@@ -102,10 +102,7 @@ func CreateFrameDecoder() *FrameDecoder {
 func (d *FrameDecoder) Push(raw string) Decoded {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	line := raw
-	if strings.HasSuffix(line, "\r") {
-		line = line[:len(line)-1]
-	}
+	line := strings.TrimSuffix(raw, "\r")
 	if line == "" {
 		return Decoded{Kind: DecodedPartial}
 	}

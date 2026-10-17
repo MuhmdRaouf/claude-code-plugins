@@ -174,16 +174,6 @@ func (l *eventLog) all() []domain.WorkerEvent {
 	return append([]domain.WorkerEvent(nil), l.seen...)
 }
 
-func (l *eventLog) kinds() []domain.WorkerEventKind {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	kinds := make([]domain.WorkerEventKind, 0, len(l.seen))
-	for _, event := range l.seen {
-		kinds = append(kinds, event.Kind)
-	}
-	return kinds
-}
-
 // waitFor resolves with the first event of the kind, failing the test after 10 s.
 func (l *eventLog) waitFor(t *testing.T, kind domain.WorkerEventKind, match func(domain.WorkerEvent) bool) domain.WorkerEvent {
 	t.Helper()

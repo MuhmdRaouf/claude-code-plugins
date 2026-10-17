@@ -1055,8 +1055,6 @@ func TestFrontFocusedEvents(t *testing.T) {
 	})
 }
 
-func ptr(text string) *string { return &text }
-
 func boolPtr(value bool) *bool { return &value }
 
 func intPtr(value int) *int { return &value }

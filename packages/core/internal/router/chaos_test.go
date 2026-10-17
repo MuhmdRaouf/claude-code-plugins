@@ -1117,14 +1117,14 @@ func TestChaosClaudeRequestsGetAnthropicsExactBytes(t *testing.T) {
 					process.DetachedOptions{Env: chaosEnvSlice(merged)})
 			},
 		})
-		ensureMs := time.Since(started)
+		ensureTook := time.Since(started)
 		if ensured != router.EnsureStarted {
 			t.Fatalf("ensure = %q, want started", ensured)
 		}
 		back := r.workerUp(0)
 		// The hook never waits for the router: it is back before the router it started is even up.
-		if elapsed := time.Since(started); ensureMs >= elapsed-ensureMs {
-			t.Fatalf("ensure took %s of %s", ensureMs, elapsed)
+		if elapsed := time.Since(started); ensureTook >= elapsed-ensureTook {
+			t.Fatalf("ensure took %s of %s", ensureTook, elapsed)
 		}
 		if back.Pid == before.Pid {
 			t.Fatalf("front pid = %d, want a new one", back.Pid)

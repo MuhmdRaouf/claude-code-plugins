@@ -88,9 +88,7 @@ func globListMatches(globs []string, path string) bool {
 //   - doublestar lets a trailing `/*` match the directory itself (`src/*` against `src`);
 //     picomatch requires the separator the `*` follows.
 func matchGlob(pattern, path string) bool {
-	if strings.HasPrefix(pattern, "./") {
-		pattern = pattern[2:]
-	}
+	pattern = strings.TrimPrefix(pattern, "./")
 	if strings.HasPrefix(path, "./") {
 		return false
 	}

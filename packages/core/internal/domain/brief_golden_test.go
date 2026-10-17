@@ -93,31 +93,6 @@ func runGoldenCase(t *testing.T, path string) {
 	}
 }
 
-// slashEveryString canonicalises every string in a decoded JSON tree the way path.resolve's
-// answers differ across platforms: a leading drive goes, backslashes become slashes.
-func slashEveryString(value any) any {
-	switch typed := value.(type) {
-	case map[string]any:
-		for name, item := range typed {
-			typed[name] = slashEveryString(item)
-		}
-		return typed
-	case []any:
-		for index, item := range typed {
-			typed[index] = slashEveryString(item)
-		}
-		return typed
-	case string:
-		text := typed
-		if len(text) >= 2 && text[1] == ':' {
-			text = text[2:]
-		}
-		return strings.ReplaceAll(text, `\`, "/")
-	default:
-		return value
-	}
-}
-
 // toJSONValue round-trips through JSON so pointers, empty slices and omitted fields compare the
 // way the golden's JSON sees them.
 func toJSONValue(value any) any {

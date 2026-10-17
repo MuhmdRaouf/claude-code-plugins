@@ -10,8 +10,8 @@ import (
 	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/adapters/fsutil"
 )
 
-// pollMs is how often a terminating group is probed for its last member.
-const pollMs = 25 * time.Millisecond
+// pollInterval is how often a terminating group is probed for its last member.
+const pollInterval = 25 * time.Millisecond
 
 // killSettleMs: after SIGKILL only the kernel is left to act; this bounds the wait for a process stuck
 // in an uninterruptible call.
@@ -61,7 +61,7 @@ func groupGoneWithin(ctx context.Context, pid int64, ms int64) bool {
 		if time.Now().After(deadline) {
 			return false
 		}
-		timer := time.NewTimer(pollMs)
+		timer := time.NewTimer(pollInterval)
 		select {
 		case <-ctx.Done():
 			timer.Stop()

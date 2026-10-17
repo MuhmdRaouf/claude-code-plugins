@@ -19,14 +19,6 @@ var keyID = keystore.NewKeyIdentity(testkit.ReferenceProvider)
 
 func strPtr(text string) *string { return &text }
 
-// deref is a nil-safe read of an optional stdin.
-func deref(text *string) string {
-	if text == nil {
-		return ""
-	}
-	return *text
-}
-
 // okRes is a tool run that exited 0 with no output.
 func okRes() testkit.RunResult {
 	code := 0

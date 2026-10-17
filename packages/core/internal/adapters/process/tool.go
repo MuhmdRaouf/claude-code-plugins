@@ -135,7 +135,7 @@ func ToolVersion(ctx context.Context, bin string, prefixArgs []string) (string, 
 		return "", errors.New(run.Message)
 	}
 	if run.Code == nil || *run.Code != 0 {
-		return "", fmt.Errorf("Command failed: %s --version", bin)
+		return "", fmt.Errorf("command failed: %s --version", bin)
 	}
 	text := strings.TrimSpace(string(run.Stdout))
 	first := text

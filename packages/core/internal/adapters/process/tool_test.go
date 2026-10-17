@@ -113,8 +113,8 @@ func TestToolVersion(t *testing.T) {
 		t.Setenv(childModeEnv, "fail-3")
 		self := selfExe(t)
 		_, err := ToolVersion(context.Background(), self, nil)
-		if err == nil || err.Error() != "Command failed: "+self+" --version" {
-			t.Fatalf("error = %v, want Command failed", err)
+		if err == nil || err.Error() != "command failed: "+self+" --version" {
+			t.Fatalf("error = %v, want command failed", err)
 		}
 	})
 

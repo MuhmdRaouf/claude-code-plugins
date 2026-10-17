@@ -483,15 +483,13 @@ func TestCommandsSetup(t *testing.T) {
 			t.Fatalf("report =\n%s\nwant\n%s", world.Out.Lines[0], want)
 		}
 		raw := world.Out.Lines[1]
-		var order []string
 		for _, field := range []string{"ready", "runtime", "acmebot", "state", "cap", "ping", "router", "models", "settings"} {
 			if at := strings.Index(raw, `"`+field+`":`); at < 0 {
 				t.Fatalf("%s missing from %s", field, raw)
 			}
-			order = append(order, field)
 		}
-		// The member order above is positional in the loop; this pass pins the member order
-		// of the document itself, which setup's JSON output keeps fixed.
+		// This pass pins the member order of the document itself, which setup's JSON
+		// output keeps fixed.
 		position := 0
 		for _, field := range []string{"ready", "runtime", "acmebot", "state", "cap", "ping", "router", "models", "settings"} {
 			at := strings.Index(raw, `"`+field+`":`)

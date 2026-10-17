@@ -131,13 +131,6 @@ func (p *keyedProvider) serve(t *testing.T) *url.URL {
 	return mustURL(t, fmt.Sprintf("http://127.0.0.1:%d/api/anthropic", port))
 }
 
-// accept is the key the provider answers 200 to (the rotated key).
-func (p *keyedProvider) accept(key string) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.want = key
-}
-
 // bearers is every Authorization the provider was asked with.
 func (p *keyedProvider) bearers() []string {
 	p.mu.Lock()

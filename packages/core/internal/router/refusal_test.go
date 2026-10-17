@@ -106,12 +106,6 @@ func (s *answeringState) set(status int, body string) {
 	s.body = body
 }
 
-func (s *answeringState) snapshot() (int, string, string, string, bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.status, s.body, s.typ, s.encoding, s.cutoff
-}
-
 func (s *answeringState) count() int {
 	s.mu.Lock()
 	defer s.mu.Unlock()

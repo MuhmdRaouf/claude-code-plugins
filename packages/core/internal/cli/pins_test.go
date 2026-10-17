@@ -91,7 +91,8 @@ func TestWirePins(t *testing.T) {
 		if deps.Clock.Now() < 1791288000000 {
 			t.Errorf("now = %d, want the wall clock after the pinned instant", deps.Clock.Now())
 		}
-		if deps.Ids.JobID() == deps.Ids.JobID() {
+		firstID, secondID := deps.Ids.JobID(), deps.Ids.JobID()
+		if firstID == secondID {
 			t.Error("two job ids are the same, want random base32 ids")
 		}
 	})

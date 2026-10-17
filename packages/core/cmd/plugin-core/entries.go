@@ -33,17 +33,6 @@ var entries = map[string]func(provider string, args []string) int{
 // stderr because the table signature has no writer parameters.
 var entryStderr io.Writer = os.Stderr
 
-func stubEntry(entry string) func(provider string, args []string) int {
-	return func(_ string, args []string) int {
-		// A hook must never fail Claude Code.
-		if contains(args, "--hook") {
-			return 0
-		}
-		fmt.Fprintf(entryStderr, "plugin-core: %s is not built yet\n", entry)
-		return 1
-	}
-}
-
 // cliEntry is the CLI bundle's entry: the wired deps behind runCli, with the plugin's quiet-exit
 // rules — a closed pipe on stdout ends the CLI with 0 and nothing said, and on a --hook path any
 // failure (a read-only home, a missing file) is silence and 0, never a failed session. Writes go

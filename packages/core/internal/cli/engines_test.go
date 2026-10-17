@@ -131,12 +131,9 @@ func TestCliEngineUsageRows(t *testing.T) {
 			t.Fatalf("exit = %d, want 0", code)
 		}
 		raw := lastLine(world)
-		var order []string
 		for _, field := range []string{"estimate", "spool", "jobs", "routerHealth"} {
 			if at := strings.Index(raw, `"`+field+`":`); at < 0 {
 				t.Fatalf("%s missing from %s", field, raw)
-			} else {
-				order = append(order, field)
 			}
 		}
 		if strings.Contains(raw, `"engines"`) {

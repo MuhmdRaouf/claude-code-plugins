@@ -132,13 +132,12 @@ type processFakeRouter struct {
 	env    map[string]string
 	how    processSpawnHow
 
-	mu          sync.Mutex
-	mode        string
-	version     string
-	controls    []processControlCall
-	servers     []*processHoldServer
-	killed      bool
-	adoptedPort int
+	mu       sync.Mutex
+	mode     string
+	version  string
+	controls []processControlCall
+	servers  []*processHoldServer
+	killed   bool
 }
 
 func (f *processFakeRouter) healthBody() string {

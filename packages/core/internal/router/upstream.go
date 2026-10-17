@@ -484,10 +484,7 @@ func NoProxy(host, port string, env ProxyEnv) bool {
 		if hasPort && only != port {
 			continue
 		}
-		domain := name
-		if strings.HasPrefix(domain, "*.") {
-			domain = strings.TrimPrefix(domain, "*.")
-		}
+		domain := strings.TrimPrefix(name, "*.")
 		domain = strings.ToLower(strings.TrimPrefix(domain, "."))
 		lower := strings.ToLower(host)
 		if lower == domain || strings.HasSuffix(lower, "."+domain) {

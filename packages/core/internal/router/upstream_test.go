@@ -430,7 +430,8 @@ func TestProxyEnvironment(t *testing.T) {
 
 	t.Run("keeps one pooled agent per route and makes a fresh one for a retry", func(t *testing.T) {
 		target := mustURL(t, "http://127.0.0.1:1")
-		if AgentFor(target, ProxyEnv{}, false) != AgentFor(target, ProxyEnv{}, false) {
+		pooled, again := AgentFor(target, ProxyEnv{}, false), AgentFor(target, ProxyEnv{}, false)
+		if pooled != again {
 			t.Error("the pooled agent of one route must be the same")
 		}
 		if AgentFor(target, ProxyEnv{}, true) == AgentFor(target, ProxyEnv{}, false) {

@@ -53,10 +53,7 @@ func CreateFrameDecoder() *FrameDecoder {
 // as a frame or is stray output the caller logs and skips.
 func (d *FrameDecoder) Push(raw string) Decoded {
 	// pi tolerates a trailing CR, so its RPC peer must too (checked against pi 1.0.4).
-	line := raw
-	if strings.HasSuffix(line, "\r") {
-		line = line[:len(line)-1]
-	}
+	line := strings.TrimSuffix(raw, "\r")
 	if line == "" {
 		return Decoded{Kind: DecodedPartial}
 	}
