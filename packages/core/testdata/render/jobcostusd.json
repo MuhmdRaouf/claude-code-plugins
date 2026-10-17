@@ -1,0 +1,247 @@
+[
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-cost01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "accepted",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T10:00:00.000Z",
+            "endedAt": "2026-10-06T10:05:00.000Z",
+            "usage": {
+              "turns": 2,
+              "inputTokens": 1000000,
+              "outputTokens": 100000,
+              "cacheReadTokens": 0,
+              "cacheWriteTokens": 0,
+              "costUsd": 9.99,
+              "rateLimitRetries": 0,
+              "durationMs": 1000
+            }
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": 1.8399999999999999
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-abc123",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0123456789abcdef0123456789abcdef01234567",
+          "worktree": "/state/worktrees/261006-abc123",
+          "branch": "zai/261006-abc123",
+          "artifactsDir": "/state/jobs/261006-abc123/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "endedAt": "2026-10-06T11:55:00.000Z",
+            "outcome": {
+              "kind": "completed"
+            },
+            "usage": {
+              "turns": 3,
+              "inputTokens": 4200,
+              "outputTokens": 310,
+              "cacheReadTokens": 2800,
+              "cacheWriteTokens": 900,
+              "costUsd": 0.0123,
+              "rateLimitRetries": 0,
+              "durationMs": 42130
+            },
+            "report": {
+              "summary": "Renamed foo to bar in 3 files",
+              "files": [
+                {
+                  "path": "src/a.ts",
+                  "why": "rename"
+                }
+              ],
+              "tests_added": [
+                "test/a.test.ts"
+              ],
+              "open_items": [
+                "docs still say foo"
+              ]
+            },
+            "verification": {
+              "gates": [
+                {
+                  "run": "npm test",
+                  "exitCode": 0,
+                  "timedOut": false,
+                  "durationMs": 1200,
+                  "tail": ""
+                },
+                {
+                  "run": "npm run lint",
+                  "exitCode": 0,
+                  "timedOut": false,
+                  "durationMs": 400,
+                  "tail": ""
+                }
+              ],
+              "changes": {
+                "added": [
+                  "src/b.ts"
+                ],
+                "modified": [
+                  "src/a.ts"
+                ],
+                "deleted": [
+                  "old.ts"
+                ],
+                "untracked": [
+                  "notes.md"
+                ]
+              },
+              "scope": {
+                "outOfScope": [],
+                "forbidden": [],
+                "repoChanged": false
+              },
+              "report": {
+                "present": true,
+                "valid": true,
+                "problems": []
+              }
+            },
+            "verdict": "pass"
+          }
+        ],
+        "createdAt": "2026-10-06T11:40:00.000Z",
+        "updatedAt": "2026-10-06T11:55:00.000Z",
+        "version": 0
+      }
+    },
+    "output": 0.007971999999999998
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-abc123",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0123456789abcdef0123456789abcdef01234567",
+          "worktree": "/state/worktrees/261006-abc123",
+          "branch": "zai/261006-abc123",
+          "artifactsDir": "/state/jobs/261006-abc123/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z"
+          }
+        ],
+        "createdAt": "2026-10-06T11:40:00.000Z",
+        "updatedAt": "2026-10-06T11:55:00.000Z",
+        "version": 0
+      }
+    },
+    "output": 0
+  }
+]

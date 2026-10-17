@@ -643,3 +643,8 @@ $RECYCLE.BIN/
 !.claude/skills/
 
 # End of https://www.toptal.com/developers/gitignore/api/go,vim,node,emacs,linux,macos,python,ansible,windows,terraform,terragrunt,intellij+all,visualstudiocode
+
+### Project ###
+# Committed build outputs: the plugins' launchers and the release build script.
+!plugins/*/plugin/dist/
+!packages/core/scripts/build/

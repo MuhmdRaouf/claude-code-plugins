@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "retries.fix",
+      "message": "Invalid input: expected number, received string"
+    }
+  ]
+}

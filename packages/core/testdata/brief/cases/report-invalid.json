@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "report",
+      "message": "must be change, sweep, notes or a path to a .json schema"
+    }
+  ]
+}

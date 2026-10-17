@@ -1,0 +1,16 @@
+Rename `foo` to `bar` everywhere.
+
+## zai contract
+
+This is a read-only investigation. Read and search; run only commands that change nothing.
+Do not create, edit or delete any file.
+Do not commit, stage, stash or switch branches.
+Never print, log or write secrets: API keys, tokens, passwords, private keys.
+
+## Gates
+
+No gates: the plugin runs no checks after you finish.
+
+## Finish
+
+End your run with the structured report (schema: notes). Report only what you did and checked.

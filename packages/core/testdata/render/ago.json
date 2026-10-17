@@ -1,0 +1,93 @@
+[
+  {
+    "input": {
+      "fromIso": "2026-10-06T12:00:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "just now"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-06T11:59:55.000Z",
+      "now": 1791288000000
+    },
+    "output": "just now"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-06T11:59:00.001Z",
+      "now": 1791288000000
+    },
+    "output": "just now"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-06T11:59:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "1m ago"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-06T11:57:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "3m ago"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-06T11:40:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "20m ago"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-06T11:00:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "1h ago"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-06T10:00:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "2h ago"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-05T12:00:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "1d ago"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-05T10:00:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "1d ago"
+  },
+  {
+    "input": {
+      "fromIso": "2026-07-08T12:00:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "90d ago"
+  },
+  {
+    "input": {
+      "fromIso": "2026-10-06T12:01:00.000Z",
+      "now": 1791288000000
+    },
+    "output": "just now"
+  },
+  {
+    "input": {
+      "fromIso": "not-a-date",
+      "now": 1791288000000
+    },
+    "output": "NaNd ago"
+  }
+]

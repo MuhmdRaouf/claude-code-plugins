@@ -1,0 +1,6722 @@
+[
+  {
+    "pattern": "**",
+    "path": "README.md",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "x.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "a.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "b.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "B.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "?.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "package.json",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "x",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src/",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src/a.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src/.eslintrc.json",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src/.keys/id.pem",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src/x.ts.bak",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src/secret/key.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": ".env",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": ".gitignore",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "a/.env",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "b/.env",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": ".github/workflows/ci.yml",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "docs",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "docs/",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "docs/guide.md",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "docs/intro/",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "docs/intro/notes.md",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "src/b/",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "-.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "a/b/x.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "a/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "a/x/b",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "a/y/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "a/b",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "deep/a/b/c/d.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "x/y.z",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "vendor/x.js",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "node_modules/pkg/index.js",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "a b.ts",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "é.md",
+    "match": true
+  },
+  {
+    "pattern": "**",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**",
+    "path": "/x.ts",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "README.md",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "x.ts",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "a.ts",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "b.ts",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "B.ts",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "?.ts",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "package.json",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "x",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "src",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "src/",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": ".env",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": ".gitignore",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "docs",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "docs/",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "-.ts",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "a b.ts",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "é.md",
+    "match": true
+  },
+  {
+    "pattern": "*",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "*",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*",
+    "path": "README.md",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "x.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "a.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "b.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "B.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "?.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "package.json",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "x",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src/",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src/a.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src/.eslintrc.json",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src/.keys/id.pem",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src/x.ts.bak",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src/secret/key.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": ".env",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": ".gitignore",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "a/.env",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "b/.env",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": ".github/workflows/ci.yml",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "docs",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "docs/",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "docs/guide.md",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "docs/intro/",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "docs/intro/notes.md",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "src/b/",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "-.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "a/b/x.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "a/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "a/x/b",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "a/y/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "a/b",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "deep/a/b/c/d.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "x/y.z",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "vendor/x.js",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "node_modules/pkg/index.js",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "a b.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "é.md",
+    "match": true
+  },
+  {
+    "pattern": "**/*",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*",
+    "path": "/x.ts",
+    "match": true
+  },
+  {
+    "pattern": "*.ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "x.ts",
+    "match": true
+  },
+  {
+    "pattern": "*.ts",
+    "path": "a.ts",
+    "match": true
+  },
+  {
+    "pattern": "*.ts",
+    "path": "b.ts",
+    "match": true
+  },
+  {
+    "pattern": "*.ts",
+    "path": "B.ts",
+    "match": true
+  },
+  {
+    "pattern": "*.ts",
+    "path": "?.ts",
+    "match": true
+  },
+  {
+    "pattern": "*.ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "-.ts",
+    "match": true
+  },
+  {
+    "pattern": "*.ts",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "a b.ts",
+    "match": true
+  },
+  {
+    "pattern": "*.ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "*.ts",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "x.ts",
+    "match": true
+  },
+  {
+    "pattern": "?.ts",
+    "path": "a.ts",
+    "match": true
+  },
+  {
+    "pattern": "?.ts",
+    "path": "b.ts",
+    "match": true
+  },
+  {
+    "pattern": "?.ts",
+    "path": "B.ts",
+    "match": true
+  },
+  {
+    "pattern": "?.ts",
+    "path": "?.ts",
+    "match": true
+  },
+  {
+    "pattern": "?.ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "-.ts",
+    "match": true
+  },
+  {
+    "pattern": "?.ts",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "?.ts",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "src",
+    "match": true
+  },
+  {
+    "pattern": "src",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "src",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": "src/",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": "src/a.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": "src/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": "src/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": "src/.eslintrc.json",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": "src/.keys/id.pem",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": "src/x.ts.bak",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": "src/secret/key.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "src/b/",
+    "match": true
+  },
+  {
+    "pattern": "src/**",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "src/a.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/*",
+    "path": "src/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/*",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "src/.eslintrc.json",
+    "match": true
+  },
+  {
+    "pattern": "src/*",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "src/x.ts.bak",
+    "match": true
+  },
+  {
+    "pattern": "src/*",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "src/b/",
+    "match": true
+  },
+  {
+    "pattern": "src/*",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/*",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src/a.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src/secret/key.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/*.ts",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src/.eslintrc.json",
+    "match": true
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/**/.*",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "README.md",
+    "match": true
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "docs/guide.md",
+    "match": true
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "docs/intro/notes.md",
+    "match": true
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "é.md",
+    "match": true
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.md",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src/.keys/id.pem",
+    "match": true
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/*.pem",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "x.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "a/b/x.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/x.ts",
+    "path": "/x.ts",
+    "match": true
+  },
+  {
+    "pattern": "**/.env",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": ".env",
+    "match": true
+  },
+  {
+    "pattern": "**/.env",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "a/.env",
+    "match": true
+  },
+  {
+    "pattern": "**/.env",
+    "path": "b/.env",
+    "match": true
+  },
+  {
+    "pattern": "**/.env",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "**/.env",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": ".env",
+    "match": true
+  },
+  {
+    "pattern": ".env",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": ".env",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": ".github/workflows/ci.yml",
+    "match": true
+  },
+  {
+    "pattern": ".github/**",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": ".github/**",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "docs/",
+    "match": true
+  },
+  {
+    "pattern": "docs/",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "docs/",
+    "match": true
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "docs/intro/",
+    "match": true
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "docs/**/",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src/",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src/a.ts",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src/.eslintrc.json",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src/.keys/id.pem",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src/x.ts.bak",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src/secret/key.ts",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "src/b/",
+    "match": true
+  },
+  {
+    "pattern": "./src/**",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "./src/**",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "/src/**",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "a/.env",
+    "match": true
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "b/.env",
+    "match": true
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "a/b/x.ts",
+    "match": true
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "a/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "a/x/b",
+    "match": true
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "a/y/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "a/b",
+    "match": true
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}/**",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "a.ts",
+    "match": true
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "b.ts",
+    "match": true
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "{a,b}.ts",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src/a.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "src/[ab].ts",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "a.ts",
+    "match": true
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[!a].ts",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "x.ts",
+    "match": true
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "b.ts",
+    "match": true
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "B.ts",
+    "match": true
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "?.ts",
+    "match": true
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "-.ts",
+    "match": true
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[^a].ts",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "a.ts",
+    "match": true
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "b.ts",
+    "match": true
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "[a-b].ts",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "a/x/b",
+    "match": true
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/*/b",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "a/x/b",
+    "match": true
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "a/b",
+    "match": true
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/**/b",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "src/a.ts",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "src/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "src/.eslintrc.json",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "src/x.ts.bak",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "a/.env",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "b/.env",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "docs/guide.md",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "docs/intro/",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "src/b/",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "a/b",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "x/y.z",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "vendor/x.js",
+    "match": true
+  },
+  {
+    "pattern": "*/*",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "*/*",
+    "path": "/x.ts",
+    "match": true
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "a/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "x/y.z",
+    "match": true
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "x/y.z",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "README.md",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "a.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "B.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "?.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "package.json",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src/",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src/a.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src/b/c.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src/.eslintrc.json",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src/.keys/id.pem",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src/x.ts.bak",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src/secret/key.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": ".env",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": ".gitignore",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "a/.env",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "b/.env",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": ".github/workflows/ci.yml",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "docs",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "docs/",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "docs/guide.md",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "docs/intro/",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "docs/intro/notes.md",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "src/b/",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "-.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "a/b/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "a/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "a/x/b",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "a/y/b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "a/b",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "deep/a/b/c/d.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "x/y.z",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "vendor/x.js",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "node_modules/pkg/index.js",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "a b.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "é.md",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "./x.ts",
+    "match": false
+  },
+  {
+    "pattern": "a/b/c.ts",
+    "path": "/x.ts",
+    "match": false
+  },
+  {
+    "pattern": "!x",
+    "path": "README.md",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "x.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "a.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "b.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "B.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "?.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "package.json",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "x",
+    "match": false
+  },
+  {
+    "pattern": "!x",
+    "path": "src",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "src/",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "src/a.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "src/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "src/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "src/.eslintrc.json",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "src/.keys/id.pem",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "src/x.ts.bak",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "src/secret/key.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": ".env",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": ".gitignore",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "a/.env",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "b/.env",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": ".github/workflows/ci.yml",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "docs",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "docs/",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "docs/guide.md",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "docs/intro/",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "docs/intro/notes.md",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "src/b/",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "-.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "a/b/x.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "a/b/c.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "a/x/b",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "a/y/b.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "a/b",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "deep/a/b/c/d.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "x/y.z",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "vendor/x.js",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "node_modules/pkg/index.js",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "a b.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "é.md",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "./x.ts",
+    "match": true
+  },
+  {
+    "pattern": "!x",
+    "path": "/x.ts",
+    "match": true
+  }
+]

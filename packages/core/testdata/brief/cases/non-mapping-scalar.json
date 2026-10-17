@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "front matter",
+      "message": "Invalid input: expected object, received string"
+    }
+  ]
+}

@@ -1,0 +1,668 @@
+[
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "zai/glm-5.3[1m]",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 0,
+      "detail": [
+        "Z.ai list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "MINIMAX-M3",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 0,
+      "detail": [
+        "MiniMax list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "claude-sonnet-5-5-20261008",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 0,
+      "detail": [
+        "Anthropic list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "Claude-Opus-5-5@20261008",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 0,
+      "detail": [
+        "Anthropic list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "gpt-99",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": null
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "claude-opus-5-5",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 0,
+      "detail": [
+        "Anthropic list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": "deepseek",
+        "model": "glm-5.3",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": null
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "not-a-model",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": null
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "claude-haiku-5-5",
+        "tokens": {
+          "input": 100000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 0.010000000000000002,
+      "detail": [
+        "Anthropic list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "claude-haiku-5-5",
+        "tokens": {
+          "input": 100001,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 0.0500005,
+      "detail": [
+        "Anthropic list",
+        "tier over 100k"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "deepseek-flash",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791338400000
+      }
+    },
+    "output": {
+      "usd": 0.3,
+      "detail": [
+        "DeepSeek list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "deepseek-flash",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791345540000
+      }
+    },
+    "output": {
+      "usd": 0.3,
+      "detail": [
+        "DeepSeek list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "deepseek-flash",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791345600000
+      }
+    },
+    "output": {
+      "usd": 0.15,
+      "detail": [
+        "DeepSeek list",
+        "off-peak ×0.5"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "deepseek-flash",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791349200000
+      }
+    },
+    "output": {
+      "usd": 0.15,
+      "detail": [
+        "DeepSeek list",
+        "off-peak ×0.5"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "deepseek-flash",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791352800000
+      }
+    },
+    "output": {
+      "usd": 0.3,
+      "detail": [
+        "DeepSeek list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "deepseek-flash",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791367200000
+      }
+    },
+    "output": {
+      "usd": 0.15,
+      "detail": [
+        "DeepSeek list",
+        "off-peak ×0.5"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "deepseek-flash",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791527400000
+      }
+    },
+    "output": {
+      "usd": 0.3,
+      "detail": [
+        "DeepSeek list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "deepseek-flash",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791586800000
+      }
+    },
+    "output": {
+      "usd": 0.15,
+      "detail": [
+        "DeepSeek list",
+        "off-peak ×0.5"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "deepseek-flash",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791615600000
+      }
+    },
+    "output": {
+      "usd": 0.15,
+      "detail": [
+        "DeepSeek list",
+        "off-peak ×0.5"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "claude-opus-5-5",
+        "tokens": {
+          "input": 1000000,
+          "output": 1000000,
+          "cacheRead": 1000000,
+          "cacheWrite5m": 1000000,
+          "cacheWrite1h": 1000000
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 37.2,
+      "detail": [
+        "Anthropic list",
+        "1 h cache writes"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "claude-opus-5-5",
+        "tokens": {
+          "input": 1000000,
+          "output": 1000000,
+          "cacheRead": 1000000,
+          "cacheWrite5m": 1000000,
+          "cacheWrite1h": 1000000
+        },
+        "ts": 1791374400000,
+        "speed": "fast"
+      }
+    },
+    "output": {
+      "usd": 74.4,
+      "detail": [
+        "Anthropic list",
+        "fast mode",
+        "1 h cache writes"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "claude-opus-4-8",
+        "tokens": {
+          "input": 1000000,
+          "output": 1000000,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000,
+        "geo": "us"
+      }
+    },
+    "output": {
+      "usd": 33,
+      "detail": [
+        "Anthropic list",
+        "US geo ×1.1"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "claude-opus-4-8",
+        "tokens": {
+          "input": 1000000,
+          "output": 1000000,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 30,
+      "detail": [
+        "Anthropic list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "claude-sonnet-4-5",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000,
+        "geo": "us"
+      }
+    },
+    "output": {
+      "usd": 3,
+      "detail": [
+        "Anthropic list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "MiniMax-M3",
+        "tokens": {
+          "input": 200000,
+          "output": 200000,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000,
+        "serviceTier": "priority"
+      }
+    },
+    "output": {
+      "usd": 0.44999999999999996,
+      "detail": [
+        "MiniMax list",
+        "priority ×1.5"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "MiniMax-M3",
+        "tokens": {
+          "input": 600000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000,
+        "serviceTier": "priority"
+      }
+    },
+    "output": {
+      "usd": 0.5399999999999999,
+      "detail": [
+        "MiniMax list",
+        "tier over 512k",
+        "priority ×1.5"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "MiniMax-M2.7-highspeed",
+        "tokens": {
+          "input": 1000000,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000,
+        "serviceTier": "priority"
+      }
+    },
+    "output": {
+      "usd": 0.6,
+      "detail": [
+        "MiniMax list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "kimi-k3",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 1000000
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 6,
+      "detail": [
+        "Moonshot list",
+        "1 h cache writes"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "kimi-k3",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 1000000,
+          "cacheWrite1h": 0
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 3,
+      "detail": [
+        "Moonshot list"
+      ]
+    }
+  },
+  {
+    "input": {
+      "request": {
+        "offering": null,
+        "model": "qwen3.8-max",
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite5m": 0,
+          "cacheWrite1h": 1000000
+        },
+        "ts": 1791374400000
+      }
+    },
+    "output": {
+      "usd": 2.5,
+      "detail": [
+        "Qwen list",
+        "1 h cache writes"
+      ]
+    }
+  }
+]

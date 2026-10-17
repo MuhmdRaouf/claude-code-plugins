@@ -1,0 +1,50 @@
+[
+  {
+    "input": {
+      "rate": null
+    },
+    "output": "n/a"
+  },
+  {
+    "input": {
+      "rate": 0
+    },
+    "output": "0%"
+  },
+  {
+    "input": {
+      "rate": 0.005
+    },
+    "output": "1%"
+  },
+  {
+    "input": {
+      "rate": 0.5
+    },
+    "output": "50%"
+  },
+  {
+    "input": {
+      "rate": 0.75
+    },
+    "output": "75%"
+  },
+  {
+    "input": {
+      "rate": 1
+    },
+    "output": "100%"
+  },
+  {
+    "input": {
+      "rate": 1.6666
+    },
+    "output": "167%"
+  },
+  {
+    "input": {
+      "rate": -1
+    },
+    "output": "-100%"
+  }
+]

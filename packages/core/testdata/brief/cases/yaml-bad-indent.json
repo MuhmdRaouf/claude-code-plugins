@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "yaml",
+      "message": "Nested mappings are not allowed in compact mappings at line 2, column 7:\n\nmode: edit\n      ^\n"
+    },
+    {
+      "kind": "yaml",
+      "message": "Implicit keys need to be on a single line at line 2, column 7:\n\nmode: edit\n      ^\n"
+    }
+  ]
+}

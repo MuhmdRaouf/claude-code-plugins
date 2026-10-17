@@ -1,0 +1,5 @@
+{"kind":"router.event","plugin":"zai","event":"fallback","reason":"dial tcp 1.2.3.4:443: i/o timeout: served by the passthrough","model":null,"ts":1791363600000}
+{"kind":"router.event","plugin":"zai","event":"refusal","reason":"upstream 401: invalid api key","model":"glm-5.3","ts":1791363600000}
+{"kind":"router.event","plugin":"zai","event":"rate_limited","reason":"upstream 429: rate limit reached","model":"glm-5.3","ts":1791363600000}
+{"kind":"router.event","plugin":"zai","event":"budget_stop","reason":"budget stop for provider:zai","model":"glm-5.3","ts":1791363600000}
+{"kind":"router.event","plugin":"zai","event":"restart","reason":"front silent for 5s: replaced","model":null,"ts":1791363600000}

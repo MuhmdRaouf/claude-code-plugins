@@ -1,0 +1,22 @@
+Rename `foo` to `bar` everywhere.
+
+## zai contract
+
+You work directly in the repository. The repository must stay unchanged.
+Do not create, edit or delete files in it.
+Write every output file to /state/jobs/j1/artifacts (also in $ZAI_ARTIFACTS).
+Do not commit, stage, stash or switch branches.
+Never print, log or write secrets: API keys, tokens, passwords, private keys.
+
+## Gates
+
+After you finish, the plugin runs these commands in your workspace. Each must exit 0.
+```sh
+npm test
+npm run lint
+```
+
+## Finish
+
+Run the gates yourself before you finish. Fix what fails.
+End your run with the structured report (schema: sweep). Report only what you did and checked.

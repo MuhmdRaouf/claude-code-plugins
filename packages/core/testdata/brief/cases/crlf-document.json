@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "value": {
+    "title": "t",
+    "body": "Line one\r\nLine two\r\n",
+    "model": "main",
+    "mode": "edit",
+    "cwd": "/work/sibling",
+    "base": "HEAD",
+    "scope": [
+      "**"
+    ],
+    "forbid": [],
+    "gates": [],
+    "timeoutMs": 7200000,
+    "retries": {
+      "fix": 1,
+      "infra": 2
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "change"
+    },
+    "addDirs": [
+      "/work/repo/docs",
+      "/opt/shared",
+      "/work/repo/vendor/lib"
+    ],
+    "env": [],
+    "tags": []
+  }
+}

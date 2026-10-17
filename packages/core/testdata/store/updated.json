@@ -1,0 +1,85 @@
+{
+  "id": "261006-abc123",
+  "brief": {
+    "title": "job 261006-abc123",
+    "body": "Do the thing.",
+    "model": "main",
+    "mode": "edit",
+    "cwd": "/repo",
+    "base": "HEAD",
+    "scope": [
+      "**"
+    ],
+    "forbid": [],
+    "gates": [
+      {
+        "run": "npm test",
+        "timeoutMs": 600000
+      }
+    ],
+    "timeoutMs": 7200000,
+    "retries": {
+      "fix": 1,
+      "infra": 2
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "change"
+    },
+    "addDirs": [],
+    "env": [],
+    "tags": []
+  },
+  "state": "running",
+  "workspace": {
+    "repoRoot": "/repo",
+    "baseSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "artifactsDir": "/state/artifacts"
+  },
+  "attempts": [
+    {
+      "n": 0,
+      "kind": "initial",
+      "prompt": "Do the thing.",
+      "sessionId": "00000000-0000-4000-8000-000000000001",
+      "startedAt": "2026-10-06T10:00:01.000Z",
+      "endedAt": "2026-10-06T10:01:00.000Z",
+      "outcome": {
+        "kind": "completed"
+      }
+    },
+    {
+      "n": 1,
+      "kind": "auto_fix",
+      "prompt": "Fix the failing gate.",
+      "feedback": "The gate failed. Look at the tail and fix it.",
+      "sessionId": "00000000-0000-4000-8000-000000000002",
+      "startedAt": "2026-10-06T10:01:00.000Z",
+      "endedAt": "2026-10-06T10:02:00.000Z",
+      "outcome": {
+        "kind": "api_error",
+        "message": "Insufficient balance",
+        "status": 429,
+        "quota": true
+      },
+      "usage": {
+        "turns": 2,
+        "inputTokens": 100,
+        "outputTokens": 50,
+        "cacheReadTokens": 10,
+        "cacheWriteTokens": 5,
+        "costUsd": 0.01,
+        "rateLimitRetries": 1,
+        "durationMs": 60000,
+        "model": "glm-5.3-flash"
+      },
+      "verdict": "quota"
+    }
+  ],
+  "createdAt": "2026-10-06T10:00:00.000Z",
+  "updatedAt": "2026-10-06T10:00:00.000Z",
+  "origin": {
+    "sessionId": "f81d4fae-7dec-41d0-a765-00a0c91e6bf6"
+  },
+  "version": 2
+}

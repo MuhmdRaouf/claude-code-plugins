@@ -1,0 +1,115 @@
+[
+  {
+    "input": {
+      "rows": [
+        [
+          "KIND",
+          "ID",
+          "MODEL",
+          "STATE",
+          "REQ",
+          "IN",
+          "OUT",
+          "LAST",
+          "TITLE"
+        ],
+        [
+          "subagent",
+          "3f2a1b9c",
+          "glm-5.3",
+          "active",
+          "12",
+          "45.2k",
+          "3.1k",
+          "just now",
+          "-"
+        ],
+        [
+          "session",
+          "9c8b7a6d",
+          "glm-5.3-flash",
+          "idle",
+          "3",
+          "1.2k",
+          "300",
+          "2h ago",
+          "-"
+        ]
+      ]
+    },
+    "output": [
+      "KIND      ID        MODEL          STATE   REQ  IN     OUT   LAST      TITLE",
+      "subagent  3f2a1b9c  glm-5.3        active  12   45.2k  3.1k  just now  -",
+      "session   9c8b7a6d  glm-5.3-flash  idle    3    1.2k   300   2h ago    -"
+    ]
+  },
+  {
+    "input": {
+      "rows": [
+        [
+          "TOTAL",
+          "15",
+          "1.1M",
+          "250.0k",
+          "500.0k",
+          "100.0k",
+          "$2.45"
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "output": [
+      "TOTAL  15  1.1M  250.0k  500.0k  100.0k  $2.45",
+      ""
+    ]
+  },
+  {
+    "input": {
+      "rows": [
+        [
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ]
+      ]
+    },
+    "output": [
+      "a",
+      "a  b"
+    ]
+  },
+  {
+    "input": {
+      "rows": [
+        [
+          "😀",
+          "ab"
+        ],
+        [
+          "x",
+          "abcd"
+        ]
+      ]
+    },
+    "output": [
+      "😀  ab",
+      "x   abcd"
+    ]
+  },
+  {
+    "input": {
+      "rows": []
+    },
+    "output": []
+  }
+]

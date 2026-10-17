@@ -1,0 +1,9 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "yaml",
+      "message": "Flow sequence in block collection must be sufficiently indented and end with a ] at line 3, column 1:\n\ngates: [\"a b\", 'c d'\nmode: edit\n^\n"
+    }
+  ]
+}

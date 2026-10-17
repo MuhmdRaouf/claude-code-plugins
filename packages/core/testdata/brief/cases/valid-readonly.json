@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "value": {
+    "title": "Read the config",
+    "body": "Read the config and report the keys.\n",
+    "model": "flash",
+    "mode": "readonly",
+    "cwd": "/work/repo",
+    "base": "HEAD",
+    "scope": [],
+    "forbid": [],
+    "gates": [],
+    "timeoutMs": 7200000,
+    "retries": {
+      "fix": 1,
+      "infra": 2
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "notes"
+    },
+    "addDirs": [],
+    "env": [],
+    "tags": []
+  }
+}

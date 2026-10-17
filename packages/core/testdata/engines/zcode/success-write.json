@@ -1,0 +1,26 @@
+{
+  "sessionId": "sess_live_fixture",
+  "traceId": "trace_fixture",
+  "turnId": "turn_fixture",
+  "response": "{\"summary\":\"GLM smoke ready\",\"findings\":[],\"open_items\":[]}",
+  "usage": {
+    "source": "provider",
+    "modelRequestCount": 4,
+    "inputTokens": 47339,
+    "outputTokens": 735,
+    "totalTokens": 48074,
+    "cacheReadTokens": 37376,
+    "cacheWriteTokens": 0,
+    "reasoningTokens": 0,
+    "webFetchRequests": 0,
+    "webSearchRequests": 0
+  },
+  "eventCount": 494,
+  "projection": {
+    "status": "idle",
+    "turnCount": 1,
+    "totalTokenCount": 48074,
+    "contextUsed": 12378,
+    "contextWindow": 200000
+  }
+}

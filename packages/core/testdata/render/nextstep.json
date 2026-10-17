@@ -1,0 +1,1005 @@
+[
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "pass"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "/zai:review 261006-next01 to read the diff and accept it, or return it with feedback."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "readonly",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "pass"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "the answer is in the report (a readonly job: nothing to merge); /zai:review 261006-next01 closes it or returns it with a follow-up."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "exec",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "pass"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "the answer is in the report (a exec job: nothing to merge); /zai:review 261006-next01 closes it or returns it with a follow-up."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "worker_error",
+            "outcome": {
+              "kind": "crashed",
+              "exitCode": 1,
+              "signal": null,
+              "stderrTail": "boom"
+            }
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "the worker never finished (crashed (exit 1): boom): nothing to accept. Fix the cause, then /zai:review 261006-next01 to return it to try again, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "worker_error"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "the worker never finished (worker error): nothing to accept. Fix the cause, then /zai:review 261006-next01 to return it to try again, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "timeout",
+            "outcome": {
+              "kind": "crashed",
+              "exitCode": 1,
+              "signal": null,
+              "stderrTail": "boom"
+            }
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "the worker never finished (crashed (exit 1): boom): nothing to accept. Fix the cause, then /zai:review 261006-next01 to return it to try again, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "timeout"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "the worker never finished (timeout): nothing to accept. Fix the cause, then /zai:review 261006-next01 to return it to try again, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "gate_fail"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "/zai:review 261006-next01 to return it with the failing output as feedback, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "scope_violation"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "/zai:review 261006-next01 to return it with the failing output as feedback, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "report_invalid"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "/zai:review 261006-next01 to return it with the failing output as feedback, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "quota"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "Z.ai GLM says the account has no balance or quota left, so it was not retried: top up at https://z.ai/manage-apikey/billing, then /zai:review 261006-next01 to return it to try again, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "stopped"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "it was stopped before it finished: /zai:review 261006-next01 to return it with feedback, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "verifying",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "it is verifying; /zai:board shows it until it awaits review."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "accepted",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "nothing left to do: the job was accepted."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "discarded",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "nothing left to do: the job was discarded."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "running",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "it is running; /zai:board shows it until it awaits review."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "queued",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "it is queued; /zai:board shows it until it awaits review."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "/zai:review j1 to return it to try again, or discard it."
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "job": {
+        "id": "261006-next01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "pass"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "/acme:review 261006-next01 to read the diff and accept it, or return it with feedback."
+  }
+]

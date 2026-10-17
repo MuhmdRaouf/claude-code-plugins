@@ -1,0 +1,10 @@
+{"id":"neg","type":"negotiate_protocol","protocolVersion":2}
+{"id":"tools","type":"set_host_tools","tools":[{"name":"submit_report","label":"Submit report","description":"Submit your final structured report. Call it exactly once, as your last action.","parameters":{"type":"object","properties":{"status":{"type":"string","enum":["done","blocked"]},"summary":{"type":"string"},"files":{"type":"array","items":{"type":"object","properties":{"path":{"type":"string"},"change":{"type":"string"}},"required":["path","change"],"additionalProperties":false}}},"required":["status","summary","files"],"additionalProperties":false},"loadMode":"essential"}]}
+{"id":"filt","type":"set_event_filter","events":["message_update","message_end","tool_execution_start","tool_execution_end","auto_retry_start","auto_retry_end","retry_fallback_applied","auto_compaction_start","auto_compaction_end","notice"],"messageUpdates":"delta"}
+{"id":"state0","type":"get_state"}
+{"id":"open","type":"open_session","sessionDir":"<root>/sessions/p9-big-frame"}
+{"id":"e0","type":"get_entries"}
+{"id":"s0","type":"get_session_stats"}
+{"id":"p2","type":"prompt","message":"Call the read tool exactly once with path \"big.txt:616-1300\". Then reply with just the number of the last line you received. Do not call submit_report."}
+{"id":"e1","type":"get_entries"}
+{"id":"s1","type":"get_session_stats"}

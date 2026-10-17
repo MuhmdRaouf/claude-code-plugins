@@ -1,0 +1,28 @@
+{
+  "pi": "1.0.4",
+  "probe": "P1",
+  "fixture": "success-readonly",
+  "description": "A readonly turn end to end: get_state, an admitted prompt, a find tool call and result, then the final assistant text and settle.",
+  "synthetic": true,
+  "source": "hand-written from pi 1.0.4 wire shapes",
+  "frames": 26,
+  "argv": [
+    "pi",
+    "--mode",
+    "rpc",
+    "--model",
+    "zai/glm-5.3",
+    "--thinking",
+    "low",
+    "--no-extensions",
+    "--no-mcp",
+    "--no-skills",
+    "--no-context-files",
+    "--tools",
+    "read,grep,find,ls",
+    "--session-id",
+    "<id>"
+  ],
+  "exit": 0,
+  "handshake_ms": 12
+}

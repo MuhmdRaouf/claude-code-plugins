@@ -1,0 +1,116 @@
+[
+  {
+    "input": {
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "queued",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "pass"
+          },
+          {
+            "n": 2,
+            "kind": "auto_fix",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z",
+            "verdict": "gate_fail"
+          }
+        ],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": {
+      "n": 2,
+      "kind": "auto_fix",
+      "prompt": "Rename `foo` to `bar` everywhere.",
+      "sessionId": "00000000-0000-4000-8000-000000000001",
+      "startedAt": "2026-10-06T00:00:00.000Z",
+      "verdict": "gate_fail"
+    }
+  },
+  {
+    "input": {
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "queued",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": null
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "model",
+      "message": "must be one of glm, glm-5.3, flash, glm-5.3-flash"
+    }
+  ]
+}

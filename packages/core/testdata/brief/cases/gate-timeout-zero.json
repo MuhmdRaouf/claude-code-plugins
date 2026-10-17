@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "gates.0.timeout",
+      "message": "invalid duration \"0s\": use a positive whole number of milliseconds or h/m/s units like 90s, 15m, 2h, 1h30m"
+    }
+  ]
+}

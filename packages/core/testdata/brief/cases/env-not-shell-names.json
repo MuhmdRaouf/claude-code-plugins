@@ -1,0 +1,25 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "env.1",
+      "message": "must be a shell variable name"
+    },
+    {
+      "kind": "field",
+      "field": "env.2",
+      "message": "must be a shell variable name"
+    },
+    {
+      "kind": "field",
+      "field": "env.3",
+      "message": "must be a shell variable name"
+    },
+    {
+      "kind": "field",
+      "field": "env.4",
+      "message": "must be a shell variable name"
+    }
+  ]
+}

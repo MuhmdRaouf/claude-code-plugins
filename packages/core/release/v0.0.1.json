@@ -1,0 +1,26 @@
+{
+  "version": "0.0.1",
+  "tag": "core-v0.0.1",
+  "assets": {
+    "darwin-amd64": {
+      "name": "plugin-core-darwin-amd64",
+      "sha256": "e0c892be9c9cb2f3519a3ee64618f3e77b71e6d588e22f0c1e222a337515b917",
+      "size": 11237520
+    },
+    "darwin-arm64": {
+      "name": "plugin-core-darwin-arm64",
+      "sha256": "1b632d76e654fe6c6a1222e876ec5332c5eb56deb517013d6ff3e5418f3a88b0",
+      "size": 10325970
+    },
+    "linux-amd64": {
+      "name": "plugin-core-linux-amd64",
+      "sha256": "44d5cfea0bec9c9dec62f6592ab9b9809a274f81f37e979b07f3ffc5bfbcce76",
+      "size": 11006076
+    },
+    "linux-arm64": {
+      "name": "plugin-core-linux-arm64",
+      "sha256": "afe8e8e4fd1390b670ad87f18a861411cc7f920e89f626f4f71bb7f0226f04fb",
+      "size": 10092668
+    }
+  }
+}

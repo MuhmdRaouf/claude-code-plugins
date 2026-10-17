@@ -1,0 +1,95 @@
+[
+  {
+    "input": {
+      "progress": {
+        "phase": "starting",
+        "turns": 0,
+        "lastText": "",
+        "rateLimitRetries": 0,
+        "toolCalls": 0,
+        "toolErrors": 0
+      }
+    },
+    "output": "starting"
+  },
+  {
+    "input": {
+      "progress": {
+        "phase": "thinking",
+        "turns": 2,
+        "lastText": "",
+        "rateLimitRetries": 0,
+        "toolCalls": 0,
+        "toolErrors": 0
+      }
+    },
+    "output": "thinking"
+  },
+  {
+    "input": {
+      "progress": {
+        "phase": "writing",
+        "turns": 4,
+        "lastText": "Now I will update the tests",
+        "rateLimitRetries": 0,
+        "toolCalls": 0,
+        "toolErrors": 0
+      }
+    },
+    "output": "writing"
+  },
+  {
+    "input": {
+      "progress": {
+        "phase": "tool",
+        "turns": 4,
+        "lastText": "",
+        "lastTool": "Bash",
+        "rateLimitRetries": 0,
+        "toolCalls": 0,
+        "toolErrors": 0
+      }
+    },
+    "output": "tool Bash"
+  },
+  {
+    "input": {
+      "progress": {
+        "phase": "rate_limited",
+        "turns": 1,
+        "lastText": "",
+        "rateLimitRetries": 1,
+        "toolCalls": 2,
+        "toolErrors": 0
+      }
+    },
+    "output": "rate limited · 2 tool calls · 1 rate-limit retry"
+  },
+  {
+    "input": {
+      "progress": {
+        "phase": "done",
+        "turns": 9,
+        "lastText": "",
+        "rateLimitRetries": 3,
+        "toolCalls": 12,
+        "toolErrors": 0
+      }
+    },
+    "output": "done · 12 tool calls · 3 rate-limit retries"
+  },
+  {
+    "input": {
+      "progress": {
+        "phase": "tool",
+        "turns": 9,
+        "lastText": "",
+        "lastTool": "Edit src/a.ts",
+        "rateLimitRetries": 2,
+        "toolCalls": 7,
+        "toolErrors": 1
+      }
+    },
+    "output": "tool Edit src/a.ts · 7 tool calls (1 failed) · 2 rate-limit retries"
+  }
+]

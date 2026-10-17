@@ -1,0 +1,52 @@
+// The provider as data: the only provider-specific file, read by the plugin's own tests, by the shared suites in
+// @muhmdraouf/plugin-test and by scripts/check-siblings.mjs (which normalises the five against it). The plugin ships
+// no runtime source; the plugin-core binary carries its own copy of this data.
+export const ZAI_PROVIDER = {
+  name: "zai",
+  display: "Z.ai GLM",
+  slash: "/zai:",
+  agentPrefix: "zai:",
+  branchPrefix: "zai/",
+  harness: "zai",
+  artifactsEnv: "ZAI_ARTIFACTS",
+  envPrefix: "ZAI",
+  agents: { main: "glm-5.3", flash: "glm-5.3-flash" },
+  catalog: {
+    main: {
+      tier: "main",
+      id: "glm-5.3",
+      label: "GLM 5.3",
+      behavesAs: "claude-opus-5-5",
+      maxOutputTokens: 131072,
+      defaultEffort: "xhigh",
+    },
+    flash: {
+      tier: "flash",
+      id: "glm-5.3-flash",
+      label: "GLM 5.3 Flash",
+      behavesAs: "claude-opus-5-5",
+      maxOutputTokens: 131072,
+      defaultEffort: "xhigh",
+    },
+  },
+  tierNames: { main: "glm", flash: "flash" },
+  defaultTier: { edit: "main", exec: "flash", readonly: "flash" },
+  pingTier: "flash",
+  workerLabel: "claude",
+  baseUrl: "https://api.z.ai/api/anthropic",
+  auth: "bearer",
+  keyEnv: ["ZAI_API_KEY"],
+  keyFile: "~/.config/zai-plugin-cc/env",
+  billingUrl: "https://z.ai/manage-apikey/billing",
+  keysUrl: "https://z.ai/manage-apikey/apikey-list",
+  strip: [],
+  /** Z.ai's probe: the web_search server tool answers 500 on glm-5.3-flash and works on glm-5.3. */
+  webSearchModel: "glm-5.3",
+  caveats: [],
+  router: {
+    port: 18787,
+    label: "dev.muhmdraouf.zai-router",
+    healthPath: "/zai-router/health",
+    modelPrefixes: ["glm-"],
+  },
+};

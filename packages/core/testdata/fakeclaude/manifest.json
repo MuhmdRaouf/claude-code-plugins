@@ -1,0 +1,487 @@
+[
+  {
+    "name": "ok",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "ok"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "ok-default-env",
+    "argv": [
+      "-p"
+    ],
+    "env": {},
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "resume-session-id",
+    "argv": [
+      "-p",
+      "--resume",
+      "abc-123"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "ok"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "session-id-wins-over-resume",
+    "argv": [
+      "-p",
+      "--session-id",
+      "first",
+      "--resume",
+      "second"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "ok"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "flag-value-missing",
+    "argv": [
+      "-p",
+      "--model"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "ok"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "model-from-env",
+    "argv": [
+      "-p",
+      "--model",
+      "opus"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "ok",
+      "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-5"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "permission-mode",
+    "argv": [
+      "-p",
+      "--permission-mode",
+      "plan"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "ok"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "echo-prompt",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "echo-prompt"
+    },
+    "stdin": "line1\nline2 \"quoted\" <tag> & amp\ttab — é 🎉 end\n",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "edit-file",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "edit-file",
+      "FAKE_CLAUDE_EDIT": "src/deep/notes.txt:hello from glm\nsecond line\n"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {
+      "src/deep/notes.txt": "hello from glm\nsecond line\n"
+    },
+    "stderr": ""
+  },
+  {
+    "name": "edit-file-on-resume",
+    "argv": [
+      "-p",
+      "--resume",
+      "r-1"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "edit-file",
+      "FAKE_CLAUDE_EDIT": "old.txt:old",
+      "FAKE_CLAUDE_EDIT_ON_RESUME": "new.txt:fresh"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {
+      "new.txt": "fresh"
+    },
+    "stderr": ""
+  },
+  {
+    "name": "edit-file-without-resume",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "edit-file",
+      "FAKE_CLAUDE_EDIT": "old.txt:old",
+      "FAKE_CLAUDE_EDIT_ON_RESUME": "new.txt:fresh"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {
+      "old.txt": "old"
+    },
+    "stderr": ""
+  },
+  {
+    "name": "edit-file-empty-spec",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "edit-file",
+      "FAKE_CLAUDE_EDIT": ""
+    },
+    "stderrNonPortable": true,
+    "stdin": "fix the bug",
+    "exit": 1,
+    "dumps": {},
+    "edits": {}
+  },
+  {
+    "name": "no-session",
+    "argv": [
+      "-p",
+      "--resume",
+      "gone-1"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "no-session"
+    },
+    "stdin": "fix the bug",
+    "exit": 1,
+    "dumps": {},
+    "edits": {},
+    "stderr": "No conversation found with session ID: gone-1\n"
+  },
+  {
+    "name": "crash",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "crash"
+    },
+    "stdin": "fix the bug",
+    "exit": 3,
+    "dumps": {},
+    "edits": {},
+    "stderr": "fake claude: simulated crash\n"
+  },
+  {
+    "name": "unknown-scenario",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "bogus"
+    },
+    "stdin": "fix the bug",
+    "exit": 2,
+    "dumps": {},
+    "edits": {},
+    "stderr": "fake claude: unknown scenario bogus\n"
+  },
+  {
+    "name": "scenario-empty-string",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": ""
+    },
+    "stdin": "fix the bug",
+    "exit": 2,
+    "dumps": {},
+    "edits": {},
+    "stderr": "fake claude: unknown scenario \n"
+  },
+  {
+    "name": "fixture",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_FIXTURE": "fixture.ndjson"
+    },
+    "files": {
+      "fixture.ndjson": "{\"z\":1,\"a\":{\"y\": [1,2,{\"k\":\"v\"}]}}\n{\"type\":\"assistant\",\"message\":{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"raw 🎉\"}]},\"session_id\":\"other\"}\n{\"lsep\":\"a\",\"u2028\":\"a b\"}"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "report",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "ok",
+      "FAKE_CLAUDE_REPORT": "{\"summary\":\"ship it\",\"steps\":[\"red\",\"green\"],\"ok\":true,\"none\":null,\"nested\":{\"z\":1,\"a\":[1.50,1e2,0.0012,1e-7,1e21,-0,123456789012345678901]}}  "
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "report-empty-object",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "ok",
+      "FAKE_CLAUDE_REPORT": "{}"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "dump",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "ok",
+      "FAKE_CLAUDE_DUMP": "dump.json",
+      "ANTHROPIC_AUTH_TOKEN": "tok-secret-1"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {
+      "dump.json": "{\"argv\":[\"-p\",\"--output-format\",\"stream-json\",\"--session-id\",\"sess-42\",\"--model\",\"sonnet\",\"--permission-mode\",\"acceptEdits\"],\"envNames\":[\"ANTHROPIC_AUTH_TOKEN\",\"FAKE_CLAUDE_DUMP\",\"FAKE_CLAUDE_SCENARIO\"],\"authTokenSha256\":\"755b2046dd8bb3da36b9fcd5a7ac5e1f363cd6aa530710454154d09d1441ea6e\"}"
+    },
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "dump-without-token",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_DUMP": "dump.json"
+    },
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {
+      "dump.json": "{\"argv\":[\"-p\",\"--output-format\",\"stream-json\",\"--session-id\",\"sess-42\",\"--model\",\"sonnet\",\"--permission-mode\",\"acceptEdits\"],\"envNames\":[\"FAKE_CLAUDE_DUMP\"],\"authTokenSha256\":null}"
+    },
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "version",
+    "argv": [
+      "--version"
+    ],
+    "env": {},
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "version-ignores-other-args",
+    "argv": [
+      "-p",
+      "--session-id",
+      "x",
+      "--version"
+    ],
+    "env": {},
+    "stdin": "fix the bug",
+    "exit": 0,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  },
+  {
+    "name": "sleep",
+    "argv": [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--session-id",
+      "sess-42",
+      "--model",
+      "sonnet",
+      "--permission-mode",
+      "acceptEdits"
+    ],
+    "env": {
+      "FAKE_CLAUDE_SCENARIO": "sleep"
+    },
+    "killed": true,
+    "stdin": "fix the bug",
+    "exit": null,
+    "dumps": {},
+    "edits": {},
+    "stderr": ""
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "input": {
+      "provider": "reference"
+    },
+    "output": "nothing was applied. The worker cannot rebase (it never commits or switches branches): discard the job with /zai:review and run the brief again on the current branch, or merge the job's branch by hand."
+  },
+  {
+    "input": {
+      "provider": "acme"
+    },
+    "output": "nothing was applied. The worker cannot rebase (it never commits or switches branches): discard the job with /acme:review and run the brief again on the current branch, or merge the job's branch by hand."
+  }
+]

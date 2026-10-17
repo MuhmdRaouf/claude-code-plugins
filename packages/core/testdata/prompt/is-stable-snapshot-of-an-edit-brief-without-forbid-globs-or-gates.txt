@@ -1,0 +1,18 @@
+Rename `foo` to `bar` everywhere.
+
+## zai contract
+
+You work in an isolated git worktree of the repository. Edit files only there.
+Change only files matching these globs:
+- `**`
+Leave your changes in the working tree. The plugin reviews and commits them.
+Do not commit, stage, stash or switch branches.
+Never print, log or write secrets: API keys, tokens, passwords, private keys.
+
+## Gates
+
+No gates: the plugin runs no checks after you finish.
+
+## Finish
+
+End your run with the structured report (schema: change). Report only what you did and checked.

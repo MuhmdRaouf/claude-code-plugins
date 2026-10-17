@@ -1,0 +1,104 @@
+[
+  {
+    "input": {
+      "amount": 0
+    },
+    "output": "$0.0000"
+  },
+  {
+    "input": {
+      "amount": 0.004
+    },
+    "output": "$0.0040"
+  },
+  {
+    "input": {
+      "amount": 0.005
+    },
+    "output": "$0.0050"
+  },
+  {
+    "input": {
+      "amount": 0.008
+    },
+    "output": "$0.0080"
+  },
+  {
+    "input": {
+      "amount": 0.0123
+    },
+    "output": "$0.0123"
+  },
+  {
+    "input": {
+      "amount": 0.0159
+    },
+    "output": "$0.0159"
+  },
+  {
+    "input": {
+      "amount": 0.04
+    },
+    "output": "$0.0400"
+  },
+  {
+    "input": {
+      "amount": 1.005
+    },
+    "output": "$1.00"
+  },
+  {
+    "input": {
+      "amount": 1.4
+    },
+    "output": "$1.40"
+  },
+  {
+    "input": {
+      "amount": 2.41
+    },
+    "output": "$2.41"
+  },
+  {
+    "input": {
+      "amount": 2.45
+    },
+    "output": "$2.45"
+  },
+  {
+    "input": {
+      "amount": 3.456
+    },
+    "output": "$3.46"
+  },
+  {
+    "input": {
+      "amount": 3.68
+    },
+    "output": "$3.68"
+  },
+  {
+    "input": {
+      "amount": 5.08
+    },
+    "output": "$5.08"
+  },
+  {
+    "input": {
+      "amount": 1234567.891
+    },
+    "output": "$1234567.89"
+  },
+  {
+    "input": {
+      "amount": -1
+    },
+    "output": "$-1.0000"
+  },
+  {
+    "input": {
+      "amount": 1e+21
+    },
+    "output": "$1e+21"
+  }
+]

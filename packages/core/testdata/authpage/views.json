@@ -1,0 +1,109 @@
+[
+  {
+    "name": "form",
+    "file": "form.html",
+    "nonce": "MDEyMzQ1Njc4OWFiY2RlZg==",
+    "plugin": "zai-plugin-cc",
+    "version": "0.0.1",
+    "display": "Z.ai GLM",
+    "storeLabel": "macOS Keychain",
+    "keysUrl": "https://z.ai/manage-apikey/apikey-list",
+    "billingUrl": "https://z.ai/manage-apikey/billing",
+    "state": {
+      "kind": "form",
+      "csrf": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY"
+    }
+  },
+  {
+    "name": "form-error",
+    "file": "form-error.html",
+    "nonce": "MDEyMzQ1Njc4OWFiY2RlZg==",
+    "plugin": "zai-plugin-cc",
+    "version": "0.0.1",
+    "display": "Z.ai GLM",
+    "storeLabel": "macOS Keychain",
+    "keysUrl": "https://z.ai/manage-apikey/apikey-list",
+    "billingUrl": "https://z.ai/manage-apikey/billing",
+    "state": {
+      "kind": "form",
+      "csrf": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY",
+      "error": "That key was refused. Try again."
+    }
+  },
+  {
+    "name": "saved",
+    "file": "saved.html",
+    "nonce": "MDEyMzQ1Njc4OWFiY2RlZg==",
+    "plugin": "zai-plugin-cc",
+    "version": "0.0.1",
+    "display": "Z.ai GLM",
+    "storeLabel": "macOS Keychain",
+    "keysUrl": "https://z.ai/manage-apikey/apikey-list",
+    "billingUrl": "https://z.ai/manage-apikey/billing",
+    "state": {
+      "kind": "saved",
+      "limited": false
+    }
+  },
+  {
+    "name": "saved-limited",
+    "file": "saved-limited.html",
+    "nonce": "MDEyMzQ1Njc4OWFiY2RlZg==",
+    "plugin": "zai-plugin-cc",
+    "version": "0.0.1",
+    "display": "Z.ai GLM",
+    "storeLabel": "macOS Keychain",
+    "keysUrl": "https://z.ai/manage-apikey/apikey-list",
+    "billingUrl": "https://z.ai/manage-apikey/billing",
+    "state": {
+      "kind": "saved",
+      "limited": true
+    }
+  },
+  {
+    "name": "ended",
+    "file": "ended.html",
+    "nonce": "MDEyMzQ1Njc4OWFiY2RlZg==",
+    "plugin": "zai-plugin-cc",
+    "version": "0.0.1",
+    "display": "Z.ai GLM",
+    "storeLabel": "macOS Keychain",
+    "keysUrl": "https://z.ai/manage-apikey/apikey-list",
+    "billingUrl": "https://z.ai/manage-apikey/billing",
+    "state": {
+      "kind": "ended",
+      "text": "That key was refused. That was the last try: run setup again in Claude Code for a new page."
+    }
+  },
+  {
+    "name": "no-version",
+    "file": "no-version.html",
+    "nonce": "MDEyMzQ1Njc4OWFiY2RlZg==",
+    "plugin": "zai-plugin-cc",
+    "version": null,
+    "display": "Z.ai GLM",
+    "storeLabel": "macOS Keychain",
+    "keysUrl": "https://z.ai/manage-apikey/apikey-list",
+    "billingUrl": "https://z.ai/manage-apikey/billing",
+    "state": {
+      "kind": "form",
+      "csrf": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY"
+    }
+  },
+  {
+    "name": "escaping",
+    "file": "escaping.html",
+    "nonce": "MDEyMzQ1Njc4OWFiY2RlZg==",
+    "plugin": "z&ai <plugin> \"cc\"",
+    "version": "0.0\"1&",
+    "display": "Z&ai <GLM> 'x'",
+    "storeLabel": "Key & Chain <label>",
+    "keysUrl": "https://z.ai/keys?a=1&b=2",
+    "billingUrl": "https://z.ai/bill?a=1&b=2",
+    "state": {
+      "kind": "form",
+      "csrf": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY",
+      "error": "& <tag> \"q\" 'a'"
+    }
+  }
+]

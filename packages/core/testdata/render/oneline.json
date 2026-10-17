@@ -1,0 +1,79 @@
+[
+  {
+    "input": {
+      "text": "Now I will\nupdate the tests",
+      "max": 160
+    },
+    "output": "Now I will update the tests"
+  },
+  {
+    "input": {
+      "text": "FAIL test/a.test.ts\nexpected 2, got 1\n",
+      "max": 200
+    },
+    "output": "FAIL test/a.test.ts expected 2, got 1"
+  },
+  {
+    "input": {
+      "text": "  padded \t with \n\n bits  ",
+      "max": 100
+    },
+    "output": "padded with bits"
+  },
+  {
+    "input": {
+      "text": "",
+      "max": 5
+    },
+    "output": ""
+  },
+  {
+    "input": {
+      "text": "abc",
+      "max": 3
+    },
+    "output": "abc"
+  },
+  {
+    "input": {
+      "text": "abc",
+      "max": 1
+    },
+    "output": "…"
+  },
+  {
+    "input": {
+      "text": "abc",
+      "max": 0
+    },
+    "output": "ab…"
+  },
+  {
+    "input": {
+      "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx😀yyyyyyyyyy",
+      "max": 61
+    },
+    "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx😀…"
+  },
+  {
+    "input": {
+      "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx😀yyyyyyyyyy",
+      "max": 60
+    },
+    "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d…"
+  },
+  {
+    "input": {
+      "text": "😀😀",
+      "max": 3
+    },
+    "output": "😀…"
+  },
+  {
+    "input": {
+      "text": "Rename the helper everywhere it is called from in the whole codebase today",
+      "max": 60
+    },
+    "output": "Rename the helper everywhere it is called from in the whole…"
+  }
+]

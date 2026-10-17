@@ -1,0 +1,104 @@
+[
+  {
+    "input": {
+      "ms": 0
+    },
+    "output": "0.0s"
+  },
+  {
+    "input": {
+      "ms": 0.004
+    },
+    "output": "0.0s"
+  },
+  {
+    "input": {
+      "ms": 0.005
+    },
+    "output": "0.0s"
+  },
+  {
+    "input": {
+      "ms": -1
+    },
+    "output": "-0.0s"
+  },
+  {
+    "input": {
+      "ms": 940
+    },
+    "output": "0.9s"
+  },
+  {
+    "input": {
+      "ms": 4999
+    },
+    "output": "5.0s"
+  },
+  {
+    "input": {
+      "ms": 9999
+    },
+    "output": "10.0s"
+  },
+  {
+    "input": {
+      "ms": 10000
+    },
+    "output": "10s"
+  },
+  {
+    "input": {
+      "ms": 42130
+    },
+    "output": "42s"
+  },
+  {
+    "input": {
+      "ms": 59000
+    },
+    "output": "59s"
+  },
+  {
+    "input": {
+      "ms": 59999
+    },
+    "output": "1m00s"
+  },
+  {
+    "input": {
+      "ms": 60000
+    },
+    "output": "1m00s"
+  },
+  {
+    "input": {
+      "ms": 125000
+    },
+    "output": "2m05s"
+  },
+  {
+    "input": {
+      "ms": 3600000
+    },
+    "output": "1h00m"
+  },
+  {
+    "input": {
+      "ms": 3723000
+    },
+    "output": "1h02m"
+  },
+  {
+    "input": {
+      "ms": 86400000
+    },
+    "output": "24h00m"
+  },
+  {
+    "input": {
+      "ms": 1234567.891
+    },
+    "output": "20m35s"
+  }
+]

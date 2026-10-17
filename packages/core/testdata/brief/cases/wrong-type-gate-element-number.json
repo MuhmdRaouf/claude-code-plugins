@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "gates.0",
+      "message": "Invalid input: expected object, received number"
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+[
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "queued",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "glm-5.3"
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "flash",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "queued",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "glm-5.3-flash"
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "job": {
+        "id": "j1",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "flash",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "queued",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0000000000000000000000000000000000000000",
+          "worktree": "/state/worktrees/j1",
+          "branch": "zai/j1",
+          "artifactsDir": "/state/jobs/j1/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T00:00:00.000Z",
+        "updatedAt": "2026-10-06T00:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "small-model-9"
+  }
+]

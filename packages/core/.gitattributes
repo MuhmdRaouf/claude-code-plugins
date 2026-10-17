@@ -1,0 +1,3 @@
+# Fixtures are byte-exact inputs (CRLF cases included): never normalise their line endings.
+testdata/** -text
+**/testdata/** -text

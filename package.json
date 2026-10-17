@@ -1,0 +1,25 @@
+{
+  "name": "cc-plugins",
+  "private": true,
+  "description": "The muhmdraouf marketplace of Claude Code plugins.",
+  "license": "GPL-3.0-or-later",
+  "workspaces": [
+    "packages/plugin-test",
+    "plugins/zai-plugin-cc",
+    "plugins/kimi-plugin-cc",
+    "plugins/deepseek-plugin-cc",
+    "plugins/minimax-plugin-cc",
+    "plugins/qwen-plugin-cc"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "check": "npm run check:attribution && npm run check:siblings && npm run check:ci && npm run check --workspaces --if-present",
+    "check:attribution": "node scripts/check-attribution.mjs",
+    "check:siblings": "node scripts/check-siblings.mjs",
+    "test": "npm run test --workspaces --if-present",
+    "check:ci": "node --test scripts/check-ci.test.mjs scripts/launcher.test.mjs"
+  },
+  "devDependencies": {
+    "vite-plus": "1.3.0"
+  }
+}

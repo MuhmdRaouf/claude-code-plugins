@@ -1,0 +1,26 @@
+[
+  {
+    "input": {
+      "model": "glm-5.3",
+      "tokens": {
+        "inputTokens": 4200,
+        "outputTokens": 310,
+        "cacheReadTokens": 2800,
+        "cacheWriteTokens": 900
+      }
+    },
+    "output": "est. $0.0080"
+  },
+  {
+    "input": {
+      "model": "not-a-model",
+      "tokens": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 1000000
+      }
+    },
+    "output": "unpriced"
+  }
+]

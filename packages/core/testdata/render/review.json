@@ -1,0 +1,854 @@
+[
+  {
+    "input": {
+      "provider": "reference",
+      "packet": {
+        "job": {
+          "id": "261006-abc123",
+          "brief": {
+            "title": "Rename the helper",
+            "body": "Rename `foo` to `bar` everywhere.",
+            "model": "main",
+            "mode": "edit",
+            "cwd": "/repo",
+            "base": "HEAD",
+            "scope": [
+              "**"
+            ],
+            "forbid": [],
+            "gates": [],
+            "timeoutMs": 7200000,
+            "retries": {
+              "fix": 1,
+              "infra": 2
+            },
+            "report": {
+              "kind": "builtin",
+              "name": "change"
+            },
+            "addDirs": [],
+            "env": [],
+            "tags": []
+          },
+          "state": "awaiting_review",
+          "workspace": {
+            "repoRoot": "/repo",
+            "baseSha": "0123456789abcdef0123456789abcdef01234567",
+            "worktree": "/state/worktrees/261006-abc123",
+            "branch": "zai/261006-abc123",
+            "artifactsDir": "/state/jobs/261006-abc123/artifacts"
+          },
+          "attempts": [
+            {
+              "n": 1,
+              "kind": "initial",
+              "prompt": "Rename `foo` to `bar` everywhere.",
+              "sessionId": "00000000-0000-4000-8000-000000000001",
+              "startedAt": "2026-10-06T00:00:00.000Z",
+              "endedAt": "2026-10-06T11:55:00.000Z",
+              "outcome": {
+                "kind": "completed"
+              },
+              "usage": {
+                "turns": 3,
+                "inputTokens": 4200,
+                "outputTokens": 310,
+                "cacheReadTokens": 2800,
+                "cacheWriteTokens": 900,
+                "costUsd": 0.0123,
+                "rateLimitRetries": 0,
+                "durationMs": 42130
+              },
+              "report": {
+                "summary": "Renamed foo to bar in 3 files",
+                "files": [
+                  {
+                    "path": "src/a.ts",
+                    "why": "rename"
+                  }
+                ],
+                "tests_added": [
+                  "test/a.test.ts"
+                ],
+                "open_items": [
+                  "docs still say foo"
+                ]
+              },
+              "verification": {
+                "gates": [
+                  {
+                    "run": "npm test",
+                    "exitCode": 1,
+                    "timedOut": false,
+                    "durationMs": 2300,
+                    "tail": "FAIL test/a.test.ts\nexpected 2, got 1\n"
+                  },
+                  {
+                    "run": "npm run lint",
+                    "exitCode": 0,
+                    "timedOut": false,
+                    "durationMs": 400,
+                    "tail": ""
+                  }
+                ],
+                "changes": {
+                  "added": [],
+                  "modified": [
+                    "src/a.ts"
+                  ],
+                  "deleted": [],
+                  "untracked": []
+                },
+                "scope": {
+                  "outOfScope": [],
+                  "forbidden": [],
+                  "repoChanged": false
+                },
+                "report": {
+                  "present": true,
+                  "valid": true,
+                  "problems": []
+                }
+              },
+              "verdict": "gate_fail"
+            },
+            {
+              "n": 2,
+              "kind": "auto_fix",
+              "prompt": "Rename `foo` to `bar` everywhere.",
+              "sessionId": "00000000-0000-4000-8000-000000000001",
+              "startedAt": "2026-10-06T00:00:00.000Z",
+              "endedAt": "2026-10-06T11:55:00.000Z",
+              "outcome": {
+                "kind": "completed"
+              },
+              "usage": {
+                "turns": 3,
+                "inputTokens": 4200,
+                "outputTokens": 310,
+                "cacheReadTokens": 2800,
+                "cacheWriteTokens": 900,
+                "costUsd": 0.0123,
+                "rateLimitRetries": 0,
+                "durationMs": 42130
+              },
+              "report": {
+                "summary": "Renamed foo to bar in 3 files",
+                "files": [
+                  {
+                    "path": "src/a.ts",
+                    "why": "rename"
+                  }
+                ],
+                "tests_added": [
+                  "test/a.test.ts"
+                ],
+                "open_items": [
+                  "docs still say foo"
+                ]
+              },
+              "verification": {
+                "gates": [
+                  {
+                    "run": "npm test",
+                    "exitCode": 0,
+                    "timedOut": false,
+                    "durationMs": 1200,
+                    "tail": ""
+                  },
+                  {
+                    "run": "npm run lint",
+                    "exitCode": 0,
+                    "timedOut": false,
+                    "durationMs": 400,
+                    "tail": ""
+                  }
+                ],
+                "changes": {
+                  "added": [
+                    "src/b.ts"
+                  ],
+                  "modified": [
+                    "src/a.ts"
+                  ],
+                  "deleted": [
+                    "old.ts"
+                  ],
+                  "untracked": [
+                    "notes.md"
+                  ]
+                },
+                "scope": {
+                  "outOfScope": [],
+                  "forbidden": [],
+                  "repoChanged": false
+                },
+                "report": {
+                  "present": true,
+                  "valid": true,
+                  "problems": []
+                }
+              },
+              "verdict": "pass"
+            }
+          ],
+          "createdAt": "2026-10-06T11:40:00.000Z",
+          "updatedAt": "2026-10-06T11:55:00.000Z",
+          "version": 0
+        },
+        "diffStat": " src/a.ts | 2 +-\n 1 file changed, 1 insertion(+), 1 deletion(-)\n",
+        "diff": "diff --git a/src/a.ts b/src/a.ts\n-foo\n+bar\n"
+      }
+    },
+    "output": "zai job 261006-abc123: Rename the helper\nverdict pass · glm-5.3 · edit · attempt 2 (auto_fix) · awaiting review\nworktree /state/worktrees/261006-abc123 (branch zai/261006-abc123, base 0123456)\n\nAttempts\n  #1 (initial): gate_fail; gates 1/2 passed (failing: `npm test`); 1 changed path, in scope; report valid.\n  #2 (auto_fix): pass; gates 2/2 passed; 4 changed paths, in scope; report valid.\n\nReport\n  Renamed foo to bar in 3 files\n  Tests added: test/a.test.ts\n  Open items:\n  - docs still say foo\n\nGates (2/2 passed)\n  pass  npm test      exit 0  1.2s\n  pass  npm run lint  exit 0  0.4s\n\nScope: in scope\nChanges (4):\n  A src/b.ts\n  M src/a.ts\n  D old.ts\n  ? notes.md\n\nUsage: 3 turns · 4.2k in / 310 out tokens · 2.8k cache read · est. $0.0080 · 42s\n\nDiff stat\n   src/a.ts | 2 +-\n   1 file changed, 1 insertion(+), 1 deletion(-)\n\nDiff\n```diff\ndiff --git a/src/a.ts b/src/a.ts\n-foo\n+bar\n```\n\nNext\n  /zai:review 261006-abc123 to read the diff and accept it, or return it with feedback."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "packet": {
+        "job": {
+          "id": "261006-abc123",
+          "brief": {
+            "title": "Rename the helper",
+            "body": "Rename `foo` to `bar` everywhere.",
+            "model": "main",
+            "mode": "edit",
+            "cwd": "/repo",
+            "base": "HEAD",
+            "scope": [
+              "**"
+            ],
+            "forbid": [],
+            "gates": [],
+            "timeoutMs": 7200000,
+            "retries": {
+              "fix": 1,
+              "infra": 2
+            },
+            "report": {
+              "kind": "builtin",
+              "name": "change"
+            },
+            "addDirs": [],
+            "env": [],
+            "tags": []
+          },
+          "state": "awaiting_review",
+          "workspace": {
+            "repoRoot": "/repo",
+            "baseSha": "0123456789abcdef0123456789abcdef01234567",
+            "worktree": "/state/worktrees/261006-abc123",
+            "branch": "zai/261006-abc123",
+            "artifactsDir": "/state/jobs/261006-abc123/artifacts"
+          },
+          "attempts": [
+            {
+              "n": 1,
+              "kind": "initial",
+              "prompt": "Rename `foo` to `bar` everywhere.",
+              "sessionId": "00000000-0000-4000-8000-000000000001",
+              "startedAt": "2026-10-06T00:00:00.000Z",
+              "endedAt": "2026-10-06T11:55:00.000Z",
+              "outcome": {
+                "kind": "completed"
+              },
+              "usage": {
+                "turns": 3,
+                "inputTokens": 4200,
+                "outputTokens": 310,
+                "cacheReadTokens": 2800,
+                "cacheWriteTokens": 900,
+                "costUsd": 0.0123,
+                "rateLimitRetries": 0,
+                "durationMs": 42130
+              },
+              "report": {
+                "summary": "Renamed foo to bar in 3 files",
+                "files": [
+                  {
+                    "path": "src/a.ts",
+                    "why": "rename"
+                  }
+                ],
+                "tests_added": [
+                  "test/a.test.ts"
+                ],
+                "open_items": [
+                  "docs still say foo"
+                ]
+              },
+              "verification": {
+                "gates": [
+                  {
+                    "run": "npm test",
+                    "exitCode": 1,
+                    "timedOut": false,
+                    "durationMs": 2300,
+                    "tail": "FAIL test/a.test.ts\nexpected 2, got 1\n"
+                  },
+                  {
+                    "run": "npm run lint",
+                    "exitCode": 0,
+                    "timedOut": false,
+                    "durationMs": 400,
+                    "tail": ""
+                  }
+                ],
+                "changes": {
+                  "added": [],
+                  "modified": [
+                    "src/a.ts"
+                  ],
+                  "deleted": [],
+                  "untracked": []
+                },
+                "scope": {
+                  "outOfScope": [],
+                  "forbidden": [],
+                  "repoChanged": false
+                },
+                "report": {
+                  "present": true,
+                  "valid": true,
+                  "problems": []
+                }
+              },
+              "verdict": "gate_fail"
+            }
+          ],
+          "createdAt": "2026-10-06T11:40:00.000Z",
+          "updatedAt": "2026-10-06T11:55:00.000Z",
+          "version": 0
+        }
+      }
+    },
+    "output": "zai job 261006-abc123: Rename the helper\nverdict gate_fail · glm-5.3 · edit · attempt 1 (initial) · awaiting review\nworktree /state/worktrees/261006-abc123 (branch zai/261006-abc123, base 0123456)\n\nReport\n  Renamed foo to bar in 3 files\n  Tests added: test/a.test.ts\n  Open items:\n  - docs still say foo\n\nGates (1/2 passed)\n  FAIL  npm test      exit 1  2.3s\n    | FAIL test/a.test.ts\n    | expected 2, got 1\n  pass  npm run lint  exit 0  0.4s\n\nScope: in scope\nChanges (1):\n  M src/a.ts\n\nUsage: 3 turns · 4.2k in / 310 out tokens · 2.8k cache read · est. $0.0080 · 42s\n\nNext\n  /zai:review 261006-abc123 to return it with the failing output as feedback, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "packet": {
+        "job": {
+          "id": "261006-abc123",
+          "brief": {
+            "title": "Rename the helper",
+            "body": "Rename `foo` to `bar` everywhere.",
+            "model": "main",
+            "mode": "exec",
+            "cwd": "/repo",
+            "base": "HEAD",
+            "scope": [],
+            "forbid": [],
+            "gates": [],
+            "timeoutMs": 7200000,
+            "retries": {
+              "fix": 1,
+              "infra": 2
+            },
+            "report": {
+              "kind": "builtin",
+              "name": "change"
+            },
+            "addDirs": [],
+            "env": [],
+            "tags": []
+          },
+          "state": "awaiting_review",
+          "workspace": {
+            "repoRoot": "/repo",
+            "baseSha": "0000000000000000000000000000000000000000",
+            "artifactsDir": "/state/jobs/x/artifacts"
+          },
+          "attempts": [
+            {
+              "n": 1,
+              "kind": "initial",
+              "prompt": "Rename `foo` to `bar` everywhere.",
+              "sessionId": "00000000-0000-4000-8000-000000000001",
+              "startedAt": "2026-10-06T00:00:00.000Z",
+              "endedAt": "2026-10-06T11:55:00.000Z",
+              "outcome": {
+                "kind": "api_error",
+                "message": "API Error: Request rejected (429)",
+                "status": 429
+              },
+              "usage": {
+                "turns": 3,
+                "inputTokens": 4200,
+                "outputTokens": 310,
+                "cacheReadTokens": 2800,
+                "cacheWriteTokens": 900,
+                "costUsd": 0.0123,
+                "rateLimitRetries": 10,
+                "durationMs": 42130
+              },
+              "verification": {
+                "gates": [],
+                "changes": {
+                  "added": [],
+                  "modified": [
+                    "package.json",
+                    ".env"
+                  ],
+                  "deleted": [],
+                  "untracked": []
+                },
+                "scope": {
+                  "outOfScope": [
+                    "package.json"
+                  ],
+                  "forbidden": [
+                    ".env"
+                  ],
+                  "repoChanged": false
+                },
+                "report": {
+                  "present": false,
+                  "valid": false,
+                  "problems": [
+                    "no structured report"
+                  ]
+                }
+              },
+              "verdict": "worker_error"
+            }
+          ],
+          "createdAt": "2026-10-06T11:40:00.000Z",
+          "updatedAt": "2026-10-06T11:55:00.000Z",
+          "version": 0
+        }
+      }
+    },
+    "output": "zai job 261006-abc123: Rename the helper\nverdict worker_error · glm-5.3 · exec · attempt 1 (initial) · awaiting review\nrepository /repo (must stay unchanged), artifacts /state/jobs/x/artifacts\n\nWorker: API error (429): API Error: Request rejected (429)\n\nReport: missing (the worker ended without a structured report)\n\nGates: none run\n\nScope: VIOLATED, out of scope: package.json; forbidden: .env\nChanges (2):\n  M package.json\n  M .env\n\nUsage: 3 turns · 4.2k in / 310 out tokens · 2.8k cache read · est. $0.0080 · 42s · 10 rate-limit retries\n\nNext\n  the worker never finished (API error (429): API Error: Request rejected (429)): nothing to accept. Fix the cause, then /zai:review 261006-abc123 to return it to try again, or discard it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "packet": {
+        "job": {
+          "id": "261006-abc123",
+          "brief": {
+            "title": "Rename the helper",
+            "body": "Rename `foo` to `bar` everywhere.",
+            "model": "main",
+            "mode": "edit",
+            "cwd": "/repo",
+            "base": "HEAD",
+            "scope": [
+              "**"
+            ],
+            "forbid": [],
+            "gates": [],
+            "timeoutMs": 7200000,
+            "retries": {
+              "fix": 1,
+              "infra": 2
+            },
+            "report": {
+              "kind": "builtin",
+              "name": "change"
+            },
+            "addDirs": [],
+            "env": [],
+            "tags": []
+          },
+          "state": "running",
+          "workspace": {
+            "repoRoot": "/repo",
+            "baseSha": "0123456789abcdef0123456789abcdef01234567",
+            "worktree": "/state/worktrees/261006-abc123",
+            "branch": "zai/261006-abc123",
+            "artifactsDir": "/state/jobs/261006-abc123/artifacts"
+          },
+          "attempts": [
+            {
+              "n": 1,
+              "kind": "initial",
+              "prompt": "Rename `foo` to `bar` everywhere.",
+              "sessionId": "00000000-0000-4000-8000-000000000001",
+              "startedAt": "2026-10-06T00:00:00.000Z",
+              "endedAt": "2026-10-06T11:55:00.000Z",
+              "outcome": {
+                "kind": "completed"
+              },
+              "usage": {
+                "turns": 3,
+                "inputTokens": 4200,
+                "outputTokens": 310,
+                "cacheReadTokens": 2800,
+                "cacheWriteTokens": 900,
+                "costUsd": 0.0123,
+                "rateLimitRetries": 0,
+                "durationMs": 42130
+              },
+              "report": {
+                "summary": "x",
+                "open_items": []
+              },
+              "verification": {
+                "gates": [],
+                "changes": {
+                  "added": [],
+                  "modified": [],
+                  "deleted": [],
+                  "untracked": []
+                },
+                "scope": {
+                  "outOfScope": [],
+                  "forbidden": [],
+                  "repoChanged": true
+                },
+                "report": {
+                  "present": true,
+                  "valid": false,
+                  "problems": [
+                    "items: Invalid input"
+                  ]
+                }
+              },
+              "verdict": "scope_violation"
+            }
+          ],
+          "createdAt": "2026-10-06T11:40:00.000Z",
+          "updatedAt": "2026-10-06T11:55:00.000Z",
+          "version": 0
+        }
+      }
+    },
+    "output": "zai job 261006-abc123: Rename the helper\nverdict scope_violation · glm-5.3 · edit · attempt 1 (initial) · running\nworktree /state/worktrees/261006-abc123 (branch zai/261006-abc123, base 0123456)\n\nReport\n  x\n  Open items: none\n  Invalid against its contract:\n  - items: Invalid input\n\nGates: none run\n\nScope: VIOLATED, the repository changed (this job must leave it unchanged)\nChanges: none\n\nUsage: 3 turns · 4.2k in / 310 out tokens · 2.8k cache read · est. $0.0080 · 42s\n\nNext\n  it is running; /zai:board shows it until it awaits review."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "packet": {
+        "job": {
+          "id": "261006-abc123",
+          "brief": {
+            "title": "Rename the helper",
+            "body": "Rename `foo` to `bar` everywhere.",
+            "model": "main",
+            "mode": "edit",
+            "cwd": "/repo",
+            "base": "HEAD",
+            "scope": [
+              "**"
+            ],
+            "forbid": [],
+            "gates": [],
+            "timeoutMs": 7200000,
+            "retries": {
+              "fix": 1,
+              "infra": 2
+            },
+            "report": {
+              "kind": "builtin",
+              "name": "change"
+            },
+            "addDirs": [],
+            "env": [],
+            "tags": []
+          },
+          "state": "awaiting_review",
+          "workspace": {
+            "repoRoot": "/repo",
+            "baseSha": "0123456789abcdef0123456789abcdef01234567",
+            "worktree": "/state/worktrees/261006-abc123",
+            "branch": "zai/261006-abc123",
+            "artifactsDir": "/state/jobs/261006-abc123/artifacts"
+          },
+          "attempts": [
+            {
+              "n": 1,
+              "kind": "initial",
+              "prompt": "Rename `foo` to `bar` everywhere.",
+              "sessionId": "00000000-0000-4000-8000-000000000001",
+              "startedAt": "2026-10-06T00:00:00.000Z",
+              "endedAt": "2026-10-06T11:55:00.000Z",
+              "outcome": {
+                "kind": "completed"
+              },
+              "usage": {
+                "turns": 3,
+                "inputTokens": 4200,
+                "outputTokens": 310,
+                "cacheReadTokens": 2800,
+                "cacheWriteTokens": 900,
+                "costUsd": 0.0123,
+                "rateLimitRetries": 0,
+                "durationMs": 42130
+              },
+              "report": {
+                "summary": "Renamed foo to bar in 3 files",
+                "files": [
+                  {
+                    "path": "src/a.ts",
+                    "why": "rename"
+                  }
+                ],
+                "tests_added": [
+                  "test/a.test.ts"
+                ],
+                "open_items": [
+                  "docs still say foo"
+                ]
+              },
+              "verification": {
+                "gates": [
+                  {
+                    "run": "npm run build",
+                    "exitCode": null,
+                    "timedOut": true,
+                    "durationMs": 5000,
+                    "tail": ""
+                  },
+                  {
+                    "run": "npm run check",
+                    "exitCode": null,
+                    "timedOut": false,
+                    "durationMs": 100,
+                    "tail": ""
+                  }
+                ],
+                "changes": {
+                  "added": [],
+                  "modified": [],
+                  "deleted": [],
+                  "untracked": []
+                },
+                "scope": {
+                  "outOfScope": [],
+                  "forbidden": [],
+                  "repoChanged": false
+                },
+                "report": {
+                  "present": true,
+                  "valid": true,
+                  "problems": []
+                }
+              },
+              "verdict": "pass"
+            }
+          ],
+          "createdAt": "2026-10-06T11:40:00.000Z",
+          "updatedAt": "2026-10-06T11:55:00.000Z",
+          "version": 0
+        }
+      }
+    },
+    "output": "zai job 261006-abc123: Rename the helper\nverdict pass · glm-5.3 · edit · attempt 1 (initial) · awaiting review\nworktree /state/worktrees/261006-abc123 (branch zai/261006-abc123, base 0123456)\n\nReport\n  Renamed foo to bar in 3 files\n  Tests added: test/a.test.ts\n  Open items:\n  - docs still say foo\n\nGates (0/2 passed)\n  FAIL  npm run build  timed out  5.0s\n    | (no output)\n  FAIL  npm run check  killed     0.1s\n    | (no output)\n\nScope: in scope\nChanges: none\n\nUsage: 3 turns · 4.2k in / 310 out tokens · 2.8k cache read · est. $0.0080 · 42s\n\nNext\n  /zai:review 261006-abc123 to read the diff and accept it, or return it with feedback."
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "packet": {
+        "job": {
+          "id": "261006-acme01",
+          "brief": {
+            "title": "Rename the helper",
+            "body": "Rename `foo` to `bar` everywhere.",
+            "model": "main",
+            "mode": "edit",
+            "cwd": "/repo",
+            "base": "HEAD",
+            "scope": [
+              "**"
+            ],
+            "forbid": [],
+            "gates": [],
+            "timeoutMs": 7200000,
+            "retries": {
+              "fix": 1,
+              "infra": 2
+            },
+            "report": {
+              "kind": "builtin",
+              "name": "change"
+            },
+            "addDirs": [],
+            "env": [],
+            "tags": []
+          },
+          "state": "awaiting_review",
+          "workspace": {
+            "repoRoot": "/repo",
+            "baseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "worktree": "/state/worktrees/261006-acme01",
+            "branch": "acme-jobs/261006-acme01",
+            "artifactsDir": "/state/jobs/261006-acme01/artifacts"
+          },
+          "attempts": [
+            {
+              "n": 1,
+              "kind": "initial",
+              "prompt": "Rename `foo` to `bar` everywhere.",
+              "sessionId": "00000000-0000-4000-8000-000000000001",
+              "startedAt": "2026-10-06T00:00:00.000Z",
+              "outcome": {
+                "kind": "completed"
+              },
+              "verification": {
+                "gates": [],
+                "changes": {
+                  "added": [],
+                  "modified": [],
+                  "deleted": [],
+                  "untracked": []
+                },
+                "scope": {
+                  "outOfScope": [],
+                  "forbidden": [],
+                  "repoChanged": false
+                },
+                "report": {
+                  "present": true,
+                  "valid": true,
+                  "problems": []
+                }
+              },
+              "verdict": "pass"
+            }
+          ],
+          "createdAt": "2026-10-06T12:00:00.000Z",
+          "updatedAt": "2026-10-06T12:00:00.000Z",
+          "version": 0
+        }
+      }
+    },
+    "output": "acme job 261006-acme01: Rename the helper\nverdict pass · big-model-9 · edit · attempt 1 (initial) · awaiting review\nworktree /state/worktrees/261006-acme01 (branch acme-jobs/261006-acme01, base bbbbbbb)\n\nReport\n  (no summary)\n  Open items: none\n\nGates: none run\n\nScope: in scope\nChanges: none\n\nNext\n  /acme:review 261006-acme01 to read the diff and accept it, or return it with feedback."
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "packet": {
+        "job": {
+          "id": "261006-acme01",
+          "brief": {
+            "title": "Rename the helper",
+            "body": "Rename `foo` to `bar` everywhere.",
+            "model": "main",
+            "mode": "edit",
+            "cwd": "/repo",
+            "base": "HEAD",
+            "scope": [
+              "**"
+            ],
+            "forbid": [],
+            "gates": [],
+            "timeoutMs": 7200000,
+            "retries": {
+              "fix": 1,
+              "infra": 2
+            },
+            "report": {
+              "kind": "builtin",
+              "name": "change"
+            },
+            "addDirs": [],
+            "env": [],
+            "tags": []
+          },
+          "state": "awaiting_review",
+          "workspace": {
+            "repoRoot": "/repo",
+            "baseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "worktree": "/state/worktrees/261006-acme01",
+            "branch": "acme-jobs/261006-acme01",
+            "artifactsDir": "/state/jobs/261006-acme01/artifacts"
+          },
+          "attempts": [
+            {
+              "n": 1,
+              "kind": "initial",
+              "prompt": "Rename `foo` to `bar` everywhere.",
+              "sessionId": "00000000-0000-4000-8000-000000000001",
+              "startedAt": "2026-10-06T00:00:00.000Z",
+              "outcome": {
+                "kind": "completed"
+              },
+              "verification": {
+                "gates": [],
+                "changes": {
+                  "added": [],
+                  "modified": [],
+                  "deleted": [],
+                  "untracked": []
+                },
+                "scope": {
+                  "outOfScope": [],
+                  "forbidden": [],
+                  "repoChanged": false
+                },
+                "report": {
+                  "present": true,
+                  "valid": true,
+                  "problems": []
+                }
+              },
+              "verdict": "gate_fail"
+            }
+          ],
+          "createdAt": "2026-10-06T12:00:00.000Z",
+          "updatedAt": "2026-10-06T12:00:00.000Z",
+          "version": 0
+        }
+      }
+    },
+    "output": "acme job 261006-acme01: Rename the helper\nverdict gate_fail · big-model-9 · edit · attempt 1 (initial) · awaiting review\nworktree /state/worktrees/261006-acme01 (branch acme-jobs/261006-acme01, base bbbbbbb)\n\nReport\n  (no summary)\n  Open items: none\n\nGates: none run\n\nScope: in scope\nChanges: none\n\nNext\n  /acme:review 261006-acme01 to return it with the failing output as feedback, or discard it."
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "packet": {
+        "job": {
+          "id": "261006-acme01",
+          "brief": {
+            "title": "Rename the helper",
+            "body": "Rename `foo` to `bar` everywhere.",
+            "model": "main",
+            "mode": "edit",
+            "cwd": "/repo",
+            "base": "HEAD",
+            "scope": [
+              "**"
+            ],
+            "forbid": [],
+            "gates": [],
+            "timeoutMs": 7200000,
+            "retries": {
+              "fix": 1,
+              "infra": 2
+            },
+            "report": {
+              "kind": "builtin",
+              "name": "change"
+            },
+            "addDirs": [],
+            "env": [],
+            "tags": []
+          },
+          "state": "running",
+          "workspace": {
+            "repoRoot": "/repo",
+            "baseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "worktree": "/state/worktrees/261006-acme01",
+            "branch": "acme-jobs/261006-acme01",
+            "artifactsDir": "/state/jobs/261006-acme01/artifacts"
+          },
+          "attempts": [
+            {
+              "n": 1,
+              "kind": "initial",
+              "prompt": "Rename `foo` to `bar` everywhere.",
+              "sessionId": "00000000-0000-4000-8000-000000000001",
+              "startedAt": "2026-10-06T00:00:00.000Z"
+            }
+          ],
+          "createdAt": "2026-10-06T12:00:00.000Z",
+          "updatedAt": "2026-10-06T12:00:00.000Z",
+          "version": 0
+        }
+      }
+    },
+    "output": "acme job 261006-acme01: Rename the helper\nverdict no verdict · big-model-9 · edit · attempt 1 (initial) · running\nworktree /state/worktrees/261006-acme01 (branch acme-jobs/261006-acme01, base bbbbbbb)\n\nNot verified yet.\n\nNext\n  it is running; /acme:board shows it until it awaits review."
+  }
+]

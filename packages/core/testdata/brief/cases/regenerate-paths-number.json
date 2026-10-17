@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "regenerate.0.paths",
+      "message": "Invalid input: expected array, received number"
+    }
+  ]
+}

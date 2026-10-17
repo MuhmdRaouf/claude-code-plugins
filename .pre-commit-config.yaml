@@ -12,6 +12,7 @@ repos:
     rev: v0.49.1
     hooks:
       - id: markdownlint
+        exclude: (^|/)testdata/
         args: ['--config', '.markdownlint.yaml']
 
   - repo: https://github.com/adrienverge/yamllint
@@ -30,9 +31,9 @@ repos:
     hooks:
       # Generated outputs (launchers, built pages, golden fixtures) are compared byte for byte by their own checks.
       - id: trailing-whitespace
-        exclude: (^|/)(dist|testdata)/
+        exclude: (^|/)(dist|testdata|golden)/|^packages/core/internal/adapters/spool/spool/
       - id: end-of-file-fixer
-        exclude: (^|/)(dist|testdata)/
+        exclude: (^|/)(dist|testdata|golden)/|^packages/core/internal/adapters/spool/spool/
       - id: check-merge-conflict
       - id: check-added-large-files
         args: ['--maxkb=500']

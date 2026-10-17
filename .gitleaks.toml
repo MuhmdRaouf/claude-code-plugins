@@ -1,6 +1,42 @@
-# gitleaks: the default rules, plus the exact fake keys the tests use. Each allowlist names one exact value in the
+# gitleaks: the default rules, plus the fake keys core's tests use. Each allowlist names one exact value in the
 # exact files that hold it; nothing else is exempt.
-title = "claude-code-plugins"
+title = "cc-plugins"
 
 [extend]
 useDefault = true
+
+[[allowlists]]
+description = "core: the fake Z.ai key the worker and engine tests hand to fake workers"
+condition = "AND"
+regexes = ['''^zai-test-key-0123456789abcdef$''']
+paths = [
+  '''^packages/core/internal/adapters/claude_headless_test\.go$''',
+]
+
+[[allowlists]]
+description = "core: the fake keystore's stored key"
+condition = "AND"
+regexes = ['''^zt-SECRET\.key_0123456789abcdef$''']
+paths = [
+  '''^packages/core/internal/testkit/fake_keystore\.go$''',
+]
+
+[[allowlists]]
+description = "core: the fake Z.ai key the router's error-reason tests prove gets redacted"
+condition = "AND"
+regexes = ['''^sk\-zai\-9f2c88d4a1b34e6f8d7c5b3a2e1f0d9c8b7a6f5e$''']
+paths = [
+  '''^packages/core/internal/router/router_test\.go$''',
+]
+
+[[allowlists]]
+description = "core: the keystore file tests' second fake key"
+condition = "AND"
+regexes = ['''^zt-OTHER\.key_9876543210fedcba$''']
+paths = ['''^packages/core/internal/adapters/keystore/file_test\.go$''']
+
+[[allowlists]]
+description = "core: a test child's heartbeat interval, which the generic key rule reads as a key"
+condition = "AND"
+regexes = ['''^FRONT_FOCUS_CHILD_HB=20$''']
+paths = ['''^packages/core/internal/router/front_test\.go$''']

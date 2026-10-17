@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "mode",
+      "message": "Invalid option: expected one of \"edit\"|\"exec\"|\"readonly\""
+    }
+  ]
+}

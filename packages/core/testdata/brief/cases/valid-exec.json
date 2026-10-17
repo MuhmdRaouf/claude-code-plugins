@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "value": {
+    "title": "Sweep the exports",
+    "body": "List every export nobody imports.\n",
+    "model": "flash",
+    "mode": "exec",
+    "cwd": "/work/repo",
+    "base": "HEAD",
+    "scope": [],
+    "forbid": [],
+    "gates": [],
+    "timeoutMs": 900000,
+    "retries": {
+      "fix": 1,
+      "infra": 2
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "sweep"
+    },
+    "addDirs": [],
+    "env": [],
+    "tags": []
+  }
+}

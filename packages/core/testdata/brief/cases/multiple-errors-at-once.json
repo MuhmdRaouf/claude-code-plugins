@@ -1,0 +1,28 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "title",
+      "message": "required"
+    },
+    {
+      "kind": "field",
+      "field": "effort",
+      "message": "must be one of low, high, max"
+    },
+    {
+      "kind": "field",
+      "field": "mode",
+      "message": "Invalid option: expected one of \"edit\"|\"exec\"|\"readonly\""
+    },
+    {
+      "kind": "field",
+      "field": "gates.0.run",
+      "message": "must not be empty"
+    },
+    {
+      "kind": "empty_body"
+    }
+  ]
+}

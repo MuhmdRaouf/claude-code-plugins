@@ -1,0 +1,20 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "forbid",
+      "message": "Invalid input: expected array, received null"
+    },
+    {
+      "kind": "field",
+      "field": "gates",
+      "message": "Invalid input: expected array, received null"
+    },
+    {
+      "kind": "field",
+      "field": "env",
+      "message": "Invalid input: expected array, received null"
+    }
+  ]
+}

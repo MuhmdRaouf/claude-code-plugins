@@ -1,0 +1,16 @@
+{"type":"other","raw":"{\"type\": \"system\", \"subtype\": \"hook_started\", \"hook_id\": \"2dc837c8-54b1-4aa4-b231-2ff1ead82c77\", \"hook_name\": \"SessionStart:startup\", \"hook_event\": \"SessionStart\", \"uuid\": \"2855b0c4-9248-4c52-802a-80e95b17d904\", \"session_id\": \"13d60183-de73-441c-ae75-5fc27a410511\"}"}
+{"type":"other","raw":"{\"type\": \"system\", \"subtype\": \"hook_response\", \"hook_id\": \"2dc837c8-54b1-4aa4-b231-2ff1ead82c77\", \"hook_name\": \"SessionStart:startup\", \"hook_event\": \"SessionStart\", \"output\": \"\", \"stdout\": \"\", \"stderr\": \"\", \"exit_code\": 0, \"outcome\": \"success\", \"uuid\": \"dd200479-1f67-45f3-8ff9-f364f89e4d8c\", \"session_id\": \"13d60183-de73-441c-ae75-5fc27a410511\"}"}
+{"type":"init","sessionId":"13d60183-de73-441c-ae75-5fc27a410511","model":"glm-5.3-flash"}
+{"type":"other","raw":"{\"type\": \"system\", \"subtype\": \"status\", \"status\": \"requesting\", \"session_id\": \"13d60183-de73-441c-ae75-5fc27a410511\", \"uuid\": \"9dc185aa-6dba-4b6f-9eef-59fe50dd3480\"}"}
+{"type":"api_retry","attempt":1,"maxRetries":10,"status":429}
+{"type":"api_retry","attempt":2,"maxRetries":10,"status":429}
+{"type":"api_retry","attempt":3,"maxRetries":10,"status":429}
+{"type":"api_retry","attempt":4,"maxRetries":10,"status":429}
+{"type":"api_retry","attempt":5,"maxRetries":10,"status":429}
+{"type":"api_retry","attempt":6,"maxRetries":10,"status":429}
+{"type":"api_retry","attempt":7,"maxRetries":10,"status":429}
+{"type":"api_retry","attempt":8,"maxRetries":10,"status":429}
+{"type":"api_retry","attempt":9,"maxRetries":10,"status":429}
+{"type":"api_retry","attempt":10,"maxRetries":10,"status":429}
+{"type":"assistant_text","text":"API Error: Request rejected (429) · [1302][Rate limit reached for requests][202610060644290fbcd9bc36024c65]"}
+{"type":"result","isError":true,"text":"API Error: Request rejected (429) · [1302][Rate limit reached for requests][202610060644290fbcd9bc36024c65]","structuredOutput":null,"turns":1,"durationMs":180747,"costUsd":0,"usage":{"inputTokens":0,"outputTokens":0,"cacheReadTokens":0,"cacheWriteTokens":0},"apiErrorStatus":429}

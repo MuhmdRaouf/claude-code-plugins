@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "scope.0",
+      "message": "Invalid input: expected string, received number"
+    }
+  ]
+}

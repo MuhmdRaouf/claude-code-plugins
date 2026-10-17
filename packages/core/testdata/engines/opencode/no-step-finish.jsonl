@@ -1,0 +1,2 @@
+{"type":"step_start","timestamp":1791316940000,"sessionID":"ses_00000004","part":{"id":"prt_000000000012","messageID":"msg_000000000004","sessionID":"ses_00000004","type":"step-start"}}
+{"type":"text","timestamp":1791316940200,"sessionID":"ses_00000004","part":{"id":"prt_000000000013","messageID":"msg_000000000004","sessionID":"ses_00000004","type":"text","text":"{\"kind\":\"file\"}","time":{"start":1791316940170,"end":1791316940190}}}

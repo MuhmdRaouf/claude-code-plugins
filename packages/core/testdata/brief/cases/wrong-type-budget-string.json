@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "budgetUsd",
+      "message": "Invalid input: expected number, received string"
+    }
+  ]
+}

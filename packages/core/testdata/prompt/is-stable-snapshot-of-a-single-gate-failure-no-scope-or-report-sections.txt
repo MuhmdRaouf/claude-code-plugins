@@ -1,0 +1,9 @@
+Verification failed: gate_fail.
+
+Gate failed: `npm test` (exit 1)
+```text
+1 failed
+```
+
+Make the smallest change that fixes exactly these failures. Keep everything else as it is.
+The contract from your first message still applies. End your run with the structured report.

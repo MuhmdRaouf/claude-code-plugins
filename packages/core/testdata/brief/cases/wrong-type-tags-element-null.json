@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "tags.1",
+      "message": "Invalid input: expected string, received null"
+    }
+  ]
+}

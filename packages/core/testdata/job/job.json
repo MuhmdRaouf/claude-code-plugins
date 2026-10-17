@@ -1,0 +1,235 @@
+{
+  "id": "j1",
+  "brief": {
+    "title": "Rename the helper",
+    "body": "Rename `foo` to `bar` everywhere.",
+    "model": "main",
+    "effort": "high",
+    "mode": "edit",
+    "priority": "normal",
+    "cwd": "/repo",
+    "base": "HEAD",
+    "scope": [
+      "src/**",
+      "docs/**"
+    ],
+    "forbid": [
+      "**/.env"
+    ],
+    "gates": [
+      {
+        "run": "npm test",
+        "timeoutMs": 600000
+      }
+    ],
+    "setup": [
+      "npm ci"
+    ],
+    "regenerate": [
+      {
+        "paths": [
+          "src/api.ts"
+        ],
+        "run": "npm run gen"
+      }
+    ],
+    "timeoutMs": 7200000,
+    "retries": {
+      "fix": 1,
+      "infra": 2
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "change"
+    },
+    "addDirs": [],
+    "env": [],
+    "budgetUsd": 5,
+    "tags": [
+      "refactor"
+    ],
+    "engine": "omp"
+  },
+  "state": "accepted",
+  "workspace": {
+    "repoRoot": "/repo",
+    "baseSha": "0000000000000000000000000000000000000000",
+    "worktree": "/state/worktrees/j1",
+    "branch": "zai/j1",
+    "artifactsDir": "/state/jobs/j1/artifacts"
+  },
+  "attempts": [
+    {
+      "n": 1,
+      "kind": "initial",
+      "prompt": "Rename `foo` to `bar` everywhere.",
+      "sessionId": "00000000-0000-4000-8000-000000000001",
+      "startedAt": "2026-10-06T00:00:00.000Z",
+      "endedAt": "2026-10-06T00:01:40.000Z",
+      "outcome": {
+        "kind": "crashed",
+        "exitCode": 1,
+        "signal": null,
+        "stderrTail": "boom\n  at foo (bar.ts:3)"
+      },
+      "usage": {
+        "turns": 3,
+        "inputTokens": 12000,
+        "outputTokens": 3400,
+        "cacheReadTokens": 56000,
+        "cacheWriteTokens": 900,
+        "costUsd": 0.0123,
+        "rateLimitRetries": 0,
+        "durationMs": 100000
+      },
+      "verification": {
+        "gates": [
+          {
+            "run": "npm test",
+            "exitCode": 1,
+            "timedOut": false,
+            "durationMs": 65000,
+            "tail": "1 failing"
+          },
+          {
+            "run": "npm run lint",
+            "exitCode": null,
+            "timedOut": true,
+            "durationMs": 60000,
+            "tail": ""
+          }
+        ],
+        "changes": {
+          "added": [],
+          "modified": [
+            "src/foo.ts"
+          ],
+          "deleted": [],
+          "untracked": []
+        },
+        "scope": {
+          "outOfScope": [
+            "README.md"
+          ],
+          "forbidden": [],
+          "repoChanged": false
+        },
+        "report": {
+          "present": false,
+          "valid": false,
+          "problems": [
+            "no structured report"
+          ]
+        }
+      },
+      "verdict": "worker_error"
+    },
+    {
+      "n": 2,
+      "kind": "auto_fix",
+      "prompt": "The gate failed. Look at the tail and fix it.",
+      "sessionId": "00000000-0000-4000-8000-000000000002",
+      "startedAt": "2026-10-06T00:02:00.000Z",
+      "endedAt": "2026-10-06T00:04:00.000Z",
+      "outcome": {
+        "kind": "completed"
+      },
+      "usage": {
+        "turns": 5,
+        "inputTokens": 48000,
+        "outputTokens": 9100,
+        "cacheReadTokens": 220000,
+        "cacheWriteTokens": 3100,
+        "costUsd": 0.0456,
+        "rateLimitRetries": 1,
+        "durationMs": 120000,
+        "model": "glm-5.3-flash"
+      },
+      "report": {
+        "summary": "Fixed the off-by-one",
+        "files": [
+          {
+            "path": "src/range.ts",
+            "why": "end bound was exclusive"
+          }
+        ],
+        "root_cause": "< instead of <=",
+        "tests_added": [
+          "test/range.test.ts"
+        ],
+        "open_items": []
+      },
+      "verification": {
+        "gates": [
+          {
+            "run": "npm test",
+            "exitCode": 0,
+            "timedOut": false,
+            "durationMs": 61000,
+            "tail": ""
+          }
+        ],
+        "changes": {
+          "added": [
+            "src/bar.ts"
+          ],
+          "modified": [
+            "src/foo.ts"
+          ],
+          "deleted": [],
+          "untracked": []
+        },
+        "scope": {
+          "outOfScope": [],
+          "forbidden": [],
+          "repoChanged": false
+        },
+        "report": {
+          "present": true,
+          "valid": true,
+          "problems": []
+        }
+      },
+      "verdict": "pass"
+    },
+    {
+      "n": 3,
+      "kind": "review_fix",
+      "prompt": "Rename `foo` to `bar` everywhere.",
+      "feedback": "Also update the docs.",
+      "sessionId": "00000000-0000-4000-8000-000000000003",
+      "startedAt": "2026-10-06T00:04:30.000Z",
+      "endedAt": "2026-10-06T00:04:31.000Z",
+      "outcome": {
+        "kind": "api_error",
+        "message": "Insufficient balance",
+        "status": 429,
+        "quota": true
+      },
+      "verdict": "quota"
+    },
+    {
+      "n": 4,
+      "kind": "infra_retry",
+      "prompt": "The provider hiccuped. Run it again.",
+      "sessionId": "00000000-0000-4000-8000-000000000004",
+      "startedAt": "2026-10-06T00:05:00.000Z",
+      "endedAt": "2026-10-06T00:05:00.500Z",
+      "outcome": {
+        "kind": "timeout"
+      },
+      "verdict": "timeout"
+    }
+  ],
+  "createdAt": "2026-10-06T00:00:00.000Z",
+  "updatedAt": "2026-10-06T00:05:01.000Z",
+  "decision": {
+    "kind": "accepted",
+    "at": "2026-10-06T00:05:30.000Z",
+    "commit": "1111111111111111111111111111111111111111"
+  },
+  "origin": {
+    "sessionId": "00000000-0000-4000-8000-0000000000ff"
+  },
+  "version": 7
+}

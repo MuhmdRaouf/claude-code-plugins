@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "value": {
+    "title": "Rename the helper",
+    "body": "Rename `foo` to `bar` everywhere.\n",
+    "model": "flash",
+    "effort": "high",
+    "mode": "edit",
+    "priority": "normal",
+    "cwd": "/work/other",
+    "base": "main",
+    "scope": [
+      "src/**",
+      "test/**"
+    ],
+    "forbid": [
+      "src/generated/**"
+    ],
+    "gates": [
+      {
+        "run": "npm test",
+        "timeoutMs": 600000
+      },
+      {
+        "run": "npm run lint",
+        "timeoutMs": 300000
+      }
+    ],
+    "setup": [
+      "npm ci"
+    ],
+    "regenerate": [
+      {
+        "paths": [
+          "package-lock.json"
+        ],
+        "run": "npm install --package-lock-only"
+      }
+    ],
+    "timeoutMs": 1800000,
+    "retries": {
+      "fix": 3,
+      "infra": 0
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "notes"
+    },
+    "addDirs": [
+      "/opt/shared"
+    ],
+    "env": [
+      "GITHUB_TOKEN"
+    ],
+    "budgetUsd": 2.5,
+    "tags": [
+      "rename",
+      "batch-7"
+    ],
+    "engine": "omp"
+  }
+}

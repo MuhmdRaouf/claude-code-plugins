@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "value": {
+    "title": "t",
+    "body": "Body.\n",
+    "model": "flash",
+    "mode": "exec",
+    "cwd": "/work/repo",
+    "base": "HEAD",
+    "scope": [],
+    "forbid": [],
+    "gates": [],
+    "timeoutMs": 7200000,
+    "retries": {
+      "fix": 1,
+      "infra": 2
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "sweep"
+    },
+    "addDirs": [],
+    "env": [],
+    "tags": []
+  }
+}

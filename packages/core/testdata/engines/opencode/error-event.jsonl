@@ -1,0 +1,3 @@
+{"type":"step_start","timestamp":1791316927000,"sessionID":"ses_00000003","part":{"id":"prt_000000000010","messageID":"msg_000000000003","sessionID":"ses_00000003","type":"step-start"}}
+{"type":"text","timestamp":1791316927200,"sessionID":"ses_00000003","part":{"id":"prt_000000000011","messageID":"msg_000000000003","sessionID":"ses_00000003","type":"text","text":"I will check the directory first.","time":{"start":1791316927170,"end":1791316927190}}}
+{"type":"error","timestamp":1791316927300,"sessionID":"ses_00000003","error":{"name":"UnknownError","data":{"message":"Unexpected server error. Check server logs for details.","ref":"err_0000000000000000000000001"}}}

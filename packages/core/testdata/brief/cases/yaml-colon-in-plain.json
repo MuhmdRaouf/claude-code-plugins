@@ -1,0 +1,9 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "yaml",
+      "message": "Nested mappings are not allowed in compact mappings at line 1, column 8:\n\ntitle: a: b\n       ^\n"
+    }
+  ]
+}

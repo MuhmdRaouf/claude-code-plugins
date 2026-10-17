@@ -1,0 +1,25 @@
+{
+  "name": "zai-plugin-cc",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Claude Code plugin: GLM (Z.ai) does bulk mechanical work; Claude orchestrates, verifies and reviews.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check:static": "vp check",
+    "format": "vp check --fix",
+    "test": "vp test",
+    "test:watch": "vp test watch",
+    "todos": "node scripts/no-todos.mjs",
+    "dist:fresh": "node scripts/build.mjs --check",
+    "check": "npm run check:static && npm run test && npm run todos && npm run dist:fresh"
+  },
+  "devDependencies": {
+    "@muhmdraouf/plugin-test": "0.0.1",
+    "@types/node": "26.6.4"
+  },
+  "engines": {
+    "node": ">=22.3"
+  }
+}

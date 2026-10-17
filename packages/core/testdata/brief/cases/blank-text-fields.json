@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "title",
+      "message": "must not be empty"
+    },
+    {
+      "kind": "field",
+      "field": "gates.0.run",
+      "message": "must not be empty"
+    }
+  ]
+}

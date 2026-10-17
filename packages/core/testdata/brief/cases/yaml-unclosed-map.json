@@ -1,0 +1,9 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "yaml",
+      "message": "Flow map in block collection must be sufficiently indented and end with a } at line 2, column 1:\n\ntitle: {unclosed\nmode: edit\n^\n"
+    }
+  ]
+}

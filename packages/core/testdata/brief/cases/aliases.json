@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "value": {
+    "title": "Rename the helper",
+    "body": "Body.\n",
+    "model": "main",
+    "mode": "edit",
+    "cwd": "/work/repo",
+    "base": "Rename the helper",
+    "scope": [
+      "**"
+    ],
+    "forbid": [],
+    "gates": [],
+    "timeoutMs": 7200000,
+    "retries": {
+      "fix": 1,
+      "infra": 2
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "change"
+    },
+    "addDirs": [],
+    "env": [],
+    "tags": []
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "engine",
+      "message": "must be one of claude, omp, opencode, pi, zcode"
+    }
+  ]
+}

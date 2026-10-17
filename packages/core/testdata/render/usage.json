@@ -1,0 +1,521 @@
+[
+  {
+    "input": {
+      "provider": "reference",
+      "report": {
+        "windows": [
+          {
+            "label": "Today",
+            "days": 1,
+            "rows": []
+          },
+          {
+            "label": "Last 7 days",
+            "days": 7,
+            "rows": [
+              {
+                "model": "glm-5.3",
+                "requests": 12,
+                "inputTokens": 1000000,
+                "outputTokens": 200000,
+                "cacheReadTokens": 500000,
+                "cacheWriteTokens": 0
+              },
+              {
+                "model": "glm-5.3-flash",
+                "requests": 3,
+                "inputTokens": 100000,
+                "outputTokens": 50000,
+                "cacheReadTokens": 0,
+                "cacheWriteTokens": 100000
+              }
+            ]
+          },
+          {
+            "label": "Last 30 days",
+            "days": 30,
+            "rows": []
+          }
+        ],
+        "jobs": [
+          {
+            "tier": "main",
+            "jobs": 5,
+            "decided": 4,
+            "accepted": 3,
+            "discarded": 1,
+            "firstTryPassRate": 0.5,
+            "acceptRate": 0.75,
+            "meanAttemptsToAccept": 1.6666,
+            "reviewReturns": 2,
+            "inputTokens": 1234567,
+            "outputTokens": 45600,
+            "cacheReadTokens": 980,
+            "costUsd": 3.456,
+            "rateLimitRetries": 12,
+            "durationMs": 3600000
+          },
+          {
+            "tier": "flash",
+            "jobs": 1,
+            "decided": 0,
+            "accepted": 0,
+            "discarded": 0,
+            "firstTryPassRate": null,
+            "acceptRate": null,
+            "meanAttemptsToAccept": null,
+            "reviewReturns": 0,
+            "inputTokens": 1234567,
+            "outputTokens": 45600,
+            "cacheReadTokens": 980,
+            "costUsd": 0.0042,
+            "rateLimitRetries": 0,
+            "durationMs": 3600000
+          }
+        ],
+        "engines": [],
+        "allJobs": [
+          {
+            "id": "261006-abc123",
+            "brief": {
+              "title": "Rename the helper",
+              "body": "Rename `foo` to `bar` everywhere.",
+              "model": "main",
+              "mode": "edit",
+              "cwd": "/repo",
+              "base": "HEAD",
+              "scope": [
+                "**"
+              ],
+              "forbid": [],
+              "gates": [],
+              "timeoutMs": 7200000,
+              "retries": {
+                "fix": 1,
+                "infra": 2
+              },
+              "report": {
+                "kind": "builtin",
+                "name": "change"
+              },
+              "addDirs": [],
+              "env": [],
+              "tags": []
+            },
+            "state": "awaiting_review",
+            "workspace": {
+              "repoRoot": "/repo",
+              "baseSha": "0123456789abcdef0123456789abcdef01234567",
+              "worktree": "/state/worktrees/261006-abc123",
+              "branch": "zai/261006-abc123",
+              "artifactsDir": "/state/jobs/261006-abc123/artifacts"
+            },
+            "attempts": [
+              {
+                "n": 1,
+                "kind": "initial",
+                "prompt": "Rename `foo` to `bar` everywhere.",
+                "sessionId": "00000000-0000-4000-8000-000000000001",
+                "startedAt": "2026-10-06T00:00:00.000Z",
+                "endedAt": "2026-10-06T11:55:00.000Z",
+                "outcome": {
+                  "kind": "completed"
+                },
+                "usage": {
+                  "turns": 3,
+                  "inputTokens": 4200,
+                  "outputTokens": 310,
+                  "cacheReadTokens": 2800,
+                  "cacheWriteTokens": 900,
+                  "costUsd": 0.0123,
+                  "rateLimitRetries": 0,
+                  "durationMs": 42130
+                },
+                "report": {
+                  "summary": "Renamed foo to bar in 3 files",
+                  "files": [
+                    {
+                      "path": "src/a.ts",
+                      "why": "rename"
+                    }
+                  ],
+                  "tests_added": [
+                    "test/a.test.ts"
+                  ],
+                  "open_items": [
+                    "docs still say foo"
+                  ]
+                },
+                "verification": {
+                  "gates": [
+                    {
+                      "run": "npm test",
+                      "exitCode": 0,
+                      "timedOut": false,
+                      "durationMs": 1200,
+                      "tail": ""
+                    },
+                    {
+                      "run": "npm run lint",
+                      "exitCode": 0,
+                      "timedOut": false,
+                      "durationMs": 400,
+                      "tail": ""
+                    }
+                  ],
+                  "changes": {
+                    "added": [
+                      "src/b.ts"
+                    ],
+                    "modified": [
+                      "src/a.ts"
+                    ],
+                    "deleted": [
+                      "old.ts"
+                    ],
+                    "untracked": [
+                      "notes.md"
+                    ]
+                  },
+                  "scope": {
+                    "outOfScope": [],
+                    "forbidden": [],
+                    "repoChanged": false
+                  },
+                  "report": {
+                    "present": true,
+                    "valid": true,
+                    "problems": []
+                  }
+                },
+                "verdict": "pass"
+              }
+            ],
+            "createdAt": "2026-10-06T11:40:00.000Z",
+            "updatedAt": "2026-10-06T11:55:00.000Z",
+            "version": 0
+          }
+        ],
+        "now": 1791288000000
+      }
+    },
+    "output": "Z.ai GLM usage\nEst. cost: today $0.0080 · 7 days $2.46 · 30 days $0.0080 (30 days: agents and /model $0.0000, jobs $0.0080)\nEstimated from Z.ai GLM list prices read 2026-10-08; your bill is the provider's. Token counts are exact.\n\nToday: no agent or /model requests.\nLast 7 days, agents and /model\nMODEL          REQ  IN      OUT     CACHE R  CACHE W  EST COST\nglm-5.3        12   1.0M    200.0k  500.0k   0        $2.41\nglm-5.3-flash  3    100.0k  50.0k   0        100.0k   $0.0400\nTOTAL          15   1.1M    250.0k  500.0k   100.0k   $2.45\nLast 30 days: no agent or /model requests.\n\nzai jobs in this repository\nMODEL          JOBS  ACCEPTED  DISCARDED  1ST-TRY  RETURNS  IN    OUT    429S  TIME\nglm-5.3        5     3         1          50%      2        1.2M  45.6k  12    1h00m\nglm-5.3-flash  1     0         0          n/a      0        1.2M  45.6k  0     1h00m"
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "report": {
+        "windows": [],
+        "jobs": [],
+        "engines": [],
+        "allJobs": [],
+        "now": 1791288000000
+      }
+    },
+    "output": "Z.ai GLM usage\nEst. cost: today $0.0000 · 7 days $0.0000 · 30 days $0.0000 (30 days: agents and /model $0.0000, jobs $0.0000)\nEstimated from Z.ai GLM list prices read 2026-10-08; your bill is the provider's. Token counts are exact.\n\n\nNo zai jobs in this repository yet."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "report": {
+        "windows": [],
+        "jobs": [],
+        "engines": [
+          {
+            "engine": "omp",
+            "models": [
+              "gpt-5.4"
+            ],
+            "jobs": 2,
+            "accepted": 1,
+            "requests": 5,
+            "inputTokens": 100000,
+            "outputTokens": 2000,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "costUsd": 1.5
+          }
+        ],
+        "allJobs": [],
+        "now": 1791288000000,
+        "health": {
+          "fallback": 1,
+          "refusal": 2,
+          "rate_limited": 3,
+          "budget_stop": 0,
+          "restart": 0
+        }
+      }
+    },
+    "output": "Z.ai GLM usage\nEst. cost: today $0.0000 · 7 days $0.0000 · 30 days $0.0000 (30 days: agents and /model $0.0000, jobs $0.0000)\nEstimated from Z.ai GLM list prices read 2026-10-08; your bill is the provider's. Token counts are exact.\nJobs on omp, opencode, pi or zcode are not in the total: their rows below are as each tool reports them.\n\nRouter health, last 24 h: 1 fallback · 2 refusals · 3 rate limits · 0 restarts\n\n\nNo zai jobs in this repository yet.\n\nzai engines (as each tool reports them; the tools run on their own setup)\nENGINE  MODEL    JOBS  ACCEPTED  REQ  IN      OUT   CACHE R  CACHE W  COST\nomp     gpt-5.4  2     1         5    100.0k  2.0k  0        0        $1.50"
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "report": {
+        "windows": [],
+        "jobs": [],
+        "engines": [],
+        "allJobs": [],
+        "now": 1791288000000,
+        "health": {
+          "fallback": 0,
+          "refusal": 0,
+          "rate_limited": 0,
+          "budget_stop": 0,
+          "restart": 0
+        }
+      }
+    },
+    "output": "Z.ai GLM usage\nEst. cost: today $0.0000 · 7 days $0.0000 · 30 days $0.0000 (30 days: agents and /model $0.0000, jobs $0.0000)\nEstimated from Z.ai GLM list prices read 2026-10-08; your bill is the provider's. Token counts are exact.\n\nRouter health, last 24 h: no fallbacks, refusals, rate limits or restarts.\n\n\nNo zai jobs in this repository yet."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "report": {
+        "windows": [],
+        "jobs": [],
+        "engines": [],
+        "allJobs": [],
+        "now": 1791288000000,
+        "advice": {
+          "mainModel": "glm-5.3",
+          "flashModel": "glm-5.3-flash",
+          "runs": 10,
+          "lightJobs": 2,
+          "lightAgents": 1,
+          "tokens": {
+            "inputTokens": 1000000,
+            "outputTokens": 0,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0
+          }
+        }
+      }
+    },
+    "output": "Z.ai GLM usage\nEst. cost: today $0.0000 · 7 days $0.0000 · 30 days $0.0000 (30 days: agents and /model $0.0000, jobs $0.0000)\nEstimated from Z.ai GLM list prices read 2026-10-08; your bill is the provider's. Token counts are exact.\n\n\nNo zai jobs in this repository yet.\n\nModel advisor (an estimate; nothing was changed)\n3 of 10 glm-5.3 runs in the last 30 days looked light: read-only or sweep jobs, or few turns and short answers.\nOn glm-5.3-flash they could have cost about $1.25 less at list prices, if the flash model handles them as well.\nFor work like that, try `model: flash` in a brief or the zai:glm-5.3-flash agent."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "report": {
+        "windows": [
+          {
+            "label": "Today",
+            "days": 1,
+            "rows": [
+              {
+                "model": "custom-x",
+                "requests": 1,
+                "inputTokens": 10,
+                "outputTokens": 10,
+                "cacheReadTokens": 0,
+                "cacheWriteTokens": 0
+              },
+              {
+                "model": "qwen3.8-max",
+                "requests": 1,
+                "inputTokens": 10,
+                "outputTokens": 10,
+                "cacheReadTokens": 0,
+                "cacheWriteTokens": 0
+              }
+            ]
+          }
+        ],
+        "jobs": [],
+        "engines": [],
+        "allJobs": [],
+        "now": 1791288000000
+      }
+    },
+    "output": "Z.ai GLM usage\nEst. cost: today $0.0001 · 7 days $0.0000 · 30 days $0.0000 (30 days: agents and /model $0.0000, jobs $0.0000)\nEstimated from Z.ai GLM list prices read 2026-10-08; your bill is the provider's. Token counts are exact.\nNo list price for custom-x: counted as $0.\nCache rates unverified for qwen3.8-max.\n\nToday, agents and /model\nMODEL        REQ  IN  OUT  CACHE R  CACHE W  EST COST\ncustom-x     1    10  10   0        0        $0.0000\nqwen3.8-max  1    10  10   0        0        $0.0001\nTOTAL        2    20  20   0        0        $0.0001\n\nNo zai jobs in this repository yet."
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "report": {
+        "windows": [],
+        "jobs": [],
+        "engines": [],
+        "allJobs": [],
+        "now": 1791288000000
+      }
+    },
+    "output": "Acme Models usage\nEst. cost: today $0.0000 · 7 days $0.0000 · 30 days $0.0000 (30 days: agents and /model $0.0000, jobs $0.0000)\nEstimated from Acme Models list prices read 2026-10-08; your bill is the provider's. Token counts are exact.\n\n\nNo acme jobs in this repository yet."
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "report": {
+        "windows": [],
+        "jobs": [
+          {
+            "tier": "flash",
+            "jobs": 1,
+            "decided": 0,
+            "accepted": 0,
+            "discarded": 0,
+            "firstTryPassRate": null,
+            "acceptRate": null,
+            "meanAttemptsToAccept": null,
+            "reviewReturns": 0,
+            "inputTokens": 1,
+            "outputTokens": 1,
+            "cacheReadTokens": 1,
+            "costUsd": 0,
+            "rateLimitRetries": 0,
+            "durationMs": 1
+          }
+        ],
+        "engines": [],
+        "allJobs": [
+          {
+            "id": "261006-acme01",
+            "brief": {
+              "title": "Rename the helper",
+              "body": "Rename `foo` to `bar` everywhere.",
+              "model": "main",
+              "mode": "edit",
+              "cwd": "/repo",
+              "base": "HEAD",
+              "scope": [
+                "**"
+              ],
+              "forbid": [],
+              "gates": [],
+              "timeoutMs": 7200000,
+              "retries": {
+                "fix": 1,
+                "infra": 2
+              },
+              "report": {
+                "kind": "builtin",
+                "name": "change"
+              },
+              "addDirs": [],
+              "env": [],
+              "tags": []
+            },
+            "state": "awaiting_review",
+            "workspace": {
+              "repoRoot": "/repo",
+              "baseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "worktree": "/state/worktrees/261006-acme01",
+              "branch": "acme-jobs/261006-acme01",
+              "artifactsDir": "/state/jobs/261006-acme01/artifacts"
+            },
+            "attempts": [
+              {
+                "n": 1,
+                "kind": "initial",
+                "prompt": "Rename `foo` to `bar` everywhere.",
+                "sessionId": "00000000-0000-4000-8000-000000000001",
+                "startedAt": "2026-10-06T00:00:00.000Z",
+                "outcome": {
+                  "kind": "completed"
+                },
+                "verification": {
+                  "gates": [],
+                  "changes": {
+                    "added": [],
+                    "modified": [],
+                    "deleted": [],
+                    "untracked": []
+                  },
+                  "scope": {
+                    "outOfScope": [],
+                    "forbidden": [],
+                    "repoChanged": false
+                  },
+                  "report": {
+                    "present": true,
+                    "valid": true,
+                    "problems": []
+                  }
+                },
+                "verdict": "pass"
+              }
+            ],
+            "createdAt": "2026-10-06T12:00:00.000Z",
+            "updatedAt": "2026-10-06T12:00:00.000Z",
+            "version": 0
+          },
+          {
+            "id": "261006-acme01",
+            "brief": {
+              "title": "Rename the helper",
+              "body": "Rename `foo` to `bar` everywhere.",
+              "model": "main",
+              "mode": "edit",
+              "cwd": "/repo",
+              "base": "HEAD",
+              "scope": [
+                "**"
+              ],
+              "forbid": [],
+              "gates": [],
+              "timeoutMs": 7200000,
+              "retries": {
+                "fix": 1,
+                "infra": 2
+              },
+              "report": {
+                "kind": "builtin",
+                "name": "change"
+              },
+              "addDirs": [],
+              "env": [],
+              "tags": []
+            },
+            "state": "awaiting_review",
+            "workspace": {
+              "repoRoot": "/repo",
+              "baseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "worktree": "/state/worktrees/261006-acme01",
+              "branch": "acme-jobs/261006-acme01",
+              "artifactsDir": "/state/jobs/261006-acme01/artifacts"
+            },
+            "attempts": [
+              {
+                "n": 1,
+                "kind": "initial",
+                "prompt": "Rename `foo` to `bar` everywhere.",
+                "sessionId": "00000000-0000-4000-8000-000000000001",
+                "startedAt": "2026-10-06T00:00:00.000Z",
+                "outcome": {
+                  "kind": "completed"
+                },
+                "verification": {
+                  "gates": [],
+                  "changes": {
+                    "added": [],
+                    "modified": [],
+                    "deleted": [],
+                    "untracked": []
+                  },
+                  "scope": {
+                    "outOfScope": [],
+                    "forbidden": [],
+                    "repoChanged": false
+                  },
+                  "report": {
+                    "present": true,
+                    "valid": true,
+                    "problems": []
+                  }
+                },
+                "verdict": "gate_fail"
+              }
+            ],
+            "createdAt": "2026-10-06T12:00:00.000Z",
+            "updatedAt": "2026-10-06T12:00:00.000Z",
+            "version": 0
+          }
+        ],
+        "now": 1791288000000
+      }
+    },
+    "output": "Acme Models usage\nEst. cost: today $0.0000 · 7 days $0.0000 · 30 days $0.0000 (30 days: agents and /model $0.0000, jobs $0.0000)\nEstimated from Acme Models list prices read 2026-10-08; your bill is the provider's. Token counts are exact.\nNo list price for big-model-9: counted as $0.\n\n\nacme jobs in this repository\nMODEL          JOBS  ACCEPTED  DISCARDED  1ST-TRY  RETURNS  IN  OUT  429S  TIME\nsmall-model-9  1     0         0          n/a      0        1   1    0     0.0s"
+  }
+]

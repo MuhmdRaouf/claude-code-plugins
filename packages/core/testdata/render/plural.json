@@ -1,0 +1,88 @@
+[
+  {
+    "input": {
+      "n": 0,
+      "noun": "job"
+    },
+    "output": "0 jobs"
+  },
+  {
+    "input": {
+      "n": 1,
+      "noun": "attempt"
+    },
+    "output": "1 attempt"
+  },
+  {
+    "input": {
+      "n": 2,
+      "noun": "attempt"
+    },
+    "output": "2 attempts"
+  },
+  {
+    "input": {
+      "n": 1,
+      "noun": "file"
+    },
+    "output": "1 file"
+  },
+  {
+    "input": {
+      "n": 10,
+      "noun": "file"
+    },
+    "output": "10 files"
+  },
+  {
+    "input": {
+      "n": 14,
+      "noun": "file"
+    },
+    "output": "14 files"
+  },
+  {
+    "input": {
+      "n": 1,
+      "noun": "tool call"
+    },
+    "output": "1 tool call"
+  },
+  {
+    "input": {
+      "n": 3,
+      "noun": "tool call"
+    },
+    "output": "3 tool calls"
+  },
+  {
+    "input": {
+      "n": 1,
+      "noun": "open item"
+    },
+    "output": "1 open item"
+  },
+  {
+    "input": {
+      "n": 2,
+      "noun": "problem"
+    },
+    "output": "2 problems"
+  },
+  {
+    "input": {
+      "n": 1,
+      "noun": "rate-limit retry",
+      "nouns": "rate-limit retries"
+    },
+    "output": "1 rate-limit retry"
+  },
+  {
+    "input": {
+      "n": 3,
+      "noun": "rate-limit retry",
+      "nouns": "rate-limit retries"
+    },
+    "output": "3 rate-limit retries"
+  }
+]

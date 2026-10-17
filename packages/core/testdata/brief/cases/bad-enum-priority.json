@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "priority",
+      "message": "Invalid option: expected one of \"high\"|\"normal\""
+    }
+  ]
+}

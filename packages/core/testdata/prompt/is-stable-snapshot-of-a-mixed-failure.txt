@@ -1,0 +1,15 @@
+Verification failed: scope_violation.
+
+Changed outside scope. Revert these changes:
+- `README.md`
+
+The structured report is invalid:
+- summary: Required
+
+Gate failed: `npm test` (exit 1)
+```text
+1 failed
+```
+
+Make the smallest change that fixes exactly these failures. Keep everything else as it is.
+The contract from your first message still applies. End your run with the structured report.

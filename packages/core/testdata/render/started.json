@@ -1,0 +1,102 @@
+[
+  {
+    "input": {
+      "provider": "reference",
+      "job": {
+        "id": "261006-abc123",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "awaiting_review",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "0123456789abcdef0123456789abcdef01234567",
+          "worktree": "/state/worktrees/261006-abc123",
+          "branch": "zai/261006-abc123",
+          "artifactsDir": "/state/jobs/261006-abc123/artifacts"
+        },
+        "attempts": [],
+        "createdAt": "2026-10-06T11:40:00.000Z",
+        "updatedAt": "2026-10-06T11:55:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "zai job 261006-abc123 started: Rename the helper (glm-5.3, edit)"
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "job": {
+        "id": "261006-acme01",
+        "brief": {
+          "title": "Rename the helper",
+          "body": "Rename `foo` to `bar` everywhere.",
+          "model": "main",
+          "mode": "edit",
+          "cwd": "/repo",
+          "base": "HEAD",
+          "scope": [
+            "**"
+          ],
+          "forbid": [],
+          "gates": [],
+          "timeoutMs": 7200000,
+          "retries": {
+            "fix": 1,
+            "infra": 2
+          },
+          "report": {
+            "kind": "builtin",
+            "name": "change"
+          },
+          "addDirs": [],
+          "env": [],
+          "tags": []
+        },
+        "state": "running",
+        "workspace": {
+          "repoRoot": "/repo",
+          "baseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "worktree": "/state/worktrees/261006-acme01",
+          "branch": "acme-jobs/261006-acme01",
+          "artifactsDir": "/state/jobs/261006-acme01/artifacts"
+        },
+        "attempts": [
+          {
+            "n": 1,
+            "kind": "initial",
+            "prompt": "Rename `foo` to `bar` everywhere.",
+            "sessionId": "00000000-0000-4000-8000-000000000001",
+            "startedAt": "2026-10-06T00:00:00.000Z"
+          }
+        ],
+        "createdAt": "2026-10-06T12:00:00.000Z",
+        "updatedAt": "2026-10-06T12:00:00.000Z",
+        "version": 0
+      }
+    },
+    "output": "acme job 261006-acme01 started: Rename the helper (big-model-9, edit)"
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "addDirs.0",
+      "message": "Invalid input: expected string, received number"
+    }
+  ]
+}

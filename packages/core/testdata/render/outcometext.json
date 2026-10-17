@@ -1,0 +1,89 @@
+[
+  {
+    "input": {
+      "outcome": {
+        "kind": "completed"
+      }
+    },
+    "output": "completed"
+  },
+  {
+    "input": {
+      "outcome": {
+        "kind": "api_error",
+        "message": "API Error: Request rejected (429)",
+        "status": 429
+      }
+    },
+    "output": "API error (429): API Error: Request rejected (429)"
+  },
+  {
+    "input": {
+      "outcome": {
+        "kind": "api_error",
+        "message": "no balance left",
+        "status": 402,
+        "quota": true
+      }
+    },
+    "output": "out of balance or quota (402): no balance left"
+  },
+  {
+    "input": {
+      "outcome": {
+        "kind": "api_error",
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    },
+    "output": "API error: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…"
+  },
+  {
+    "input": {
+      "outcome": {
+        "kind": "crashed",
+        "exitCode": 1,
+        "signal": null,
+        "stderrTail": "Error: boom\n"
+      }
+    },
+    "output": "crashed (exit 1): Error: boom"
+  },
+  {
+    "input": {
+      "outcome": {
+        "kind": "crashed",
+        "exitCode": null,
+        "signal": "SIGKILL",
+        "stderrTail": ""
+      }
+    },
+    "output": "crashed (signal SIGKILL)"
+  },
+  {
+    "input": {
+      "outcome": {
+        "kind": "crashed",
+        "exitCode": null,
+        "signal": null,
+        "stderrTail": ""
+      }
+    },
+    "output": "crashed (exit ?)"
+  },
+  {
+    "input": {
+      "outcome": {
+        "kind": "timeout"
+      }
+    },
+    "output": "timed out"
+  },
+  {
+    "input": {
+      "outcome": {
+        "kind": "stopped"
+      }
+    },
+    "output": "stopped on request"
+  }
+]

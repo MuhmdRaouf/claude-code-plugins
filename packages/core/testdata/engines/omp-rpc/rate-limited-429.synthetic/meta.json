@@ -1,0 +1,43 @@
+{
+ "omp": "18.6.1",
+ "probe": "P8",
+ "fixture": "rate-limited-429.SYNTHETIC",
+ "description": "SYNTHETIC: real success-readonly stream with two 429 failures + auto_retry_start x2 + auto_retry_end spliced in (see synth_429.py docstring)",
+ "synthetic": true,
+ "source": "p8-burst-glm-00",
+ "frames": 22,
+ "argv": [
+  "omp",
+  "--mode",
+  "rpc",
+  "--no-ui",
+  "--config",
+  "<root>/omp-overlay.yml",
+  "--session-dir",
+  "<root>/sessions/p8-burst-glm-00",
+  "--model",
+  "zai/glm-5.3",
+  "--thinking",
+  "low",
+  "--tools",
+  "read,grep,glob",
+  "--approval-mode",
+  "yolo",
+  "--no-extensions",
+  "--no-skills",
+  "--no-rules",
+  "--no-title"
+ ],
+ "exit": 0,
+ "ready_ms": 777,
+ "handshake_ms": 920,
+ "max_physical_frame": 15922,
+ "syntheticFrames": [
+  13,
+  14,
+  15,
+  16,
+  18
+ ],
+ "trimmed": "systemPrompt bodies elided; available_commands_update cut to 2 commands; tool result fields over 64 KB cut to head/tail 16 KB with $truncated; response data over 64 KB replaced by $truncated; rpc_chunk: first and last chunk kept, data replaced by its length (see omp-research/probes/scripts/trim_for_repo.py)"
+}

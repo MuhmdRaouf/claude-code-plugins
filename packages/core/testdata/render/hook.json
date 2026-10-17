@@ -1,0 +1,149 @@
+[
+  {
+    "input": {
+      "provider": "reference",
+      "rows": [
+        {
+          "kind": "job",
+          "id": "261006-run001",
+          "model": "glm-5.3",
+          "state": "running",
+          "verdict": "no verdict",
+          "stale": false,
+          "at": "2026-10-06T11:59:00.000Z",
+          "title": "Rename the helper",
+          "requests": 3,
+          "inputTokens": 4200,
+          "outputTokens": 310
+        },
+        {
+          "kind": "job",
+          "id": "261006-abc123",
+          "model": "glm-5.3",
+          "state": "awaiting_review",
+          "verdict": "pass",
+          "stale": false,
+          "at": "2026-10-06T11:55:00.000Z",
+          "title": "Rename the helper",
+          "requests": 3,
+          "inputTokens": 4200,
+          "outputTokens": 310
+        },
+        {
+          "kind": "job",
+          "id": "261006-run001",
+          "model": "glm-5.3",
+          "state": "running",
+          "verdict": "no verdict",
+          "stale": false,
+          "at": "2026-10-06T11:59:00.000Z",
+          "title": "Rename the helper",
+          "requests": 3,
+          "inputTokens": 4200,
+          "outputTokens": 310
+        }
+      ]
+    },
+    "output": "zai: 1 job awaits review (/zai:review 261006-abc123); 2 jobs queued or running. /zai:board lists them."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "rows": [
+        {
+          "kind": "job",
+          "id": "j-done",
+          "state": "accepted",
+          "at": "2026-10-06T12:00:00.000Z"
+        }
+      ]
+    },
+    "output": ""
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "rows": [
+        {
+          "kind": "job",
+          "id": "261006-a",
+          "model": "glm-5.3",
+          "state": "awaiting_review",
+          "verdict": "pass",
+          "stale": false,
+          "at": "2026-10-06T00:00:00.000Z",
+          "title": "Rename the helper"
+        },
+        {
+          "kind": "job",
+          "id": "261006-b",
+          "model": "glm-5.3",
+          "state": "awaiting_review",
+          "verdict": "pass",
+          "stale": false,
+          "at": "2026-10-06T00:00:00.000Z",
+          "title": "Rename the helper"
+        },
+        {
+          "kind": "job",
+          "id": "261006-c",
+          "model": "glm-5.3",
+          "state": "awaiting_review",
+          "verdict": "pass",
+          "stale": false,
+          "at": "2026-10-06T00:00:00.000Z",
+          "title": "Rename the helper"
+        },
+        {
+          "kind": "job",
+          "id": "261006-d",
+          "model": "glm-5.3",
+          "state": "awaiting_review",
+          "verdict": "pass",
+          "stale": false,
+          "at": "2026-10-06T00:00:00.000Z",
+          "title": "Rename the helper"
+        },
+        {
+          "kind": "job",
+          "id": "261006-e",
+          "model": "glm-5.3",
+          "state": "awaiting_review",
+          "verdict": "pass",
+          "stale": false,
+          "at": "2026-10-06T00:00:00.000Z",
+          "title": "Rename the helper"
+        }
+      ]
+    },
+    "output": "zai: 5 jobs await review (/zai:review 261006-a, /zai:review 261006-b, /zai:review 261006-c and 2 more). /zai:board lists them."
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "rows": [
+        {
+          "kind": "job",
+          "id": "261006-acme01",
+          "model": "big-model-9",
+          "state": "running",
+          "verdict": "no verdict",
+          "stale": true,
+          "at": "2026-10-06T12:00:00.000Z",
+          "title": "Rename the helper"
+        },
+        {
+          "kind": "job",
+          "id": "261006-acme01",
+          "model": "big-model-9",
+          "state": "awaiting_review",
+          "verdict": "pass",
+          "stale": false,
+          "at": "2026-10-06T12:00:00.000Z",
+          "title": "Rename the helper"
+        }
+      ]
+    },
+    "output": "acme: 1 job awaits review (/acme:review 261006-acme01); 1 job queued or running. /acme:board lists them."
+  }
+]

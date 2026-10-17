@@ -1,0 +1,56 @@
+[
+  {
+    "input": {
+      "advice": {
+        "mainModel": "glm-5.3",
+        "flashModel": "glm-5.3-flash",
+        "runs": 10,
+        "lightJobs": 2,
+        "lightAgents": 1,
+        "tokens": {
+          "inputTokens": 1000000,
+          "outputTokens": 0,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0
+        }
+      }
+    },
+    "output": 1.25
+  },
+  {
+    "input": {
+      "advice": {
+        "mainModel": "custom-model",
+        "flashModel": "glm-5.3-flash",
+        "runs": 10,
+        "lightJobs": 2,
+        "lightAgents": 1,
+        "tokens": {
+          "inputTokens": 1000000,
+          "outputTokens": 0,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0
+        }
+      }
+    },
+    "output": null
+  },
+  {
+    "input": {
+      "advice": {
+        "mainModel": "glm-5.3",
+        "flashModel": "custom-flash",
+        "runs": 10,
+        "lightJobs": 2,
+        "lightAgents": 1,
+        "tokens": {
+          "inputTokens": 1000000,
+          "outputTokens": 0,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0
+        }
+      }
+    },
+    "output": null
+  }
+]

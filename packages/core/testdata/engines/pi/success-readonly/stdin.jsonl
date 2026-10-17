@@ -1,0 +1,2 @@
+{"id":"c1","type":"get_state"}
+{"id":"c2","type":"prompt","message":"List the text files in the current directory."}

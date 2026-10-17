@@ -1,0 +1,80 @@
+[
+  {
+    "input": {
+      "urlOrHost": "https://api.anthropic.com/v1/messages"
+    },
+    "output": "anthropic"
+  },
+  {
+    "input": {
+      "urlOrHost": "api.z.ai"
+    },
+    "output": "zai"
+  },
+  {
+    "input": {
+      "urlOrHost": "https://api.moonshot.ai/v1"
+    },
+    "output": "moonshot"
+  },
+  {
+    "input": {
+      "urlOrHost": "https://api.deepseek.com/chat/completions"
+    },
+    "output": "deepseek"
+  },
+  {
+    "input": {
+      "urlOrHost": "api.minimax.io"
+    },
+    "output": "minimax"
+  },
+  {
+    "input": {
+      "urlOrHost": "https://dashscope-intl.aliyuncs.com/api/v2/apps"
+    },
+    "output": "qwen"
+  },
+  {
+    "input": {
+      "urlOrHost": "https://api.openai.com/v1"
+    },
+    "output": null
+  },
+  {
+    "input": {
+      "urlOrHost": "localhost:4173"
+    },
+    "output": null
+  },
+  {
+    "input": {
+      "urlOrHost": "https://API.Z.AI/v1"
+    },
+    "output": "zai"
+  },
+  {
+    "input": {
+      "urlOrHost": "  api.deepseek.com/chat/completions  "
+    },
+    "output": "deepseek"
+  },
+  {
+    "input": {
+      "urlOrHost": "api.minimax.io:8443/x"
+    },
+    "output": "minimax"
+  },
+  {
+    "input": {
+      "urlOrHost": ""
+    },
+    "output": null
+  },
+  {
+    "input": {
+      "urlOrHost": "zai"
+    },
+    "output": null
+  }
+]

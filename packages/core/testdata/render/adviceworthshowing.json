@@ -1,0 +1,96 @@
+[
+  {
+    "input": {
+      "advice": {
+        "mainModel": "glm-5.3",
+        "flashModel": "glm-5.3-flash",
+        "runs": 10,
+        "lightJobs": 2,
+        "lightAgents": 1,
+        "tokens": {
+          "inputTokens": 1000000,
+          "outputTokens": 0,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0
+        }
+      }
+    },
+    "output": true
+  },
+  {
+    "input": {},
+    "output": false
+  },
+  {
+    "input": {
+      "advice": {
+        "mainModel": "glm-5.3",
+        "flashModel": "glm-5.3-flash",
+        "runs": 9,
+        "lightJobs": 2,
+        "lightAgents": 1,
+        "tokens": {
+          "inputTokens": 1000000,
+          "outputTokens": 0,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0
+        }
+      }
+    },
+    "output": false
+  },
+  {
+    "input": {
+      "advice": {
+        "mainModel": "glm-5.3",
+        "flashModel": "glm-5.3-flash",
+        "runs": 10,
+        "lightJobs": 1,
+        "lightAgents": 1,
+        "tokens": {
+          "inputTokens": 1000000,
+          "outputTokens": 0,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0
+        }
+      }
+    },
+    "output": false
+  },
+  {
+    "input": {
+      "advice": {
+        "mainModel": "glm-5.3",
+        "flashModel": "glm-5.3-flash",
+        "runs": 10,
+        "lightJobs": 2,
+        "lightAgents": 1,
+        "tokens": {
+          "inputTokens": 1000,
+          "outputTokens": 0,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0
+        }
+      }
+    },
+    "output": false
+  },
+  {
+    "input": {
+      "advice": {
+        "mainModel": "glm-5.3",
+        "flashModel": "custom-flash",
+        "runs": 10,
+        "lightJobs": 2,
+        "lightAgents": 1,
+        "tokens": {
+          "inputTokens": 1000000,
+          "outputTokens": 0,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0
+        }
+      }
+    },
+    "output": false
+  }
+]

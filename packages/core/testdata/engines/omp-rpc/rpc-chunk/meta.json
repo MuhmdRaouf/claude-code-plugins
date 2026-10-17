@@ -1,0 +1,44 @@
+{
+ "omp": "18.6.1",
+ "probe": "P9",
+ "fixture": "rpc-chunk",
+ "description": "protocol v2: get_entries response of 1.17 MB arrives as 5 rpc_chunk frames",
+ "synthetic": false,
+ "source": "p9b-rpc-chunk",
+ "frames": 77,
+ "argv": [
+  "omp",
+  "--mode",
+  "rpc",
+  "--no-ui",
+  "--config",
+  "<root>/omp-overlay.yml",
+  "--session-dir",
+  "<root>/sessions/p9-big-frame",
+  "--model",
+  "zai/glm-5.3-flash",
+  "--thinking",
+  "low",
+  "--tools",
+  "read,grep,glob",
+  "--approval-mode",
+  "yolo",
+  "--no-extensions",
+  "--no-skills",
+  "--no-rules",
+  "--no-title"
+ ],
+ "exit": 0,
+ "ready_ms": 1835,
+ "handshake_ms": 1921,
+ "max_physical_frame": 850293,
+ "reassembled": [
+  {
+   "chunkId": "rpc-1",
+   "chunks": 5,
+   "byteLength": 1168092,
+   "type": "response"
+  }
+ ],
+ "trimmed": "systemPrompt bodies elided; available_commands_update cut to 2 commands; tool result fields over 64 KB cut to head/tail 16 KB with $truncated; response data over 64 KB replaced by $truncated; rpc_chunk: first and last chunk kept, data replaced by its length (see omp-research/probes/scripts/trim_for_repo.py)"
+}

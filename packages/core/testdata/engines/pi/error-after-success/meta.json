@@ -1,0 +1,26 @@
+{
+  "pi": "1.0.4",
+  "probe": "P2",
+  "fixture": "error-after-success",
+  "description": "pi admits the prompt (success response) and the failure arrives on the message stream instead: an assistant message that ends stopReason error with the provider's 401 body.",
+  "synthetic": true,
+  "source": "hand-written from pi 1.0.4 wire shapes",
+  "frames": 13,
+  "argv": [
+    "pi",
+    "--mode",
+    "rpc",
+    "--model",
+    "zai/glm-5.3",
+    "--no-extensions",
+    "--no-mcp",
+    "--no-skills",
+    "--no-context-files",
+    "--tools",
+    "read,grep,find,ls",
+    "--session-id",
+    "<id>"
+  ],
+  "exit": 0,
+  "handshake_ms": 12
+}

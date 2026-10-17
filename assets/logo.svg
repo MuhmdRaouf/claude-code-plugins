@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="claude-code-plugins logo">
+  <title>claude-code-plugins</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#313244"/>
+      <stop offset="1" stop-color="#11111b"/>
+    </linearGradient>
+    <linearGradient id="link" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cba6f7"/>
+      <stop offset="1" stop-color="#89b4fa"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#tile)"/>
+  <rect x="4.5" y="4.5" width="119" height="119" rx="27.5" fill="none" stroke="#45475a"/>
+  <!-- a socket: one hub, four plugins snapped in around it -->
+  <g stroke="url(#link)" stroke-width="7" stroke-linecap="round" fill="none">
+    <path d="M64 64 L64 34"/>
+    <path d="M64 64 L94 64"/>
+    <path d="M64 64 L64 94"/>
+    <path d="M64 64 L34 64"/>
+  </g>
+  <rect x="50" y="50" width="28" height="28" rx="9" fill="#1e1e2e" stroke="#cba6f7" stroke-width="5"/>
+  <circle cx="64" cy="28" r="9" fill="#a6e3a1"/>
+  <circle cx="100" cy="64" r="9" fill="#fab387"/>
+  <circle cx="64" cy="100" r="9" fill="#89b4fa"/>
+  <circle cx="28" cy="64" r="9" fill="#f5c2e7"/>
+</svg>

@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "retries.fix",
+      "message": "Too small: expected number to be >=0"
+    },
+    {
+      "kind": "field",
+      "field": "retries.infra",
+      "message": "Invalid input: expected int, received number"
+    }
+  ]
+}

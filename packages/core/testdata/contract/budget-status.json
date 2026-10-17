@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "updatedAt": 1791363600000,
+  "stopped": ["provider:zai"],
+  "spend": [
+    { "id": "zai-month", "pct": 100 },
+    { "id": "total-month", "pct": 42.5 }
+  ]
+}

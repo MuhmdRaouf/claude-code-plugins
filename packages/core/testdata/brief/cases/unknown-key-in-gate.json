@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "gates.0.run",
+      "message": "required"
+    },
+    {
+      "kind": "field",
+      "field": "gates.0.cmd",
+      "message": "unknown field"
+    }
+  ]
+}

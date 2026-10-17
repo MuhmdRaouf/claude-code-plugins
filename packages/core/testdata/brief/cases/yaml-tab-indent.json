@@ -1,0 +1,9 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "yaml",
+      "message": "Tabs are not allowed as indentation at line 2, column 1:\n\ntitle: t\n\tmode: edit\n^\n"
+    }
+  ]
+}

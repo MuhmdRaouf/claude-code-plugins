@@ -51,7 +51,7 @@ jobs:
               - package.json
               - package-lock.json
               - scripts/check-ci.test.mjs
-              - scripts/check-all.mjs
+              - scripts/launcher.test.mjs
               - scripts/launcher.mjs
               - .github/actions/**
               - .github/workflows/ci.yml

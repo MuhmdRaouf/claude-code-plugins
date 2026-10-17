@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "value": {
+    "title": "t",
+    "body": "Body.\n",
+    "model": "main",
+    "mode": "edit",
+    "cwd": "/work/repo",
+    "base": "2026-10-13",
+    "scope": [
+      "**"
+    ],
+    "forbid": [],
+    "gates": [],
+    "timeoutMs": 7200000,
+    "retries": {
+      "fix": 1,
+      "infra": 2
+    },
+    "report": {
+      "kind": "builtin",
+      "name": "change"
+    },
+    "addDirs": [],
+    "env": [],
+    "tags": [
+      "1_000",
+      "0b101",
+      "12:30"
+    ]
+  }
+}

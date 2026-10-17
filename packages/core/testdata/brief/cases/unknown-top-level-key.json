@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "error": [
+    {
+      "kind": "field",
+      "field": "retries.fixes",
+      "message": "unknown field"
+    },
+    {
+      "kind": "field",
+      "field": "scopes",
+      "message": "unknown field"
+    }
+  ]
+}

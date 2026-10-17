@@ -1,0 +1,71 @@
+[
+  {
+    "input": {
+      "provider": "reference",
+      "rows": [
+        {
+          "kind": "subagent",
+          "id": "3f2a1b9c",
+          "model": "glm-5.3",
+          "state": "active",
+          "requests": 12,
+          "inputTokens": 45200,
+          "outputTokens": 3100,
+          "at": "2026-10-06T11:59:55.000Z"
+        },
+        {
+          "kind": "session",
+          "id": "9c8b7a6d",
+          "model": "glm-5.3-flash",
+          "state": "idle",
+          "requests": 3,
+          "inputTokens": 1200,
+          "outputTokens": 300,
+          "at": "2026-10-06T10:00:00.000Z"
+        },
+        {
+          "kind": "job",
+          "id": "261006-run001",
+          "state": "running",
+          "at": "2026-10-06T11:57:00.000Z",
+          "title": "Rename the helper"
+        },
+        {
+          "kind": "job",
+          "id": "261006-old001",
+          "state": "verifying",
+          "stale": true,
+          "at": "2026-10-05T10:00:00.000Z",
+          "title": "Sweep call sites"
+        },
+        {
+          "kind": "omp",
+          "id": "261006-omp001",
+          "model": "gpt-5.4",
+          "state": "running",
+          "pid": 4242,
+          "at": "2026-10-06T11:58:00.000Z",
+          "title": "Try a port"
+        }
+      ],
+      "now": 1791288000000
+    },
+    "output": "KIND      ID             MODEL          STATE               REQ  IN     OUT   LAST      TITLE\nsubagent  3f2a1b9c       glm-5.3        active              12   45.2k  3.1k  just now  -\nsession   9c8b7a6d       glm-5.3-flash  idle                3    1.2k   300   2h ago    -\njob       261006-run001  -              running             -    -      -     3m ago    Rename the helper\njob       261006-old001  -              verifying (stale)   -    -      -     1d ago    Sweep call sites\nomp       261006-omp001  gpt-5.4        running (pid 4242)  -    -      -     2m ago    Try a port\n\nomp rows: model and numbers as the tool itself reports them (it runs on its own setup).\n\nstale: 1 job has no live driver (261006-old001); stopping one here moves it to review, where /zai:review <id> discards it."
+  },
+  {
+    "input": {
+      "provider": "reference",
+      "rows": [],
+      "now": 1791288000000
+    },
+    "output": "No Z.ai GLM activity yet. After /zai:setup, the sessions and subagents on its models appear here."
+  },
+  {
+    "input": {
+      "provider": "acme",
+      "rows": [],
+      "now": 1791288000000
+    },
+    "output": "No Acme Models activity yet. After /acme:setup, the sessions and subagents on its models appear here."
+  }
+]
