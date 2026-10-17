@@ -23,7 +23,7 @@ The routers write the spool and read the budget file; huddle drains the one and 
 Plus one thing that is not a plugin: `packages/core`, the engine the five provider plugins share (one Go
 binary, `plugin-core`).
 
-**The five provider plugins**
+### The five provider plugins
 
 - The same plugin, written five times over one core, by hand. No template, no generation step.
 - Each has its own provider data, router port, key, model ids and slash prefix.
@@ -60,7 +60,7 @@ binary, `plugin-core`).
 
 ## 2. Repository layout
 
-```
+```text
 cc-plugins/
 ├── .claude-plugin/marketplace.json     the catalogue: one entry per plugin, source ./plugins/<project>/plugin
 ├── .github/workflows/release.yml       runs on a tag v<VERSION> pushed by hand (no workflow creates tags) and
@@ -158,7 +158,7 @@ cc-plugins/
 
 ### 3.1 The big picture
 
-```
+```text
              ┌───────────────────────── your machine ───────────────────────────┐
   you ──▶ Claude Code session(s) ──ANTHROPIC_BASE_URL──▶ provider router(s)      │
              │  /model: Opus, Sonnet,      (127.0.0.1:18787 zai, :18788 kimi …)  │
@@ -372,7 +372,7 @@ Three independent mechanisms. Each one works without the others:
   - `/<p>:remove` sends the front a `POST <health>/retire` control call (loopback and the pid file's token), and
     moves `router.pid` to `router.retired`; the uninstall watch retires the front the same way (below).
   - A retired front drains its worker, passes every other request to Anthropic exactly as it came, and answers this
-    provider's models, peers' models and peer hops with a 400 that is not retried: "<Display> was removed: restart
+    provider's models, peers' models and peer hops with a 400 that is not retried: "`<Display>` was removed: restart
     Claude Code to stop using its router".
   - It writes one `router.event` line (`restart`) to the spool and nothing after it, and takes its registry entry out.
   - Every 30 s it reads `ps -axo pid=,lstart=,args=`. A Claude Code session is a command line whose program is
@@ -558,7 +558,7 @@ The plugin never decides acceptance. Claude never takes a worker's "done" on tru
 
 **The lifecycle.**
 
-```
+```text
 brief ─submit─▶ queued ─slot─▶ running ─exit─▶ verifying ─▶ awaiting_review ─accept─▶ accepted
                                  ▲                  │ fail + fix budget      ├─return(feedback)─▶ review_fix attempt
                                  └── auto_fix ◀─────┘                        └─discard─▶ discarded
@@ -725,7 +725,7 @@ once, on zai, against the binary.
 
 ### 4.1 Install
 
-```
+```text
 /plugin marketplace add MuhmdRaouf/claude-code-plugins
 /plugin install zai-plugin-cc@muhmdraouf          # and/or kimi-, deepseek-, minimax-, qwen-plugin-cc
 ```
@@ -855,7 +855,7 @@ slash commands.
 
 ### 4.3 The job CLI
 
-```
+```text
 zai run <brief.md|-> [--engine claude|omp|opencode|pi|zcode] [--flash] [--mode edit|exec|readonly] [--wait|--bg] [--json]
 zai wait <id>…            zai batch <dir|glob|manifest> [--wait]     zai board [--all] [--watch]
 zai show <id> [--follow]  zai review <id> [--diff|--summary]  zai accept <id> [--no-commit] [--force] [--no-verify]
@@ -1005,10 +1005,10 @@ The router's own records are in the state root: `router/router.log` and `router-
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| after a plugin update the router stays down and a command says "plugin-core <version> is not installed; run /zai:setup" (127) | the new release's binary is missing: the session-start download failed or was cut short | nothing to do: any hook starts one detached download (locked in the version dir, so one download serves every hook), and a later hook in the session runs the installed binary; `/zai:setup` forces it at once |
+| after a plugin update the router stays down and a command says "plugin-core `<version>` is not installed; run /zai:setup" (127) | the new release's binary is missing: the session-start download failed or was cut short | nothing to do: any hook starts one detached download (locked in the version dir, so one download serves every hook), and a later hook in the session runs the installed binary; `/zai:setup` forces it at once |
 | a GLM request fails with "key refused or missing: run /zai:setup" (a 400, not retried) | Z.ai refused the key, or there is none | rerun `/zai:setup` (opens the key page); Claude models are not affected |
 | a GLM request fails naming a top-up page (a 400, not retried) | the Z.ai account is out of balance or quota | top up at the page named (`https://z.ai/manage-apikey/billing`), then retry |
-| a GLM request fails with "budget reached for this <period>" (a 400, not retried) | a radar budget with action `stop` covers zai (or `total`) and is spent | raise or remove it in radar's dashboard (radar is part of [huddle](https://github.com/MuhmdRaouf/huddle)), or wait for the period to end |
+| a GLM request fails with "budget reached for this `<period>`" (a 400, not retried) | a radar budget with action `stop` covers zai (or `total`) and is spent | raise or remove it in radar's dashboard (radar is part of [huddle](https://github.com/MuhmdRaouf/huddle)), or wait for the period to end |
 | a GLM request fails with "was removed: restart Claude Code" (a 400, not retried) | zai was removed or uninstalled while this session was open; its retired router still serves Claude models | restart Claude Code, or run `/zai:setup` to turn zai on again |
 | GLM requests answer 503 naming `/zai:setup` | the router is degraded or in emergency mode; Claude traffic is unaffected | wait a minute for the next worker, or run `/zai:setup`; check `status` and `router-crash.log` |
 | 429s, slow jobs | provider rate limit | AIMD lowers concurrency automatically; lower `ZAI_MAX_CONCURRENCY` |

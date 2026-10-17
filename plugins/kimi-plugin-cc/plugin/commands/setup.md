@@ -27,12 +27,12 @@ One question, "What should Moonshot Kimi set up?", header "Setup", single choice
    the `kimi:kimi-k3` and `kimi:kimi-k2.6` agents on them.
 2. `Built-in plus other tools (omp, opencode, pi, zcode)`: the same, then Moonshot Kimi jobs also run on the tools picked next.
 
-Mark the current state by adding ` (current)` to one label: the second option when any tool's `watcher` is not null,
+Mark the current state by adding `(current)` to one label: the second option when any tool's `watcher` is not null,
 otherwise the first when `setup` is true, neither when `setup` is false.
 
 Only when the answer is the second option, ask a second question, "Which tools should run Moonshot Kimi jobs?", header
-"Tools", multiSelect, one option per tool in this order: `omp`, `opencode`, `pi`, `zcode`. Add ` (installed)` to a tool's label
-when its `binary.ok` is true and ` (not found)` when it is false, and `, enabled` before the closing parenthesis when
+"Tools", multiSelect, one option per tool in this order: `omp`, `opencode`, `pi`, `zcode`. Add `(installed)` to a tool's label
+when its `binary.ok` is true and `(not found)` when it is false, and `, enabled` before the closing parenthesis when
 its `watcher` is not null. Each option's description is its `binary` value or error. A tool that is not found may
 still be chosen: its check then reports the failing line.
 
@@ -113,16 +113,16 @@ Each tool runs on the user's own setup; the Moonshot Kimi model only watches its
 and go on with the next tool:
 
 - binary: install the tool so it is on `PATH` (omp is Oh My Pi).
-- smoke failed: run <tool> once and log in or configure it; the plugin uses it as it is.
+- smoke failed: run `<tool>` once and log in or configure it; the plugin uses it as it is.
 
-When it is ready, ask — always, even when a watcher was chosen before — one question, "Who should watch <tool> runs?",
+When it is ready, ask — always, even when a watcher was chosen before — one question, "Who should watch `<tool>` runs?",
 header "Watcher", single choice, these two options in this order:
 
 1. `Kimi K3 (Moonshot Kimi)`: the `kimi:<tool>` agent that hands work to the tool runs on Kimi K3 through the kimi
    router.
 2. `Claude Sonnet`: the `kimi:<tool>` agent runs on Sonnet.
 
-Mark the current choice by adding ` (current)` to its label: the first option when the report's `engine.watcher` is
+Mark the current choice by adding `(current)` to its label: the first option when the report's `engine.watcher` is
 `provider`, the second when it is `sonnet`, neither when it is null. Then run with the answer, `provider` for the first
 option and `sonnet` for the second, and show its one line:
 

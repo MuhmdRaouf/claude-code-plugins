@@ -34,7 +34,7 @@ that workflow automatically.
    ([MuhmdRaouf/claude-code-plugins](https://github.com/MuhmdRaouf/claude-code-plugins)), at user scope (available in
    every project):
 
-   ```
+   ```text
    /plugin marketplace add MuhmdRaouf/claude-code-plugins
    /plugin install minimax-plugin-cc@muhmdraouf
    ```
@@ -49,7 +49,7 @@ Other ways to install:
   (`--scope project` or `local` enables it for one repository only).
 - From a clone of the monorepo (for development), load the plugin directly:
 
-  ```
+  ```sh
   npm ci && npm run build -w plugins/minimax-plugin-cc
   claude --plugin-dir ./plugins/minimax-plugin-cc/plugin
   ```
@@ -69,7 +69,7 @@ Other ways to install:
 
 Turn the plugin on:
 
-```
+```text
 /minimax:setup
 ```
 
@@ -233,7 +233,7 @@ for minutes, so on the minimax models only:
 
 - a refused or missing key becomes a 400, not retried, saying `MiniMax key refused or missing: run /minimax:setup`;
 - an account with no balance or quota becomes a 400, not retried, naming the page where you top up
-  (https://platform.minimax.io/user-center/payment/balance).
+  (<https://platform.minimax.io/user-center/payment/balance>).
 
 Claude models are never touched. The key is never written to a log, a spool line or an error body: an upstream error
 that quotes it is blanked out first.
@@ -317,7 +317,7 @@ and `/minimax:review`. The CLI runs it end to end:
 2. `minimax wait`, `minimax show`, `minimax board` follow it.
 3. `minimax review`, `minimax accept`, `minimax return`, `minimax discard` decide it (`/minimax:review` does the same with questions).
 
-```
+```text
 brief ──▶ MiniMax worker ──▶ plugin verifies ──▶ awaiting review ──▶ Claude: accept │ return(feedback) │ discard
               ▲            gates · scope ·                                              │
               │            report contract                                              │
@@ -335,7 +335,7 @@ brief ──▶ MiniMax worker ──▶ plugin verifies ──▶ awaiting revi
 
 ### Job lifecycle
 
-```
+```text
 queued ─▶ running ─▶ verifying ─▶ awaiting_review ─▶ accepted
    ▲                    │                │
    │                    └─ auto-fix ─────┤ (same MiniMax session, while the fix budget lasts)
@@ -622,7 +622,7 @@ The state directory is the first of these that applies, created with mode 0700:
 - **A MiniMax request fails with "key refused or missing: run /minimax:setup".** MiniMax refused the key, or there is none. Run
   `/minimax:setup` and paste a working key. Claude models are not affected.
 - **A MiniMax request fails naming a top-up page.** The MiniMax account is out of balance or quota.
-  - Top up at https://platform.minimax.io/user-center/payment/balance, then retry; the router does not retry it for you.
+  - Top up at <https://platform.minimax.io/user-center/payment/balance>, then retry; the router does not retry it for you.
   - A job that ran into it ends with verdict `quota` and is not retried either: top up, then return it from
     `/minimax:review`.
 - **`setup:omp`, `setup:opencode`, `setup:pi` or `setup:zcode` fails on the smoke line.** The tool is not logged in or configured.

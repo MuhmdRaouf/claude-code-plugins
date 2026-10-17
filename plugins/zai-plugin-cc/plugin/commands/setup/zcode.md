@@ -50,7 +50,7 @@ chosen before; never skip the question as already answered. One question, "Who s
 2. `Claude Sonnet`: the `zai:zcode` agent runs on Sonnet.
 
 The watcher only writes the brief, waits for the job and reads the review; zcode itself keeps running on its own model.
-Mark the current choice by adding ` (current)` to its label: the first option when the report's `engine.watcher` is
+Mark the current choice by adding `(current)` to its label: the first option when the report's `engine.watcher` is
 `provider`, the second when it is `sonnet`, neither when it is null. Then run with the answer, `provider` for the
 first option and `sonnet` for the second:
 

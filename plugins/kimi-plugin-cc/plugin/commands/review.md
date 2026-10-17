@@ -30,7 +30,7 @@ diff itself, run it again with `--diff`.
 ## 3. Ask what to do
 
 If the user's own message already said what to do with this job, do that and skip the question. Otherwise ask with
-AskUserQuestion, header "Decision", "What should happen to job <id>?", these options in this order:
+AskUserQuestion, header "Decision", "What should happen to job `<id>`?", these options in this order:
 
 - verdict `pass` on an `edit` job: `Accept` (commits the change on the current branch), `Return with feedback`,
   `Discard`, `Leave it`.

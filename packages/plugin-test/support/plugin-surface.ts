@@ -474,9 +474,9 @@ export function describePluginSurface(options: PluginSurfaceOptions): void {
       expect(text).toContain(
         "multiSelect, one option per tool in this order: `omp`, `opencode`, `pi`, `zcode`",
       );
-      expect(text).toContain(" (installed)");
-      expect(text).toContain(" (not found)");
-      expect(text).toContain(" (current)");
+      expect(text).toContain("`(installed)`");
+      expect(text).toContain("`(not found)`");
+      expect(text).toContain("`(current)`");
       expect(text).toContain("setup --engine-enable <tool> --watcher provider");
       expect(text).toContain("setup --engine-enable <tool> --watcher sonnet");
       expect(text).toContain(`\`${PROVIDER.catalog.main.label} (${PROVIDER.display})\``);
@@ -508,7 +508,7 @@ export function describePluginSurface(options: PluginSurfaceOptions): void {
         expect(text).toContain(`"Who should watch ${engine} runs?"`);
         expect(text).toContain(`${PROVIDER.catalog.main.label} (${PROVIDER.display})`);
         expect(text).toContain("`Claude Sonnet`");
-        expect(text).toContain(" (current)");
+        expect(text).toContain("`(current)`");
       },
     );
 

@@ -32,7 +32,7 @@ downloaded by `/<p>:setup`. It is private, never published as a library.
 
 ## The loop
 
-```
+```text
  brief ──submit──▶ queued ──slot──▶ running ──worker exits──▶ verifying ──▶ awaiting_review ──accept──▶ accepted
                                      ▲                          │  verdict≠pass and                │
                                      │                          │  fix budget left                  ├─return(feedback)─┐
@@ -247,7 +247,7 @@ Budgets (`internal/domain/budget.go`, `internal/router/budget.go`):
 - The router reads `<radar home>/budget-status.json` (`$RADAR_HOME`, else `~/.agents/radar`) at
   most every 5 s.
 - While it lists `provider:<p>` or `total` as stopped, the router answers the provider's models with the key refusal's
-  non-retryable 400 ("<Display> budget reached for this <period>: …"). The period comes from `budgets.json`.
+  non-retryable 400 ("`<Display>` budget reached for this `<period>`: …"). The period comes from `budgets.json`.
 - A missing, unparsable, oversized, non-regular or stale (over 10 minutes) file stops nothing.
 - `claude-*` is never read against it.
 
@@ -306,7 +306,7 @@ The dispatcher subagent:
 One binary, `cmd/plugin-core`, dispatches `plugin-core <provider> <cli|router|passthrough|ensure>`; the plugins' committed
 `dist/run` launcher downloads the pinned release and executes it with those arguments. The engine needs no runtime.
 
-```
+```text
 packages/core/
   cmd/plugin-core/        the only main: provider + entry dispatch, --version, the --orphan-launch plumbing
   internal/domain/        pure logic: brief schema/defaults/duration, job + lifecycle state machine, verdicts, prompt

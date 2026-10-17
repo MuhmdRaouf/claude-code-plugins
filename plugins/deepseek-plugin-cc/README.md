@@ -34,7 +34,7 @@ that workflow automatically.
    ([MuhmdRaouf/claude-code-plugins](https://github.com/MuhmdRaouf/claude-code-plugins)), at user scope (available in
    every project):
 
-   ```
+   ```text
    /plugin marketplace add MuhmdRaouf/claude-code-plugins
    /plugin install deepseek-plugin-cc@muhmdraouf
    ```
@@ -49,7 +49,7 @@ Other ways to install:
   (`--scope project` or `local` enables it for one repository only).
 - From a clone of the monorepo (for development), load the plugin directly:
 
-  ```
+  ```sh
   npm ci && npm run build -w plugins/deepseek-plugin-cc
   claude --plugin-dir ./plugins/deepseek-plugin-cc/plugin
   ```
@@ -69,7 +69,7 @@ Other ways to install:
 
 Turn the plugin on:
 
-```
+```text
 /deepseek:setup
 ```
 
@@ -233,7 +233,7 @@ for minutes, so on the deepseek models only:
 
 - a refused or missing key becomes a 400, not retried, saying `DeepSeek key refused or missing: run /deepseek:setup`;
 - an account with no balance or quota becomes a 400, not retried, naming the page where you top up
-  (https://platform.deepseek.com/top_up).
+  (<https://platform.deepseek.com/top_up>).
 
 Claude models are never touched. The key is never written to a log, a spool line or an error body: an upstream error
 that quotes it is blanked out first.
@@ -317,7 +317,7 @@ and `/deepseek:review`. The CLI runs it end to end:
 2. `deepseek wait`, `deepseek show`, `deepseek board` follow it.
 3. `deepseek review`, `deepseek accept`, `deepseek return`, `deepseek discard` decide it (`/deepseek:review` does the same with questions).
 
-```
+```text
 brief ──▶ DeepSeek worker ──▶ plugin verifies ──▶ awaiting review ──▶ Claude: accept │ return(feedback) │ discard
               ▲            gates · scope ·                                              │
               │            report contract                                              │
@@ -335,7 +335,7 @@ brief ──▶ DeepSeek worker ──▶ plugin verifies ──▶ awaiting rev
 
 ### Job lifecycle
 
-```
+```text
 queued ─▶ running ─▶ verifying ─▶ awaiting_review ─▶ accepted
    ▲                    │                │
    │                    └─ auto-fix ─────┤ (same DeepSeek session, while the fix budget lasts)
@@ -622,7 +622,7 @@ The state directory is the first of these that applies, created with mode 0700:
 - **A DeepSeek request fails with "key refused or missing: run /deepseek:setup".** DeepSeek refused the key, or there is none. Run
   `/deepseek:setup` and paste a working key. Claude models are not affected.
 - **A DeepSeek request fails naming a top-up page.** The DeepSeek account is out of balance or quota.
-  - Top up at https://platform.deepseek.com/top_up, then retry; the router does not retry it for you.
+  - Top up at <https://platform.deepseek.com/top_up>, then retry; the router does not retry it for you.
   - A job that ran into it ends with verdict `quota` and is not retried either: top up, then return it from
     `/deepseek:review`.
 - **`setup:omp`, `setup:opencode`, `setup:pi` or `setup:zcode` fails on the smoke line.** The tool is not logged in or configured.
