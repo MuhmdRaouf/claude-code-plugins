@@ -388,6 +388,49 @@ func TestUninstallSettingsUndo(t *testing.T) {
 		}
 	})
 
+	t.Run("proxy mode: setup writes the three keys and uninstall leaves settings.json byte-identical", func(t *testing.T) {
+		original := "{\n    \"theme\": \"dark\",\n    \"permissions\": { \"allow\": [] }\n}\n"
+		path := undoSettings(t, original)
+		caDir := domain.NewStateLayout(filepath.Join(t.TempDir(), "zai")).CA
+		var delta adapters.SettingsDelta
+		_, err := adapters.ApplyProviderSettings(context.Background(), path, routerProvider, undoRouterURL,
+			adapters.ApplyProviderOptions{
+				CADir:  caDir,
+				Record: func(recorded adapters.SettingsDelta) { delta = recorded },
+			})
+		if err != nil {
+			t.Fatal(err)
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var env struct {
+			Env map[string]string `json:"env"`
+		}
+		if err := json.Unmarshal(data, &env); err != nil {
+			t.Fatal(err)
+		}
+		if env.Env["HTTPS_PROXY"] != undoRouterURL || env.Env["NO_PROXY"] != "localhost,127.0.0.1" {
+			t.Fatalf("env = %v, want the proxy keys", env.Env)
+		}
+		if _, err := os.ReadFile(env.Env["NODE_EXTRA_CA_CERTS"]); err != nil {
+			t.Fatalf("read the CA file the merge wrote: %v", err)
+		}
+		if delta.ProxyBefore != nil || delta.CABefore != nil || delta.NoProxyBefore != nil || !delta.CreatedProxy {
+			t.Fatalf("delta = %+v, want the proxy keys recorded as created", delta)
+		}
+
+		if _, err := adapters.UndoProviderSettings(context.Background(), path, "zai",
+			MergeSettingsUndo(nil, &delta), undoRouterURL, nil); err != nil {
+			t.Fatal(err)
+		}
+		after, err := os.ReadFile(path)
+		if err != nil || string(after) != original {
+			t.Fatalf("settings after = %q %v, want the original bytes", after, err)
+		}
+	})
+
 	t.Run("reverts only this plugin's keys when the user edited another key in between", func(t *testing.T) {
 		path := undoSettings(t, "{\n  \"theme\": \"dark\",\n  \"availableModels\": [\n    \"sonnet\"\n  ]\n}\n")
 		delta := undoSetUp(t, path, nil)

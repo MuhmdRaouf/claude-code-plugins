@@ -34,6 +34,7 @@ func TestStateLayout(t *testing.T) {
 			Slots:           filepath.Join(root, "slots"),
 			Jobs:            filepath.Join(root, "jobs"),
 			Checkouts:       filepath.Join(root, "checkouts"),
+			CA:              filepath.Join(filepath.Dir(root), "ca"),
 		}
 		if !reflect.DeepEqual(layout, want) {
 			t.Fatalf("stateLayout(%q) = %#v, want %#v", root, layout, want)

@@ -1,6 +1,8 @@
 // The setup wiring: plain `setup` starts the plugin's router (a background process its hooks keep
-// alive), adds the provider's two models to `/model` and points Claude Code at the router, so
-// picking one routes through it while every `claude-*` request still reaches Anthropic untouched.
+// alive), adds the provider's two models to `/model` and routes Claude Code through the router —
+// proxy mode where it can (HTTPS_PROXY at the router and its local CA, so Remote Control keeps
+// working), base-URL mode as the fallback beside a proxy or CA of the user's own — so picking one
+// routes through it while every `claude-*` request still reaches Anthropic untouched.
 // Every change it makes outside the plugin goes into the ledger, so the router can undo exactly
 // those when the plugin is uninstalled. `setup --remove` undoes all of it; the SessionStart hook
 // re-applies it after plugin updates (and after a re-enable), never pings the provider, and falls
@@ -422,9 +424,22 @@ func liveOthers(ctx context.Context, deps SetupDeps) []string {
 }
 
 // routesProvider is where Claude Code's settings point now, and whether that is a router of ours
-// that will route the provider's ids: this plugin's (when it is up) or another live plugin router
-// (which forwards them here).
+// that will route the provider's ids: the proxy keys naming this router (when it is up) or
+// another live plugin router (which forwards them here), or — base-URL mode, beside a proxy of
+// the user's own — the base URL on this router or another live one.
 func routesProvider(deps SetupDeps, routerOk bool, live []string) bool {
+	settings, ok := adapters.ReadProxySettings(deps.SettingsPath)
+	if ok && settings.HTTPSProxy != nil {
+		port := proxyPortOf(*settings.HTTPSProxy)
+		if port == domain.PortOf(domain.RouterBaseURL(deps.Provider, deps.Env)) {
+			return routerOk
+		}
+		for _, url := range live {
+			if domain.PortOf(url) == port {
+				return true
+			}
+		}
+	}
 	current, ok := adapters.ReadBaseUrl(deps.SettingsPath)
 	if !ok {
 		return false
@@ -433,6 +448,15 @@ func routesProvider(deps SetupDeps, routerOk bool, live []string) bool {
 		return true
 	}
 	return slices.Contains(live, current)
+}
+
+// proxyPortOf is the port a proxy variable's value names, a missing scheme added the way a proxy
+// URL is read; -1 when it names none.
+func proxyPortOf(raw string) int64 {
+	if !strings.Contains(raw, "://") {
+		raw = "http://" + raw
+	}
+	return domain.PortOf(raw)
 }
 
 // installedMarker is `${CLAUDE_PLUGIN_DATA}/installed` when the data dir is this plugin's own.
@@ -514,6 +538,8 @@ func mergeSettings(ctx context.Context, deps SetupDeps, live []string) LinesResu
 	}
 	options := adapters.ApplyProviderOptions{
 		LivePluginURLs: live,
+		CADir:          layout.CA,
+		EnvProxy:       ownProxyInEnv(deps.Env),
 		Record: func(recorded adapters.SettingsDelta) {
 			delta = &recorded
 		},
@@ -528,6 +554,23 @@ func mergeSettings(ctx context.Context, deps SetupDeps, live []string) LinesResu
 	}
 	recordLedger(ctx, deps, delta, keyInStore(ctx, deps))
 	return LinesResult{OK: true, Value: lines}
+}
+
+// ownProxyInEnv is the proxy variable this process's own environment applies, lowercase before
+// uppercase the way Claude Code reads them: a user who exported their own proxy keeps base-URL
+// mode even where the settings carry none of it. A value naming a plugin router is ours.
+func ownProxyInEnv(env domain.EnvLookup) *string {
+	for _, name := range []string{"https_proxy", "HTTPS_PROXY"} {
+		value, ok := env[name]
+		if !ok || value == "" {
+			continue
+		}
+		if domain.IsPluginRouterProxy(value) {
+			return nil
+		}
+		return &value
+	}
+	return nil
 }
 
 // keyInStore is whether the key comes from this plugin's own entry in the OS store: only setup's
@@ -560,8 +603,8 @@ func withRouterKey(ctx context.Context, deps SetupDeps, started app.StringResult
 }
 
 // ApplyRouting is `setup`'s wiring, in order: router, registry, settings merge (and ledger),
-// agents, the setupDone mark. The agents name the provider's ids only when Claude Code's base URL
-// is a router of ours that can route them.
+// agents, the setupDone mark. The agents name the provider's ids only when Claude Code's settings
+// point at a router of ours that can route them.
 func ApplyRouting(ctx context.Context, deps SetupDeps) RoutingApplied {
 	startedLine, startedErr := deps.EnsureRouter(ctx)
 	if startedErr == nil {
@@ -711,15 +754,21 @@ func startWatchdog(ctx context.Context, deps SetupDeps) {
 
 // hookFallback is the router being down or the key missing: the agents keep the provider's models
 // (asking for GLM gets GLM or an honest failure, never Sonnet in its place). With the router down,
-// the base URL comes off it (onto another live plugin router when there is one) so Claude itself
-// keeps working. A missing key leaves the router and the base URL alone: Claude traffic does not
-// need the key. The user hears why at every session start until it is fixed. The repaired lines
-// parameter is kept for the signature and unused.
+// the settings come off it — the proxy keys, or the base URL a fallback mode kept — onto another
+// live plugin router when there is one, so Claude itself keeps working. A missing key leaves the
+// router and the settings alone: Claude traffic does not need the key. The user hears why at every
+// session start until it is fixed. The repaired lines parameter is kept for the signature and unused.
 func hookFallback(ctx context.Context, deps SetupDeps, message string, repaired []string, routerDown bool) ExitCode {
 	recordAgentsBefore(ctx, deps, ApplyAgentModels(ctx, deps.BundlePath, deps.Provider, AgentModelsProvider, deps.Env))
 	if routerDown {
-		_, _ = adapters.ClearBaseUrl(ctx, deps.SettingsPath,
-			domain.RouterBaseURL(deps.Provider, deps.Env), liveOthers(ctx, deps), deps.Provider.Name)
+		others := liveOthers(ctx, deps)
+		lines, err := adapters.ClearProxy(ctx, deps.SettingsPath,
+			domain.RouterBaseURL(deps.Provider, deps.Env), others, deps.Provider.Name)
+		if err != nil || len(lines) == 0 {
+			// Base-URL mode beside a proxy of the user's own: the base URL is the one on the dead router.
+			_, _ = adapters.ClearBaseUrl(ctx, deps.SettingsPath,
+				domain.RouterBaseURL(deps.Provider, deps.Env), others, deps.Provider.Name)
+		}
 	}
 	UserMessage(deps.Out, deps.Provider.Name+": "+message)
 	return ExitOK

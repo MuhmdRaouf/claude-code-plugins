@@ -322,9 +322,12 @@ async function setupWithKeyPage(run: Run): Promise<void> {
   expect(run.upstream.seen.some((seen) => seen.authSha === sha(`Bearer ${FAKE_KEY}`))).toBe(true);
   const settings = JSON.parse(readFileSync(box.settings, "utf8")) as {
     modelPicker: { options: { model: string }[] };
-    env: { ANTHROPIC_BASE_URL: string };
+    env: { HTTPS_PROXY: string; NODE_EXTRA_CA_CERTS: string; ANTHROPIC_BASE_URL?: string };
   };
-  expect(settings.env.ANTHROPIC_BASE_URL).toBe(run.routerUrl);
+  // Proxy mode: the proxy keys route Claude Code (no base URL left), and the CA file exists where they name it.
+  expect(settings.env.HTTPS_PROXY).toBe(run.routerUrl);
+  expect(settings.env.ANTHROPIC_BASE_URL).toBeUndefined();
+  expect(existsSync(settings.env.NODE_EXTRA_CA_CERTS)).toBe(true);
   expect(settings.modelPicker.options.map((option) => option.model)).toEqual([
     provider.catalog.main.id,
     provider.catalog.flash.id,

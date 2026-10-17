@@ -476,7 +476,7 @@ func TestCommandsSetup(t *testing.T) {
 			"  ping:     ok: big-model-9 answered (2 turns, unpriced)",
 			"  router:   running on http://127.0.0.1:18800 (pid 4242)",
 			"  models:   big-model-9, small-model-9",
-			"  settings: " + filepath.Join(world.Root, "home", ".claude", "settings.json") + " (updated: added Big Model 9 (big-model-9) to /model; added Small Model 9 (small-model-9) to /model; pointed ANTHROPIC_BASE_URL at http://127.0.0.1:18800; turned on MCP tool search)",
+			"  settings: " + filepath.Join(world.Root, "home", ".claude", "settings.json") + " (updated: added Big Model 9 (big-model-9) to /model; added Small Model 9 (small-model-9) to /model; pointed HTTPS_PROXY at http://127.0.0.1:18800; turned on MCP tool search)",
 			"Restart Claude Code now. This session keeps talking to Anthropic until it restarts; Big Model 9 in /model and the acme agents work from the next session.",
 		}, "\n")
 		if world.Out.Lines[0] != want {

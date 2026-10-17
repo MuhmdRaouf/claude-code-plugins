@@ -2158,3 +2158,224 @@ func TestCurrentProxySettingsReadsTheLowercaseProxyFirst(t *testing.T) {
 		t.Fatalf("plan = %s; want base-url beside the user's own proxy", plan.Kind)
 	}
 }
+
+// proxyCADir is a CA directory laid out like production's: the sibling of a state root, so the
+// PEM path the merge writes is one nothing else in the test owns.
+func proxyCADir(t *testing.T) string {
+	t.Helper()
+	return domain.NewStateLayout(filepath.Join(t.TempDir(), "zai")).CA
+}
+
+// proxyAppliedLines is an apply that must have succeeded, in proxy mode.
+func proxyAppliedLines(t *testing.T, path, caDir string, options ApplyProviderOptions) []string {
+	t.Helper()
+	options.CADir = caDir
+	lines, err := ApplyProviderSettings(t.Context(), path, providers.Zai, routerURL, options)
+	if err != nil {
+		t.Fatalf("applyProviderSettings(%s): %v", path, err)
+	}
+	return lines
+}
+
+// proxyEnvIn reads the settings file's env object back as strings.
+func proxyEnvIn(t *testing.T, path string) map[string]string {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	env := proxyRoot(t, string(data)).get("env")
+	got := make(map[string]string, env.size())
+	for _, key := range env.keys {
+		value, _ := env.get(key).text()
+		got[key] = value
+	}
+	return got
+}
+
+const ownProxyNote = "kept your own proxy/CA; Remote Control needs ANTHROPIC_BASE_URL unset, so routing uses the base URL"
+
+func TestApplyProviderSettingsProxyMode(t *testing.T) {
+	t.Run("hermetic settings get the three keys, the CA file they name and no base URL", func(t *testing.T) {
+		path := settingsFilePath(t)
+		caDir := proxyCADir(t)
+
+		assertLines(t, proxyAppliedLines(t, path, caDir, ApplyProviderOptions{}),
+			"added GLM 5.3 (glm-5.3) to /model",
+			"added GLM 5.3 Flash (glm-5.3-flash) to /model",
+			"set GLM 5.3 default effort to xhigh",
+			"set GLM 5.3 Flash default effort to xhigh",
+			"pointed HTTPS_PROXY at "+routerURL,
+			"turned on MCP tool search",
+		)
+		env := proxyEnvIn(t, path)
+		if env["HTTPS_PROXY"] != routerURL {
+			t.Fatalf("HTTPS_PROXY = %q; want %q", env["HTTPS_PROXY"], routerURL)
+		}
+		if env["NO_PROXY"] != "localhost,127.0.0.1" {
+			t.Fatalf("NO_PROXY = %q; want the loopback entries", env["NO_PROXY"])
+		}
+		if _, has := env["ANTHROPIC_BASE_URL"]; has {
+			t.Fatal("ANTHROPIC_BASE_URL is set; proxy mode replaces it")
+		}
+		caPEM, err := os.ReadFile(env["NODE_EXTRA_CA_CERTS"])
+		if err != nil {
+			t.Fatalf("read the CA file the merge wrote: %v", err)
+		}
+		if !strings.HasPrefix(string(caPEM), "-----BEGIN CERTIFICATE-----") {
+			t.Fatalf("NODE_EXTRA_CA_CERTS = %q; want a PEM certificate file", env["NODE_EXTRA_CA_CERTS"])
+		}
+	})
+
+	t.Run("a plugin-router base URL is taken out: the proxy replaces it", func(t *testing.T) {
+		path := settingsFilePath(t)
+		writeSettingsFile(t, path, "{\n  \"env\": {\n    \"ANTHROPIC_BASE_URL\": \""+kimiRouter+"\"\n  }\n}\n")
+
+		assertLines(t, proxyAppliedLines(t, path, proxyCADir(t), ApplyProviderOptions{}),
+			"added GLM 5.3 (glm-5.3) to /model",
+			"added GLM 5.3 Flash (glm-5.3-flash) to /model",
+			"set GLM 5.3 default effort to xhigh",
+			"set GLM 5.3 Flash default effort to xhigh",
+			"pointed HTTPS_PROXY at "+routerURL,
+			"removed ANTHROPIC_BASE_URL ("+kimiRouter+")",
+			"turned on MCP tool search",
+		)
+		env := proxyEnvIn(t, path)
+		if _, has := env["ANTHROPIC_BASE_URL"]; has {
+			t.Fatal("the plugin-router base URL survived")
+		}
+		if env["HTTPS_PROXY"] != routerURL {
+			t.Fatalf("HTTPS_PROXY = %q; want %q", env["HTTPS_PROXY"], routerURL)
+		}
+	})
+
+	t.Run("a second run changes nothing", func(t *testing.T) {
+		path := settingsFilePath(t)
+		caDir := proxyCADir(t)
+		proxyAppliedLines(t, path, caDir, ApplyProviderOptions{})
+		before, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assertLines(t, proxyAppliedLines(t, path, caDir, ApplyProviderOptions{}))
+
+		after, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(after) != string(before) {
+			t.Fatalf("a second run rewrote the file:\n%s", after)
+		}
+	})
+
+	t.Run("the user's own HTTPS_PROXY keeps base-URL mode and prints the plan's report", func(t *testing.T) {
+		path := settingsFilePath(t)
+		writeSettingsFile(t, path, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \"http://proxy.corp:3128\",\n    \"ANTHROPIC_BASE_URL\": \"https://gateway.example\"\n  }\n}\n")
+
+		assertLines(t, proxyAppliedLines(t, path, proxyCADir(t), ApplyProviderOptions{}),
+			ownProxyNote,
+			"added GLM 5.3 (glm-5.3) to /model",
+			"added GLM 5.3 Flash (glm-5.3-flash) to /model",
+			"set GLM 5.3 default effort to xhigh",
+			"set GLM 5.3 Flash default effort to xhigh",
+			"kept ANTHROPIC_BASE_URL (https://gateway.example): your own proxy",
+		)
+		env := proxyEnvIn(t, path)
+		if env["HTTPS_PROXY"] != "http://proxy.corp:3128" {
+			t.Fatalf("HTTPS_PROXY = %q; want the user's own", env["HTTPS_PROXY"])
+		}
+		if _, has := env["NODE_EXTRA_CA_CERTS"]; has {
+			t.Fatal("NODE_EXTRA_CA_CERTS is set beside the user's own proxy")
+		}
+		if _, has := env["ENABLE_TOOL_SEARCH"]; has {
+			t.Fatal("tool search is on though nothing routes")
+		}
+	})
+
+	t.Run("an unusable CA keeps base-URL mode and says so in one line", func(t *testing.T) {
+		path := settingsFilePath(t)
+		caDir := filepath.Join(t.TempDir(), "ca")
+		if err := os.MkdirAll(caDir, 0o777); err != nil {
+			t.Fatal(err)
+		}
+		// The umask strips the write bits a mode alone cannot set back.
+		if err := os.Chmod(caDir, 0o777); err != nil {
+			t.Fatal(err)
+		}
+
+		lines, err := ApplyProviderSettings(t.Context(), path, providers.Zai, routerURL, ApplyProviderOptions{CADir: caDir})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(lines) != 7 || !strings.HasPrefix(lines[0], "the local CA is unusable (") ||
+			!strings.HasSuffix(lines[0], "): routing keeps ANTHROPIC_BASE_URL") {
+			t.Fatalf("lines = %#v; want the CA's one-line note first", lines)
+		}
+		env := proxyEnvIn(t, path)
+		if env["ANTHROPIC_BASE_URL"] != routerURL {
+			t.Fatalf("ANTHROPIC_BASE_URL = %q; want %q", env["ANTHROPIC_BASE_URL"], routerURL)
+		}
+		if _, has := env["HTTPS_PROXY"]; has {
+			t.Fatal("HTTPS_PROXY is set without a usable CA")
+		}
+	})
+
+	t.Run("the caller's own proxy in the environment keeps base-URL mode", func(t *testing.T) {
+		path := settingsFilePath(t)
+
+		own := "http://proxy.corp:3128"
+		assertLines(t, proxyAppliedLines(t, path, proxyCADir(t), ApplyProviderOptions{EnvProxy: &own}),
+			"added GLM 5.3 (glm-5.3) to /model",
+			"added GLM 5.3 Flash (glm-5.3-flash) to /model",
+			"set GLM 5.3 default effort to xhigh",
+			"set GLM 5.3 Flash default effort to xhigh",
+			"pointed ANTHROPIC_BASE_URL at "+routerURL,
+			"turned on MCP tool search",
+		)
+		env := proxyEnvIn(t, path)
+		if _, has := env["HTTPS_PROXY"]; has {
+			t.Fatal("HTTPS_PROXY is set beside the user's own environment proxy")
+		}
+		if env["ANTHROPIC_BASE_URL"] != routerURL {
+			t.Fatalf("ANTHROPIC_BASE_URL = %q; want %q", env["ANTHROPIC_BASE_URL"], routerURL)
+		}
+	})
+
+	t.Run("an environment proxy naming a plugin router does not: proxy mode goes on", func(t *testing.T) {
+		path := settingsFilePath(t)
+		ours := routerURL
+
+		assertLines(t, proxyAppliedLines(t, path, proxyCADir(t), ApplyProviderOptions{EnvProxy: &ours}),
+			"added GLM 5.3 (glm-5.3) to /model",
+			"added GLM 5.3 Flash (glm-5.3-flash) to /model",
+			"set GLM 5.3 default effort to xhigh",
+			"set GLM 5.3 Flash default effort to xhigh",
+			"pointed HTTPS_PROXY at "+routerURL,
+			"turned on MCP tool search",
+		)
+		if env := proxyEnvIn(t, path); env["HTTPS_PROXY"] != routerURL {
+			t.Fatalf("HTTPS_PROXY = %q; want %q", env["HTTPS_PROXY"], routerURL)
+		}
+	})
+
+	t.Run("a base URL of the user's own is never overwritten and keeps base-URL mode", func(t *testing.T) {
+		path := settingsFilePath(t)
+		writeSettingsFile(t, path, "{\n  \"env\": {\n    \"ANTHROPIC_BASE_URL\": \"https://gateway.example\"\n  }\n}\n")
+
+		assertLines(t, proxyAppliedLines(t, path, proxyCADir(t), ApplyProviderOptions{}),
+			"added GLM 5.3 (glm-5.3) to /model",
+			"added GLM 5.3 Flash (glm-5.3-flash) to /model",
+			"set GLM 5.3 default effort to xhigh",
+			"set GLM 5.3 Flash default effort to xhigh",
+			"kept ANTHROPIC_BASE_URL (https://gateway.example): your own proxy",
+		)
+		env := proxyEnvIn(t, path)
+		if _, has := env["HTTPS_PROXY"]; has {
+			t.Fatal("HTTPS_PROXY is set beside the user's own base URL")
+		}
+		if env["ANTHROPIC_BASE_URL"] != "https://gateway.example" {
+			t.Fatalf("ANTHROPIC_BASE_URL = %q; want the user's own", env["ANTHROPIC_BASE_URL"])
+		}
+	})
+}

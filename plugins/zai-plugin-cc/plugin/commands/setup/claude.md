@@ -40,19 +40,21 @@ The report leads with the outcome:
 - `ready`: when this run changed something it ends with the restart line. Show it, because the current session keeps
   talking to Anthropic until Claude Code restarts, and GLM 5.3 in `/model` and the zai agents work from the next
   session.
-- `not routed`: Claude Code's base URL is the user's own proxy, so nothing reaches the zai router. Give the fix the
-  line names.
+- `not routed`: a proxy or base URL in `settings.json` is the user's own, so nothing reaches the zai router. Give
+  the fix the line names.
 
 If Claude ever can't connect: when part of the router fails, it passes Claude's requests straight to Anthropic, and
-the session hooks take the base URL off a router that cannot come back. Removing `env.ANTHROPIC_BASE_URL` from
-`~/.claude/settings.json` (or restoring `~/.claude/settings.json.zai-backup`) always restores direct Anthropic access.
+the session hooks take the proxy keys (or the base URL) off a router that cannot come back. Removing the
+`env.HTTPS_PROXY` and `env.NODE_EXTRA_CA_CERTS` entries from `~/.claude/settings.json` (or restoring
+`~/.claude/settings.json.zai-backup`) always restores direct Anthropic access.
 
 Uninstalling the plugin: run `/zai:remove`, then `/plugin uninstall zai-plugin-cc@muhmdraouf`. Uninstalled first, the
 router cleans up after itself: it takes its entries out of `settings.json`, puts the agents' models back, retires
 while the sessions that still use it are open, and removes its own files once they close.
 
 `/zai:remove` (`setup --remove`) undoes all of it: the agents go back to the models they had before setup (as the ledger
-recorded them), the `/model` entries and the base URL go away, and the router retires: sessions already open keep
+recorded them), the `/model` entries and the proxy keys go away (or the base URL, when a proxy of the user's own
+kept base-URL mode), and the router retires: sessions already open keep
 working through it until they close. A session-start hook re-applies the setup after a
 plugin update overwrote it, falling back to Sonnet when the router is down or the key is gone.
 

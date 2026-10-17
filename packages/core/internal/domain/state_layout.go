@@ -100,6 +100,9 @@ type StateLayout struct {
 	Jobs  string
 	// The accepts' temporary checkouts, one per job id.
 	Checkouts string
+	// The local CA every plugin's router shares, next to the state roots (~/.agents/ca): it signs
+	// only api.anthropic.com, and never enters a system trust store.
+	CA string
 }
 
 const enginePidFilename = "engine.pid"
@@ -136,6 +139,7 @@ func NewStateLayout(root string) StateLayout {
 		Slots:           filepath.Join(root, "slots"),
 		Jobs:            jobs,
 		Checkouts:       checkouts,
+		CA:              filepath.Join(filepath.Dir(root), "ca"),
 	}
 }
 

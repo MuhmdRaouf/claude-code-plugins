@@ -456,19 +456,21 @@ func TestApplyRouting(t *testing.T) {
 		if got, want := registry["catalogIds"], []any{"glm-5.3", "glm-5.3-flash"}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("catalogIds = %v, want %v", got, want)
 		}
-		want := jsonValue(t, `{
+		caPath, _ := envOf(t, settingsOf(t, h))["NODE_EXTRA_CA_CERTS"].(string)
+		want := jsonValue(t, fmt.Sprintf(`{
 			"modelPicker": {
 				"options": [
 					{"model": "glm-5.3", "label": "GLM 5.3", "behavesAs": "claude-opus-5-5"},
 					{"model": "glm-5.3-flash", "label": "GLM 5.3 Flash", "behavesAs": "claude-opus-5-5"}
 				]
 			},
-			"env": {"ANTHROPIC_BASE_URL": "http://127.0.0.1:18787", "ENABLE_TOOL_SEARCH": "true"},
+			"env": {"HTTPS_PROXY": "http://127.0.0.1:18787", "NODE_EXTRA_CA_CERTS": %q,
+				"NO_PROXY": "localhost,127.0.0.1", "ENABLE_TOOL_SEARCH": "true"},
 			"modelSettings": {
 				"glm-5.3": {"effortLevel": "xhigh"},
 				"glm-5.3-flash": {"effortLevel": "xhigh"}
 			}
-		}`)
+		}`, caPath))
 		if got := settingsOf(t, h); !reflect.DeepEqual(got, want) {
 			t.Fatalf("settings = %v, want %v", got, want)
 		}
@@ -477,6 +479,68 @@ func TestApplyRouting(t *testing.T) {
 		}
 		if !cli.ReadSetupDone(h.root) {
 			t.Fatal("readSetupDone = false, want true")
+		}
+	})
+
+	t.Run("writes the three proxy keys and no base URL, with the CA file at the path written", func(t *testing.T) {
+		h := newHarness(t, nil)
+
+		applied := cli.ApplyRouting(context.Background(), h.deps())
+
+		if !applied.Settings.OK {
+			t.Fatalf("settings = %+v, want ok", applied.Settings)
+		}
+		env := envOf(t, settingsOf(t, h))
+		if got := env["HTTPS_PROXY"]; got != routedEnv {
+			t.Fatalf("HTTPS_PROXY = %v, want %q", got, routedEnv)
+		}
+		if got := env["NO_PROXY"]; got != "localhost,127.0.0.1" {
+			t.Fatalf("NO_PROXY = %v, want the loopback entries", got)
+		}
+		if _, has := env["ANTHROPIC_BASE_URL"]; has {
+			t.Fatal("settings keep ANTHROPIC_BASE_URL, want proxy mode without it")
+		}
+		if got := env["ENABLE_TOOL_SEARCH"]; got != "true" {
+			t.Fatalf("ENABLE_TOOL_SEARCH = %v, want true", got)
+		}
+		caPath, _ := env["NODE_EXTRA_CA_CERTS"].(string)
+		caPEM, err := os.ReadFile(caPath)
+		if err != nil {
+			t.Fatalf("read the CA file the merge wrote: %v", err)
+		}
+		if !strings.HasPrefix(string(caPEM), "-----BEGIN CERTIFICATE-----") {
+			t.Fatalf("NODE_EXTRA_CA_CERTS = %q, want a PEM certificate file", caPath)
+		}
+		if lines := applied.Settings.Value; len(lines) == 0 || lines[len(lines)-2] != "pointed HTTPS_PROXY at "+routedEnv {
+			t.Fatalf("settings lines = %q, want the proxy set reported before tool search", lines)
+		}
+	})
+
+	t.Run("takes a pre-existing plugin-router base URL out when proxy mode takes over", func(t *testing.T) {
+		h := newHarness(t, nil)
+		ctx := context.Background()
+		if err := os.MkdirAll(filepath.Dir(h.deps().SettingsPath), 0o755); err != nil {
+			t.Fatalf("mkdir settings dir: %v", err)
+		}
+		if err := os.WriteFile(h.deps().SettingsPath,
+			[]byte(`{"env":{"ANTHROPIC_BASE_URL":"http://127.0.0.1:18788"}}`), 0o644); err != nil {
+			t.Fatalf("write settings: %v", err)
+		}
+
+		applied := cli.ApplyRouting(ctx, h.deps())
+
+		if !applied.Settings.OK {
+			t.Fatalf("settings = %+v, want ok", applied.Settings)
+		}
+		env := envOf(t, settingsOf(t, h))
+		if _, has := env["ANTHROPIC_BASE_URL"]; has {
+			t.Fatal("the plugin-router base URL survived proxy mode")
+		}
+		if got := env["HTTPS_PROXY"]; got != routedEnv {
+			t.Fatalf("HTTPS_PROXY = %v, want %q", got, routedEnv)
+		}
+		if text := agentText(t, h.root, "glm-5.3"); !strings.Contains(text, "model: glm-5.3") {
+			t.Fatalf("glm-5.3 agent = %q, want a model: glm-5.3 line", text)
 		}
 	})
 
@@ -640,7 +704,7 @@ func TestRemoveRouting(t *testing.T) {
 		}
 	})
 
-	t.Run("repoints ANTHROPIC_BASE_URL at the other live registered router when one answers", func(t *testing.T) {
+	t.Run("repoints HTTPS_PROXY at the other live registered router when one answers", func(t *testing.T) {
 		port := healthyServer(t, "/kimi-router/health")
 		h := newHarness(t, map[string]string{"ANTHROPIC_BASE_URL": routedEnv})
 		ctx := context.Background()
@@ -659,8 +723,8 @@ func TestRemoveRouting(t *testing.T) {
 
 		settings := settingsOf(t, h)
 		want := fmt.Sprintf("http://127.0.0.1:%d", port)
-		if got := envOf(t, settings)["ANTHROPIC_BASE_URL"]; got != want {
-			t.Fatalf("ANTHROPIC_BASE_URL = %v, want %q", got, want)
+		if got := envOf(t, settings)["HTTPS_PROXY"]; got != want {
+			t.Fatalf("HTTPS_PROXY = %v, want %q", got, want)
 		}
 		if _, has := settings["modelPicker"]; has {
 			t.Fatal("modelPicker survives remove, want it gone")
@@ -709,10 +773,11 @@ func TestRemoveRouting(t *testing.T) {
 		cli.RemoveRouting(ctx, h.deps())
 
 		// No ledger, so what setup added is not on record: the entries go by their ids, and the
-		// tool-search flag and the effort levels cannot be told from ones the user set, so they stay.
+		// tool-search flag and the effort levels cannot be told from ones the user set, so they
+		// stay. NO_PROXY stays too: it may hold the user's own entries.
 		want := jsonValue(t, `{
 			"modelPicker": {"options": []},
-			"env": {"ENABLE_TOOL_SEARCH": "true"},
+			"env": {"ENABLE_TOOL_SEARCH": "true", "NO_PROXY": "localhost,127.0.0.1"},
 			"modelSettings": {
 				"glm-5.3": {"effortLevel": "xhigh"},
 				"glm-5.3-flash": {"effortLevel": "xhigh"}
@@ -809,7 +874,7 @@ func TestRoutingHook(t *testing.T) {
 		}
 	})
 
-	t.Run("keeps the agents on the provider and removes the base URL when the router cannot start", func(t *testing.T) {
+	t.Run("keeps the agents on the provider and takes the proxy keys off when the router cannot start", func(t *testing.T) {
 		h := newHarness(t, nil)
 		ctx := context.Background()
 		cli.ApplyRouting(ctx, h.deps())
@@ -822,12 +887,64 @@ func TestRoutingHook(t *testing.T) {
 		if text := agentText(t, h.root, "glm-5.3"); !strings.Contains(text, "model: glm-5.3") {
 			t.Fatalf("glm-5.3 agent = %q, want a model: glm-5.3 line", text)
 		}
-		if _, has := envOf(t, settingsOf(t, h))["ANTHROPIC_BASE_URL"]; has {
-			t.Fatal("settings keep ANTHROPIC_BASE_URL, want it removed")
+		env := envOf(t, settingsOf(t, h))
+		for _, key := range []string{"HTTPS_PROXY", "NODE_EXTRA_CA_CERTS", "ANTHROPIC_BASE_URL"} {
+			if _, has := env[key]; has {
+				t.Fatalf("settings keep %s, want it removed", key)
+			}
+		}
+		// NO_PROXY may hold the user's own entries, so a removal leaves it.
+		if got := env["NO_PROXY"]; got != "localhost,127.0.0.1" {
+			t.Fatalf("NO_PROXY = %v, want it left in place", got)
 		}
 		want := []string{`{"systemMessage":"zai: the zai router could not start, so the zai agents cannot reach Z.ai GLM this session. Run /zai:setup to see why."}`}
 		if !reflect.DeepEqual(h.out.Lines, want) {
 			t.Fatalf("lines = %q, want %q", h.out.Lines, want)
+		}
+	})
+
+	t.Run("a proxy of the user's own in the hook's environment keeps base-URL mode", func(t *testing.T) {
+		h := newHarness(t, nil)
+		ctx := context.Background()
+		cli.ApplyRouting(ctx, h.deps())
+		if err := os.WriteFile(h.deps().SettingsPath, []byte("{}"), 0o644); err != nil {
+			t.Fatalf("write settings: %v", err)
+		}
+		if h.env == nil {
+			h.env = map[string]string{}
+		}
+		h.env["HTTPS_PROXY"] = "http://proxy.corp:3128"
+		h.out.Lines = nil
+
+		if got := cli.RoutingHook(ctx, h.deps()); got != cli.ExitOK {
+			t.Fatalf("routingHook = %d, want %d", got, cli.ExitOK)
+		}
+		env := envOf(t, settingsOf(t, h))
+		if got := env["ANTHROPIC_BASE_URL"]; got != routedEnv {
+			t.Fatalf("ANTHROPIC_BASE_URL = %v, want %q (base-URL mode)", got, routedEnv)
+		}
+		if _, has := env["HTTPS_PROXY"]; has {
+			t.Fatal("settings keep HTTPS_PROXY, want none beside the user's own environment proxy")
+		}
+	})
+
+	t.Run("a lowercase https_proxy in the hook's environment counts too", func(t *testing.T) {
+		h := newHarness(t, map[string]string{"https_proxy": "http://proxy.corp:3128"})
+		ctx := context.Background()
+		cli.ApplyRouting(ctx, h.deps())
+		if err := os.WriteFile(h.deps().SettingsPath, []byte("{}"), 0o644); err != nil {
+			t.Fatalf("write settings: %v", err)
+		}
+		h.out.Lines = nil
+
+		cli.RoutingHook(ctx, h.deps())
+
+		env := envOf(t, settingsOf(t, h))
+		if got := env["ANTHROPIC_BASE_URL"]; got != routedEnv {
+			t.Fatalf("ANTHROPIC_BASE_URL = %v, want %q (base-URL mode)", got, routedEnv)
+		}
+		if _, has := env["HTTPS_PROXY"]; has {
+			t.Fatal("settings keep HTTPS_PROXY, want none beside the user's own lowercase proxy")
 		}
 	})
 
@@ -850,7 +967,7 @@ func TestRoutingHook(t *testing.T) {
 		}
 	})
 
-	t.Run("keeps the base URL when another live router deserves it", func(t *testing.T) {
+	t.Run("keeps the proxy keys on another live router when one deserves them", func(t *testing.T) {
 		port := healthyServer(t, "/kimi-router/health")
 		h := newHarness(t, nil)
 		ctx := context.Background()
@@ -870,8 +987,8 @@ func TestRoutingHook(t *testing.T) {
 		cli.RoutingHook(ctx, h.deps())
 
 		want := fmt.Sprintf("http://127.0.0.1:%d", port)
-		if got := envOf(t, settingsOf(t, h))["ANTHROPIC_BASE_URL"]; got != want {
-			t.Fatalf("ANTHROPIC_BASE_URL = %v, want %q", got, want)
+		if got := envOf(t, settingsOf(t, h))["HTTPS_PROXY"]; got != want {
+			t.Fatalf("HTTPS_PROXY = %v, want %q", got, want)
 		}
 	})
 }
@@ -891,8 +1008,9 @@ func TestLedgerMarkerAgentsGate(t *testing.T) {
 			ledger.RouterURL != routedEnv ||
 			ledger.SettingsPath != h.deps().SettingsPath ||
 			ledger.Settings.BaseURLBefore != nil ||
+			ledger.Settings.ProxyBefore != nil ||
 			!reflect.DeepEqual(ledger.Settings.OptionsAdded, []string{"glm-5.3", "glm-5.3-flash"}) ||
-			!ledger.Settings.CreatedEnv ||
+			!ledger.Settings.CreatedEnv || !ledger.Settings.CreatedProxy ||
 			ledger.Keystore.Created ||
 			ledger.Marker == nil || *ledger.Marker != filepath.Join(data, "installed") {
 			t.Fatalf("ledger = %+v", ledger)
@@ -998,8 +1116,8 @@ func TestLedgerMarkerAgentsGate(t *testing.T) {
 		if !reflect.DeepEqual(h.out.Lines, want) {
 			t.Fatalf("lines = %q, want %q", h.out.Lines, want)
 		}
-		if got := envOf(t, settingsOf(t, h))["ANTHROPIC_BASE_URL"]; got != routedEnv {
-			t.Fatalf("ANTHROPIC_BASE_URL = %v, want %q", got, routedEnv)
+		if got := envOf(t, settingsOf(t, h))["HTTPS_PROXY"]; got != routedEnv {
+			t.Fatalf("HTTPS_PROXY = %v, want %q", got, routedEnv)
 		}
 		if !cli.ReadSetupDone(h.root) {
 			t.Fatal("readSetupDone = false, want true")
@@ -1012,7 +1130,7 @@ func TestLedgerMarkerAgentsGate(t *testing.T) {
 		}
 	})
 
-	t.Run("a missing key leaves the router and the base URL alone, and says so at every session start", func(t *testing.T) {
+	t.Run("a missing key leaves the router and the proxy keys alone, and says so at every session start", func(t *testing.T) {
 		h := newHarness(t, nil)
 		ctx := context.Background()
 		cli.ApplyRouting(ctx, h.deps())
@@ -1022,8 +1140,8 @@ func TestLedgerMarkerAgentsGate(t *testing.T) {
 		cli.RoutingHook(ctx, h.deps())
 		cli.RoutingHook(ctx, h.deps())
 
-		if got := envOf(t, settingsOf(t, h))["ANTHROPIC_BASE_URL"]; got != routedEnv {
-			t.Fatalf("ANTHROPIC_BASE_URL = %v, want %q", got, routedEnv)
+		if got := envOf(t, settingsOf(t, h))["HTTPS_PROXY"]; got != routedEnv {
+			t.Fatalf("HTTPS_PROXY = %v, want %q", got, routedEnv)
 		}
 		message := `{"systemMessage":"zai: no Z.ai GLM key found, so the zai agents cannot reach Z.ai GLM. Run /zai:setup to enter it."}`
 		if want := []string{message, message}; !reflect.DeepEqual(h.out.Lines, want) {
@@ -1317,8 +1435,12 @@ func TestRoutingHookRepairsSettings(t *testing.T) {
 
 	cli.RoutingHook(ctx, h.deps())
 
-	if _, has := envOf(t, settingsOf(t, h))["ANTHROPIC_BASE_URL"]; !has {
-		t.Fatal("settings keep no ANTHROPIC_BASE_URL, want it re-applied")
+	env := envOf(t, settingsOf(t, h))
+	if got := env["HTTPS_PROXY"]; got != routedEnv {
+		t.Fatalf("HTTPS_PROXY = %v, want it re-applied (%q)", got, routedEnv)
+	}
+	if _, has := env["ANTHROPIC_BASE_URL"]; has {
+		t.Fatal("settings keep ANTHROPIC_BASE_URL, want proxy mode without it")
 	}
 	if len(h.out.Lines) != 0 {
 		t.Fatalf("lines = %q, want none", h.out.Lines)

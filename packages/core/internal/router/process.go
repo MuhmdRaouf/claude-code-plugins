@@ -444,7 +444,7 @@ func waitOurs(ctx context.Context, c *startCtx, port int, child DetachedChild, u
 func StartRouter(ctx context.Context, o StartOptions) (string, error) {
 	c := startNow(o)
 	line, err := bringUp(ctx, c)
-	GuardBaseUrl(ctx, o, err == nil)
+	GuardSettings(ctx, o, err == nil)
 	return line, err
 }
 
@@ -899,25 +899,41 @@ func max64(a, b int64) int64 {
 	return b
 }
 
-// ── the base URL guard ──────────────────────────────────────────────────────────────────────────────────────────────
+// ── the settings guard ───────────────────────────────────────────────────────────────────────────────────────────────
 
-// GuardBaseUrl keeps Claude Code's base URL on something that answers: when it names this router
-// and the router could not be brought up, or names another plugin's router that is dead and no
-// longer registered (that plugin was uninstalled), it is repointed at a live plugin router or
-// removed. A base URL that is not one of the plugin routers is never touched. Says one line when
-// it changed something: the running session keeps its URL until restarted.
-func GuardBaseUrl(ctx context.Context, o StartOptions, up bool) {
+// GuardSettings keeps Claude Code's settings on something that answers: a proxy or base URL naming
+// this router when the router could not be brought up, or naming another plugin's router that is
+// dead and no longer registered (that plugin was uninstalled), is repointed at a live plugin
+// router or removed. Anything that is not one of the plugin routers is never touched. Says one
+// line when it changed something: the running session keeps its settings until restarted.
+func GuardSettings(ctx context.Context, o StartOptions, up bool) {
 	path := adapters.ClaudeSettingsPath(o.Env)
-	current, ok := adapters.ReadBaseUrl(path)
+	settings, ok := adapters.ReadProxySettings(path)
 	if !ok {
 		return
 	}
 	ours := domain.RouterBaseURL(o.Provider, o.Env)
+	// The proxy keys first: proxy mode is the default. A proxy that is not a plugin router's is
+	// the user's own, and base-URL mode is what they run on — its base URL is guarded below.
+	if settings.HTTPSProxy != nil && domain.IsPluginRouterProxy(*settings.HTTPSProxy) {
+		guardOne(ctx, o, path, *settings.HTTPSProxy, ours, up, adapters.ClearProxy)
+		return
+	}
+	if settings.BaseURL != nil {
+		guardOne(ctx, o, path, *settings.BaseURL, ours, up, adapters.ClearBaseUrl)
+	}
+}
+
+// guardOne clears one routing entry (ClearProxy or ClearBaseUrl) when its value names a plugin
+// router that is dead — this one that could not be brought up, or another plugin's that is no
+// longer registered and answers nothing — and says one line when it did.
+func guardOne(ctx context.Context, o StartOptions, path, value, ours string, up bool,
+	clear func(ctx context.Context, path, routerURL string, others []string, name string) ([]string, error)) {
 	dead := false
-	if current == ours {
+	if value == ours {
 		dead = !up
-	} else if domain.IsPluginRouterURL(current) {
-		port := domain.PortOf(current)
+	} else if domain.IsPluginRouterURL(value) {
+		port := domain.PortOf(value)
 		registered := false
 		for _, entry := range ReadRegistry(o.Env) {
 			if entry.Port == port {
@@ -937,16 +953,16 @@ func GuardBaseUrl(ctx context.Context, o StartOptions, up bool) {
 	var others []string
 	for _, entry := range LiveRouters(ctx, o.Env, o.Provider.Name, nil) {
 		url := fmt.Sprintf("http://127.0.0.1:%d", entry.Port)
-		if url != current {
+		if url != value {
 			others = append(others, url)
 		}
 	}
-	lines, err := adapters.ClearBaseUrl(ctx, path, current, others, o.Provider.Name)
+	lines, err := clear(ctx, path, value, others, o.Provider.Name)
 	if err != nil || len(lines) == 0 || o.Say == nil {
 		return
 	}
-	why := fmt.Sprintf("the router at %s is gone", current)
-	if current == ours {
+	why := fmt.Sprintf("the router at %s is gone", value)
+	if value == ours {
 		why = "the router could not start"
 	}
 	o.Say(fmt.Sprintf("%s: %s; %s. Restart Claude Code sessions that still fail to connect.",

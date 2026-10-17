@@ -303,6 +303,22 @@ func TestPlanProxy(t *testing.T) {
 		}
 	})
 
+	t.Run("this router on a port override is never the user's own proxy", func(t *testing.T) {
+		overridden := "http://127.0.0.1:26244"
+		plan := PlanProxy(ProxySettings{HTTPSProxy: &overridden}, overridden, caPath, nil)
+		if plan.Kind != ProxyPlanKeep {
+			t.Fatalf("plan = %+v, want a keep of our own overridden router", plan)
+		}
+		plan = PlanProxy(ProxySettings{}, overridden, caPath, nil)
+		if plan.Kind != ProxyPlanSet || plan.Proxy != overridden {
+			t.Fatalf("plan = %+v, want a set on the overridden router", plan)
+		}
+		plan = PlanProxyRemoval(ProxySettings{HTTPSProxy: &overridden}, overridden, nil)
+		if plan.Kind != ProxyPlanRemove {
+			t.Fatalf("removal = %+v, want remove on the overridden router", plan)
+		}
+	})
+
 	t.Run("a foreign CA falls back too, with no proxy of ours in the way", func(t *testing.T) {
 		ca := "/elsewhere/ca.pem"
 		plan := PlanProxy(ProxySettings{CA: &ca}, routerURL, caPath, nil)

@@ -410,6 +410,29 @@ func processPointSettingsAt(t *testing.T, s *processSetup, url string) {
 	}
 }
 
+// processPointProxyAt writes Claude Code's settings with HTTPS_PROXY and a kept var.
+func processPointProxyAt(t *testing.T, s *processSetup, url string) {
+	t.Helper()
+	if err := os.MkdirAll(filepath.Join(s.home, ".claude"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	text, err := json.MarshalIndent(struct {
+		Env struct {
+			HTTPSProxy string `json:"HTTPS_PROXY"`
+			Other      string `json:"OTHER"`
+		} `json:"env"`
+	}{Env: struct {
+		HTTPSProxy string `json:"HTTPS_PROXY"`
+		Other      string `json:"OTHER"`
+	}{HTTPSProxy: url, Other: "kept"}}, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(s.settings, append(text, '\n'), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // processBaseUrlIn is the settings' env object.
 func processBaseUrlIn(t *testing.T, s *processSetup) map[string]string {
 	t.Helper()
@@ -1433,12 +1456,74 @@ func TestStartRouter(t *testing.T) {
 	})
 }
 
-func TestRouterProcessBaseUrlGuard(t *testing.T) {
+func TestRouterProcessSettingsGuard(t *testing.T) {
 	t.Parallel()
+	t.Run("takes the proxy keys off another plugin's router that is dead and unregistered, or repoints them at a live one", func(t *testing.T) {
+		s := newProcessSetup(t)
+		processPointProxyAt(t, s, "http://127.0.0.1:18791")
+		GuardSettings(context.Background(), s.options(nil), true)
+		if env := processBaseUrlIn(t, s); !reflect.DeepEqual(env, map[string]string{"OTHER": "kept"}) {
+			t.Fatalf("the dead router's proxy survived: %v", env)
+		}
+
+		live, err := FreePort()
+		if err != nil {
+			t.Fatal(err)
+		}
+		processHold(t, live, func(w http.ResponseWriter, req *http.Request) {
+			_, _ = w.Write([]byte(`{"ok":true,"name":"kimi"}`))
+		})
+		processPointProxyAt(t, s, "http://127.0.0.1:18791")
+		if err := SaveRegistryEntry(context.Background(), s.env, RegisteredRouter{
+			Name: "kimi", Port: int64(live), ModelPrefixes: []string{}, CatalogIds: []string{}, UpdatedAt: "t",
+		}); err != nil {
+			t.Fatal(err)
+		}
+		GuardSettings(context.Background(), s.options(nil), true)
+		if env := processBaseUrlIn(t, s); !reflect.DeepEqual(env, map[string]string{
+			"HTTPS_PROXY": fmt.Sprintf("http://127.0.0.1:%d", live),
+			"OTHER":       "kept",
+		}) {
+			t.Fatalf("the proxy = %v, want the live peer", env)
+		}
+	})
+
+	t.Run("never touches a proxy that is not a plugin router, nor one a registered or answering router owns", func(t *testing.T) {
+		s := newProcessSetup(t)
+		processPointProxyAt(t, s, "http://proxy.corp:3128")
+		GuardSettings(context.Background(), s.options(nil), false)
+		if env := processBaseUrlIn(t, s); env["HTTPS_PROXY"] != "http://proxy.corp:3128" {
+			t.Fatalf("the user's own proxy was touched: %v", env)
+		}
+		processPointProxyAt(t, s, "http://127.0.0.1:18790")
+		GuardSettings(context.Background(), s.options(func(o *StartOptions) {
+			o.Answers = func(context.Context, int) bool { return true }
+		}), true)
+		if env := processBaseUrlIn(t, s); env["HTTPS_PROXY"] != "http://127.0.0.1:18790" {
+			t.Fatalf("an answering router's proxy was touched: %v", env)
+		}
+		if err := SaveRegistryEntry(context.Background(), s.env, RegisteredRouter{
+			Name: "minimax", Port: 18790, ModelPrefixes: []string{}, CatalogIds: []string{}, UpdatedAt: "t",
+		}); err != nil {
+			t.Fatal(err)
+		}
+		processPointProxyAt(t, s, "http://127.0.0.1:18790")
+		GuardSettings(context.Background(), s.options(nil), true)
+		if env := processBaseUrlIn(t, s); env["HTTPS_PROXY"] != "http://127.0.0.1:18790" {
+			t.Fatalf("a registered router's proxy was touched: %v", env)
+		}
+		own := fmt.Sprintf("http://127.0.0.1:%d", s.port)
+		processPointProxyAt(t, s, own)
+		GuardSettings(context.Background(), s.options(nil), true)
+		if env := processBaseUrlIn(t, s); env["HTTPS_PROXY"] != own {
+			t.Fatalf("our own router's proxy was touched: %v", env)
+		}
+	})
+
 	t.Run("takes the base URL off another plugin's router that is dead and unregistered, or repoints it at a live one", func(t *testing.T) {
 		s := newProcessSetup(t)
 		processPointSettingsAt(t, s, "http://127.0.0.1:18791")
-		GuardBaseUrl(context.Background(), s.options(nil), true)
+		GuardSettings(context.Background(), s.options(nil), true)
 		if env := processBaseUrlIn(t, s); !reflect.DeepEqual(env, map[string]string{"OTHER": "kept"}) {
 			t.Fatalf("the dead router's URL survived: %v", env)
 		}
@@ -1456,7 +1541,7 @@ func TestRouterProcessBaseUrlGuard(t *testing.T) {
 		}); err != nil {
 			t.Fatal(err)
 		}
-		GuardBaseUrl(context.Background(), s.options(nil), true)
+		GuardSettings(context.Background(), s.options(nil), true)
 		if env := processBaseUrlIn(t, s); !reflect.DeepEqual(env, map[string]string{
 			"ANTHROPIC_BASE_URL": fmt.Sprintf("http://127.0.0.1:%d", live),
 			"OTHER":              "kept",
@@ -1467,14 +1552,14 @@ func TestRouterProcessBaseUrlGuard(t *testing.T) {
 
 	t.Run("never touches a base URL that is not a plugin router, nor a registered or answering one", func(t *testing.T) {
 		s := newProcessSetup(t)
-		GuardBaseUrl(context.Background(), s.options(nil), false)
+		GuardSettings(context.Background(), s.options(nil), false)
 		processPointSettingsAt(t, s, "https://my-proxy.example")
-		GuardBaseUrl(context.Background(), s.options(nil), false)
+		GuardSettings(context.Background(), s.options(nil), false)
 		if env := processBaseUrlIn(t, s); env["ANTHROPIC_BASE_URL"] != "https://my-proxy.example" {
 			t.Fatalf("the user's proxy was touched: %v", env)
 		}
 		processPointSettingsAt(t, s, "http://127.0.0.1:18790")
-		GuardBaseUrl(context.Background(), s.options(func(o *StartOptions) {
+		GuardSettings(context.Background(), s.options(func(o *StartOptions) {
 			o.Answers = func(context.Context, int) bool { return true }
 		}), true)
 		if env := processBaseUrlIn(t, s); env["ANTHROPIC_BASE_URL"] != "http://127.0.0.1:18790" {
@@ -1485,12 +1570,12 @@ func TestRouterProcessBaseUrlGuard(t *testing.T) {
 		}); err != nil {
 			t.Fatal(err)
 		}
-		GuardBaseUrl(context.Background(), s.options(nil), true)
+		GuardSettings(context.Background(), s.options(nil), true)
 		if env := processBaseUrlIn(t, s); env["ANTHROPIC_BASE_URL"] != "http://127.0.0.1:18790" {
 			t.Fatalf("a registered router was touched: %v", env)
 		}
 		processPointSettingsAt(t, s, fmt.Sprintf("http://127.0.0.1:%d", s.port))
-		GuardBaseUrl(context.Background(), s.options(nil), true)
+		GuardSettings(context.Background(), s.options(nil), true)
 		if env := processBaseUrlIn(t, s); env["ANTHROPIC_BASE_URL"] != fmt.Sprintf("http://127.0.0.1:%d", s.port) {
 			t.Fatalf("our own router was touched: %v", env)
 		}

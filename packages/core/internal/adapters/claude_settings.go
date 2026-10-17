@@ -1,5 +1,7 @@
-// The Claude Code settings merge: `setup` puts the provider's models in `/model` and points
-// Claude Code at the plugin's router, owning exactly the entries whose `model` is in its catalog so `setup --remove`
+// The Claude Code settings merge: `setup` puts the provider's models in `/model` and routes
+// Claude Code through the plugin's router — proxy mode where it can (the three proxy keys at the
+// router and its local CA, so Remote Control keeps working), base-URL mode as the fallback —
+// owning exactly the entries whose `model` is in its catalog so `setup --remove`
 // (and the router's own uninstall cleanup) can take those back out. Everything else in the file survives. Every write
 // is careful: only a missing file counts as empty (any other read error writes nothing), the first write ever keeps a
 // `settings.json.<name>-backup`, the result must survive a JSON round trip, the file's mode and a symlink are kept,
@@ -18,8 +20,10 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/adapters/fsutil"
+	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/adapters/localca"
 	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/adapters/process"
 	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/domain"
 )
@@ -66,6 +70,13 @@ type SettingsDelta struct {
 type ApplyProviderOptions struct {
 	// LivePluginURLs are the plugin router URLs answering health checks now.
 	LivePluginURLs []string
+	// CADir is the local CA's directory; proxy mode needs it to name the CA file. Empty, or a
+	// directory the CA cannot be loaded from, keeps base-URL mode.
+	CADir string
+	// EnvProxy is the proxy variable the caller's own process environment applies, lowercase
+	// before uppercase the way Claude Code reads them; nil when there is none. A value that is
+	// not a plugin router is the user's own proxy and keeps base-URL mode.
+	EnvProxy *string
 	// OwnOptions are the ids the ledger says earlier runs added to /model: their rows are
 	// setup's, however they look now, so an upgrade brings them up to what setup writes today
 	// (their behavesAs).
@@ -75,17 +86,33 @@ type ApplyProviderOptions struct {
 }
 
 // ApplyProviderSettings merges one modelPicker.options entry per catalog model, appends the ids
-// to availableModels only when that list already exists, and sets env.ANTHROPIC_BASE_URL per the
-// plan. Idempotent: a second run changes nothing. Returns the report lines, or an error and
+// to availableModels only when that list already exists, and routes Claude Code per the plan:
+// proxy mode (the three proxy keys at the router and its CA) when it can be had, base-URL mode
+// otherwise. Idempotent: a second run changes nothing. Returns the report lines, or an error and
 // writes nothing when the file is unparsable or a touched key has the wrong type. Record gets
 // what changed (only when something did).
 func ApplyProviderSettings(ctx context.Context, path string, provider domain.Provider, routerURL string, options ApplyProviderOptions) ([]string, error) {
+	caPath, caNote := proxyCAPath(ctx, options.CADir)
 	return editSettings(ctx, path, provider.Name, func(root *jsonNode) ([]string, error) {
-		return applyProviderEdit(root, path, provider, routerURL, options)
+		return applyProviderEdit(root, path, provider, routerURL, options, caPath, caNote)
 	}, false)
 }
 
-func applyProviderEdit(root *jsonNode, path string, provider domain.Provider, routerURL string, options ApplyProviderOptions) ([]string, error) {
+// proxyCAPath loads the local CA the proxy keys name; the returned note (nil when proxy mode is
+// on) says why base-URL mode took over.
+func proxyCAPath(ctx context.Context, dir string) (string, *string) {
+	if dir == "" {
+		return "", nil
+	}
+	ca, err := localca.LoadOrCreate(ctx, dir, time.Now())
+	if err != nil {
+		note := fmt.Sprintf("the local CA is unusable (%s): routing keeps ANTHROPIC_BASE_URL", err)
+		return "", &note
+	}
+	return ca.CertPath(), nil
+}
+
+func applyProviderEdit(root *jsonNode, path string, provider domain.Provider, routerURL string, options ApplyProviderOptions, caPath string, caNote *string) ([]string, error) {
 	createdModelPicker := root.get("modelPicker") == nil
 	picker, err := ensureObject(root, "modelPicker", path)
 	if err != nil {
@@ -110,26 +137,90 @@ func applyProviderEdit(root *jsonNode, path string, provider domain.Provider, ro
 	if err != nil {
 		return nil, err
 	}
-	plan := domain.PlanBaseUrl(baseURLBefore, routerURL, options.LivePluginURLs)
-	// "Routing through this router" is a fresh set, a move from a dead plugin router — or the
-	// base URL an earlier run already pointed here.
-	routed := routedThrough(plan, baseURLBefore, routerURL)
 	efforts, err := applyEfforts(root, provider, path)
 	if err != nil {
 		return nil, err
 	}
+	created := createdContainers{modelPicker: createdModelPicker, options: createdOptions, env: createdEnv}
+	// Proxy mode when the CA is usable and nothing of the user's own stands in the way; the
+	// fallbacks below keep base-URL mode, each saying why in the plan's own report.
+	var proxyNote *string
+	if caPath != "" && !userProxyInEnv(options.EnvProxy) {
+		proxyBefore, err := currentProxySettings(root, path)
+		if err != nil {
+			return nil, err
+		}
+		plan := domain.PlanProxy(proxyBefore, routerURL, caPath, options.LivePluginURLs)
+		if plan.Kind != domain.ProxyPlanBaseURL && !userBaseURL(baseURLBefore) {
+			// "Routing through a router of ours" is a fresh set, or keys kept naming this router
+			// or another live one (which forwards here).
+			routed := proxyRouted(plan, proxyBefore, routerURL, options.LivePluginURLs)
+			var lines []string
+			lines = append(lines, mergeModelOptions(modelOptions, provider, options.OwnOptions)...)
+			lines = append(lines, efforts.lines...)
+			lines = append(lines, available.lines...)
+			lines = append(lines, applyProxy(root, plan, path)...)
+			lines = append(lines, applyToolSearch(root, routed, toolSearchBefore, path)...)
+			if options.Record != nil {
+				options.Record(recordedProxyDelta(plan, proxyBefore, before, provider, available.appended,
+					created, routed, toolSearchBefore, efforts.added))
+			}
+			return lines, nil
+		}
+		if plan.Kind == domain.ProxyPlanBaseURL {
+			proxyNote = plan.Report
+		}
+	}
+	plan := domain.PlanBaseUrl(baseURLBefore, routerURL, options.LivePluginURLs)
+	// "Routing through this router" is a fresh set, a move from a dead plugin router — or the
+	// base URL an earlier run already pointed here.
+	routed := routedThrough(plan, baseURLBefore, routerURL)
 	var lines []string
+	if caNote != nil {
+		lines = append(lines, *caNote)
+	}
+	if proxyNote != nil {
+		lines = append(lines, *proxyNote)
+	}
 	lines = append(lines, mergeModelOptions(modelOptions, provider, options.OwnOptions)...)
 	lines = append(lines, efforts.lines...)
 	lines = append(lines, available.lines...)
 	lines = append(lines, applyBaseUrl(root, plan, path)...)
 	lines = append(lines, applyToolSearch(root, routed, toolSearchBefore, path)...)
 	if options.Record != nil {
-		options.Record(recordedDelta(plan, baseURLBefore, before, provider, available.appended,
-			createdContainers{modelPicker: createdModelPicker, options: createdOptions, env: createdEnv},
+		options.Record(recordedDelta(plan, baseURLBefore, before, provider, available.appended, created,
 			routed, toolSearchBefore, efforts.added))
 	}
 	return lines, nil
+}
+
+// userProxyInEnv is whether the caller's own environment applies a proxy that is not a plugin
+// router's: the user exported their own proxy, and Claude Code reads it before anything the
+// settings could add.
+func userProxyInEnv(envProxy *string) bool {
+	return envProxy != nil && !domain.IsPluginRouterProxy(*envProxy)
+}
+
+// userBaseURL is whether the settings point Claude at a base URL that is not one of the plugin
+// routers: the user's own gateway. Proxy mode would put every one of their requests on our
+// router, so it stays off until the base URL goes.
+func userBaseURL(baseURL *string) bool {
+	return baseURL != nil && !domain.IsPluginRouterURL(*baseURL)
+}
+
+// proxyRouted is true when the settings end up routing Claude Code through a router of ours that
+// can route the provider's ids: the proxy keys freshly set on this router, or kept naming this
+// router or another live one (which forwards here).
+func proxyRouted(plan domain.ProxyPlan, before domain.ProxySettings, routerURL string, live []string) bool {
+	if plan.Kind == domain.ProxyPlanSet {
+		return true
+	}
+	if plan.Kind != domain.ProxyPlanKeep || before.HTTPSProxy == nil {
+		return false
+	}
+	name := domain.ProxyRouterName(*before.HTTPSProxy)
+	ours := name != "" && name == domain.PluginRouters[domain.PortOf(routerURL)]
+	return ours || domain.ProxyRouterIsLive(live, name)
 }
 
 // routedThrough is true when the settings end up routing Claude Code through this router: a fresh
@@ -172,9 +263,43 @@ type createdContainers struct {
 	env         bool
 }
 
+// recordedProxyDelta is the delta to record for the ledger in proxy mode: what this run set (with
+// what was there before) and the containers it created. A keep that changed something (a NO_PROXY
+// it appended to) records the before-values too: the undo puts the user's entries back.
+func recordedProxyDelta(plan domain.ProxyPlan, before domain.ProxySettings, beforeModels map[string]bool, provider domain.Provider, appended []string, created createdContainers, routed bool, toolSearchBefore *string, efforts *StringMap) SettingsDelta {
+	availableAppended := appended
+	if availableAppended == nil {
+		availableAppended = []string{}
+	}
+	delta := SettingsDelta{
+		AvailableAppended:  availableAppended,
+		CreatedModelPicker: created.modelPicker,
+		CreatedOptions:     created.options,
+		// The env container counts as this run's when this run is the one that filled it: the
+		// proxy keys' undo and the tool-search undo each empty it when they take the last key.
+		CreatedEnv:        created.env && plan.Kind == domain.ProxyPlanSet,
+		CreatedProxy:      created.env && plan.Kind == domain.ProxyPlanSet,
+		CreatedToolSearch: toolSearchBefore == nil && routed,
+		EffortsAdded:      efforts,
+	}
+	if plan.Kind == domain.ProxyPlanSet || (plan.Kind == domain.ProxyPlanKeep && plan.Report != nil) {
+		delta.ProxyBefore = before.HTTPSProxy
+		delta.CABefore = before.CA
+		delta.NoProxyBefore = before.NoProxy
+	}
+	delta.OptionsAdded = make([]string, 0, 2)
+	for _, id := range catalogIDs(provider) {
+		if !beforeModels[id] {
+			delta.OptionsAdded = append(delta.OptionsAdded, id)
+		}
+	}
+	return delta
+}
+
 // RemoveProviderSettings removes exactly the entries whose model is one of this provider's
-// catalog ids (an emptied list stays an empty array) and clears env.ANTHROPIC_BASE_URL per the
-// plan.
+// catalog ids (an emptied list stays an empty array) and clears the routing env per the plans:
+// the proxy keys and the base URL naming this router go (each repointed at another live plugin
+// router when there is any), anything else is not ours to touch.
 func RemoveProviderSettings(ctx context.Context, path string, provider domain.Provider, routerURL string, othersRegistered []string) ([]string, error) {
 	return editSettings(ctx, path, provider.Name, func(root *jsonNode) ([]string, error) {
 		ids := catalogIDs(provider)
@@ -186,14 +311,17 @@ func RemoveProviderSettings(ctx context.Context, path string, provider domain.Pr
 		if err != nil {
 			return nil, err
 		}
-		current, err := currentBaseUrl(root, path)
+		proxy, err := currentProxySettings(root, path)
 		if err != nil {
 			return nil, err
 		}
 		var lines []string
 		lines = append(lines, entries...)
 		lines = append(lines, available...)
-		lines = append(lines, applyBaseUrl(root, domain.PlanBaseUrlRemoval(current, routerURL, othersRegistered), path)...)
+		// The base URL first, so the proxy plan's stale-base-URL removal finds nothing left to
+		// report twice.
+		lines = append(lines, applyBaseUrl(root, domain.PlanBaseUrlRemoval(proxy.BaseURL, routerURL, othersRegistered), path)...)
+		lines = append(lines, applyProxy(root, domain.PlanProxyRemoval(proxy, routerURL, othersRegistered), path)...)
 		return lines, nil
 	}, false)
 }
@@ -239,6 +367,25 @@ func ReadBaseUrl(path string) (string, bool) {
 	}
 	url, ok := env.get("ANTHROPIC_BASE_URL").text()
 	return url, ok
+}
+
+// ReadProxySettings is the file's proxy-mode shape (the four env values the proxy plan decides
+// on); ok is false when the file cannot be read or an env key has the wrong shape. Which of the
+// values are set is the caller's question.
+func ReadProxySettings(path string) (domain.ProxySettings, bool) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return domain.ProxySettings{}, false
+	}
+	root, err := parseJSON(string(data))
+	if err != nil {
+		return domain.ProxySettings{}, false
+	}
+	settings, err := currentProxySettings(root, path)
+	if err != nil {
+		return domain.ProxySettings{}, false
+	}
+	return settings, true
 }
 
 // SettingsUndo is what setup changed, as the ledger recorded it (see SettingsDelta, merged across
@@ -423,10 +570,10 @@ func undoProxy(root *jsonNode, undo SettingsUndo, routerURL string, livePluginUR
 	return lines
 }
 
-// proxyIsOurs is whether an HTTPS_PROXY value names this plugin's router.
+// proxyIsOurs is whether an HTTPS_PROXY value points at this plugin's router: its loopback host
+// with this router's port, canonical or overridden.
 func proxyIsOurs(current, routerURL string) bool {
-	ours := domain.PluginRouters[domain.PortOf(routerURL)]
-	return ours != "" && domain.ProxyRouterName(current) == ours
+	return domain.ProxyIsThisRouter(current, routerURL)
 }
 
 // undoToolSearch takes env.ENABLE_TOOL_SEARCH out when setup set it and it still says so: a value

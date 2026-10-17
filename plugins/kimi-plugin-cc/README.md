@@ -125,7 +125,8 @@ Setup takes the first key it finds, in this order:
 2. Sends one tiny request to `kimi-k2.6` to prove the key works.
 3. When everything answers, starts the kimi router (a small background process the plugin starts and repairs itself).
 4. Adds Kimi K3 and Kimi K2.6 to `/model` next to Sonnet and Opus.
-5. Points Claude Code at the router, and moves the kimi agents onto the Kimi models.
+5. Points Claude Code's proxy at the router (`HTTPS_PROXY` in `settings.json`, with a local CA), and moves the kimi
+   agents onto the Kimi models.
 
 ### The report
 
@@ -134,9 +135,9 @@ The report starts with the outcome, one line:
 - `ready`: the models are in `/model` and the agents run on them. When the run changed something, the last line says
   to restart Claude Code. Do that: the session you ran setup in keeps talking to Anthropic until it restarts, and
   Kimi K3 in `/model` and the kimi agents work from the next session.
-- `not routed`: `ANTHROPIC_BASE_URL` in `settings.json` is your own proxy, so nothing reaches the kimi router and the
-  agents run on Sonnet. Point that proxy at the router, or remove the entry and run setup again. Setup never
-  overwrites a base URL that is yours.
+- `not routed`: a proxy or base URL in `settings.json` is yours, so nothing reaches the kimi router and the agents run
+  on Sonnet. Point it at the router, or remove the entry and run setup again. Setup never overwrites an entry that is
+  yours.
 - `not ready`: a `FAILED` line says which check failed and what to do.
 
 Once routed:
@@ -151,7 +152,7 @@ Once routed:
 1. Run `/kimi:remove`. It undoes the setup:
    - the agents go back to the models they had before setup;
    - the Kimi models leave `/model`;
-   - the base URL is taken out of `settings.json`;
+   - the proxy keys are taken out of `settings.json` (or the base URL, when a proxy of your own kept base-URL mode);
    - the router retires: sessions already open keep working through it, and it exits once they close (after 7 days
      at most);
    - the stored key is deleted.
@@ -216,7 +217,21 @@ Claude Code sends every model request to one address, so the agents can only run
   spool under `~/.agents/radar/spool/`, which `board` and `usage` read back. The spool and the home it lives
   under belong to radar, part of [huddle](https://github.com/MuhmdRaouf/huddle).
 - A model another installed provider plugin serves is forwarded to its router unchanged, so several provider plugins
-  can share the one base URL.
+  can share the one proxy.
+
+### Remote Control and the local CA
+
+- Routing points Claude Code's `HTTPS_PROXY` at the router instead of `ANTHROPIC_BASE_URL`, so `claude rc` (Remote
+  Control) keeps working with routing on: the base URL stays unset, and only requests to `api.anthropic.com` are
+  decrypted and routed while every other host is tunnelled untouched.
+- The router signs `api.anthropic.com` with a per-user local CA that lives in `~/.agents/ca` and is never added to a
+  system trust store. The CA carries a critical constraint for that one name, so a leaked key cannot sign a
+  certificate any client accepts for another host. Setup hands the CA to Claude Code through `NODE_EXTRA_CA_CERTS`.
+- The loopback entries are appended to `NO_PROXY`, and a base URL that is one of the five plugin routers is taken
+  out: the proxy replaces it.
+- A proxy or CA of your own keeps base-URL mode (`ANTHROPIC_BASE_URL`), and your entries are never overwritten. A
+  CA that cannot be created falls back to base-URL mode too, said in one line.
+- `/kimi:remove` takes the proxy keys back out (`NO_PROXY` entries you had stay) and puts the previous values back.
 
 ### It never cuts Claude off
 
@@ -227,7 +242,7 @@ Claude Code sends every model request to one address, so the agents can only run
 - If the router cannot start at all, an emergency passthrough takes the port instead.
 - Updates swap the worker without closing the port.
 - Hooks before every prompt and every subagent bring a router that died back before the next request. When no router
-  of this plugin can hold the port, they take the base URL out of `settings.json`.
+  of this plugin can hold the port, they take its proxy keys (or the base URL) out of `settings.json`.
 
 ### Key and balance errors
 
@@ -244,7 +259,8 @@ that quotes it is blanked out first.
 
 ### Recovery and uninstall
 
-- **If Claude ever can't connect:** remove `env.ANTHROPIC_BASE_URL` from `~/.claude/settings.json` (or put back
+- **If Claude ever can't connect:** remove the `env.HTTPS_PROXY` and `env.NODE_EXTRA_CA_CERTS` entries from
+  `~/.claude/settings.json` (or `env.ANTHROPIC_BASE_URL`, when a proxy of your own kept base-URL mode; or put back
   `~/.claude/settings.json.kimi-backup`, saved before the first change). That always restores direct Anthropic access.
 - **Uninstalling the plugin:** run `/kimi:remove`, then `/plugin uninstall kimi-plugin-cc@muhmdraouf`.
 - If you uninstall without removing first, the router still cleans up on its own: it notices the plugin is gone, takes

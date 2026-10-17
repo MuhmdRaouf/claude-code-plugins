@@ -232,6 +232,18 @@ Three independent mechanisms. Each one works without the others:
   - Fields the provider rejects (`provider.strip`) are removed from the body.
   - Hop-by-hop headers are dropped.
   - Streaming responses (SSE) are piped through without buffering.
+- **Proxy mode (Remote Control).** The front is also a localhost HTTPS proxy, on when it has a CA directory
+  (`<state>/../ca`, in practice `~/.agents/ca`). Setup's default writes `HTTPS_PROXY` into Claude Code's
+  `settings.json` instead of `ANTHROPIC_BASE_URL`, so `claude rc` keeps working with routing on.
+  - A `CONNECT` to `api.anthropic.com:443` is decrypted with the per-user local CA and routed exactly as a base-URL
+    request, model claim included. The CA signs only that one name (`internal/adapters/localca`), is handed to Claude
+    Code through `NODE_EXTRA_CA_CERTS`, and never enters a system trust store.
+  - Every other `CONNECT` is tunnelled blind: the TLS stays between the client and the target, nothing is read, and a
+    tunnel that names this machine is refused.
+  - The loopback entries are appended to `NO_PROXY`; a base URL that is one of the five plugin routers is taken out.
+  - A proxy or CA of the user's own keeps base-URL mode, and so does an unusable CA: the fallback is said in one
+    line, and `CONNECT api.anthropic.com` then passes through as a blind tunnel (one line in `router.log`), so Claude
+    is never cut off.
 - **Errors.** Failures come back in Anthropic's error shape, so Claude Code shows a readable message.
 - **Refusals Claude Code can act on** (provider routes only).
   - Why: Claude Code reads a 401 as its own Anthropic login failing, and retries 429s and 5xx errors for minutes.
@@ -267,7 +279,7 @@ Three independent mechanisms. Each one works without the others:
   - A router that receives another provider's model id forwards it once to that provider's router.
   - The forward carries the header `x-provider-router-hop: 1`. A second hop is refused with 508.
   - A dead peer returns 502 naming `/<p>:setup`, and fails only that peer's models.
-  - Result: all five plugins can be set up together while Claude Code points at only one base URL.
+  - Result: all five plugins can be set up together while Claude Code points at only one router.
 - **Route events.** One JSON line per routed request goes to `~/.agents/radar/spool/<date>.jsonl` — the spool
   radar, part of [huddle](https://github.com/MuhmdRaouf/huddle), drains.
   - Fields: `plugin, model, upstream, route, status, latency_ms, usage, session_id, agent_id, parent_agent_id`.
@@ -367,8 +379,9 @@ Three independent mechanisms. Each one works without the others:
     the router start lock keeps them from starting two routers.
 - **A port that someone else holds.**
   - The router never kills or takes over a foreign server.
-  - The base-URL guard removes this plugin's base URL from `settings.json` when no live router of the plugin's can
-    hold the port. The next session talks to Anthropic directly.
+  - The settings guard (`GuardSettings`, run after every `StartRouter`) removes this plugin's proxy keys, or its base
+    URL in base-URL mode, from `settings.json` when no live router of the plugin's can hold the port. The next session
+    talks to Anthropic directly.
 - **Retiring on removal.** A Claude Code session reads `ANTHROPIC_BASE_URL` once, when it starts, so every session
   already open keeps sending to the router after a removal. The router therefore retires instead of stopping:
   - `/<p>:remove` sends the front a `POST <health>/retire` control call (loopback and the pid file's token), and
@@ -466,7 +479,16 @@ Two more cases follow the lettered ones:
 - `modelPicker.options`: one `{model, label}` row per catalog model (zai: `glm-5.3` "GLM 5.3", `glm-5.3-flash`
   "GLM 5.3 Flash"). They appear in `/model` next to Opus and Sonnet.
 - `availableModels`: the same ids are appended only if you already restrict models with that list.
-- `env.ANTHROPIC_BASE_URL`:
+- Proxy mode, the default (`internal/domain.PlanProxy`, `internal/adapters/claude_settings.go`):
+  - `env.HTTPS_PROXY` is pointed at the router when unset, or kept when it names this router or another live plugin
+    router's, and moved to this one when it names another plugin's router that is not running;
+  - `env.NODE_EXTRA_CA_CERTS` is pointed at the local CA (`~/.agents/ca`, section 3.2);
+  - the loopback entries are appended to `env.NO_PROXY` (entries already there stay first, and a removal leaves
+    `NO_PROXY` in place: it may hold the user's own);
+  - `env.ANTHROPIC_BASE_URL` that is one of the five plugin routers is taken out: the proxy replaces it.
+- Base-URL mode, the fallback (`internal/domain.PlanBaseUrl`): a proxy or CA of the user's own (in `settings.json` or
+  the environment, lowercase `https_proxy` read before `HTTPS_PROXY`), a `settings.json` base URL that is none of the
+  five routers, or a CA that cannot be created keeps `env.ANTHROPIC_BASE_URL` planning instead:
   - set to the router when it is unset, or already points at one of the five plugin routers;
   - moved to this one when it points at another plugin's router that is not running;
   - any other value is your own proxy: it is reported and never overwritten.
@@ -491,8 +513,8 @@ How the merge behaves (`internal/adapters/claude_settings.go`):
 **The setup report** starts with one outcome line:
 
 - `ready`;
-- `not routed`: `ANTHROPIC_BASE_URL` is the user's own proxy, so nothing reaches the router and the agents run on
-  Sonnet. The line names the fix.
+- `not routed`: a proxy or base URL in `settings.json` is the user's own, so nothing reaches the router and the agents
+  run on Sonnet. The line names the fix.
 - `not ready`: a `FAILED` line says which check failed.
 
 When the run changed `settings.json` or an agent, the report ends with the restart line.
@@ -516,7 +538,7 @@ When the run changed `settings.json` or an agent, the report ends with the resta
 - **Removing it.** `/<p>:remove` (`setup --remove`):
   - puts the agents back on the models the ledger recorded before setup (the shipped `sonnet` only without a
     ledger);
-  - takes the plugin's `/model` entries and base URL out of `settings.json`;
+  - takes the plugin's `/model` entries and proxy keys out of `settings.json` (or its base URL, in base-URL mode);
   - retires the router (section 3.2): open sessions keep working through it until they close;
   - deletes the stored key.
   - Uninstalling is then `/plugin uninstall <p>-plugin-cc@muhmdraouf`.

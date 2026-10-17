@@ -239,16 +239,28 @@ func proxyURL(raw string) string {
 	return raw
 }
 
+// ProxyIsThisRouter is whether a proxy variable's value points at this router: its loopback host
+// with this router's port, whatever port that is (the `${P}_ROUTER_PORT` override moves the router
+// off the five canonical ones, and a router of ours there is still ours).
+func ProxyIsThisRouter(raw, routerURL string) bool {
+	port := PortOf(routerURL)
+	if port == -1 {
+		return false
+	}
+	parsed, err := url.Parse(proxyURL(raw))
+	return err == nil && PortOf(proxyURL(raw)) == port && IsLoopback(urlHostname(parsed))
+}
+
 // PlanProxy decides the proxy keys the way PlanBaseUrl decides the base URL: point them at this
 // router when unset or at a plugin router that is down; a live plugin router's keys stay (five
 // hooks moving them back and forth is what this prevents); the user's own proxy or CA is never
 // touched and the plan falls back to base-URL mode instead.
 func PlanProxy(env ProxySettings, routerURL, caPath string, livePluginURLs []string) ProxyPlan {
-	if env.HTTPSProxy != nil && ProxyRouterName(*env.HTTPSProxy) == "" {
+	if env.HTTPSProxy != nil && !ProxyIsThisRouter(*env.HTTPSProxy, routerURL) && ProxyRouterName(*env.HTTPSProxy) == "" {
 		note := ownProxyNote
 		return ProxyPlan{Kind: ProxyPlanBaseURL, Report: &note}
 	}
-	ours := env.HTTPSProxy != nil && ProxyRouterName(*env.HTTPSProxy) == PluginRouters[PortOf(routerURL)]
+	ours := env.HTTPSProxy != nil && ProxyIsThisRouter(*env.HTTPSProxy, routerURL)
 	// A CA we did not write is only in the way when this plan would have to own it: next to this
 	// router a foreign CA cannot reach it, while next to another live plugin router it rides along
 	// with that one.
@@ -284,8 +296,7 @@ func PlanProxy(env ProxySettings, routerURL, caPath string, livePluginURLs []str
 // PlanProxyRemoval clears: take the proxy and CA out when HTTPS_PROXY points at this router,
 // repointing it at another live one when there is any; anything else is not ours to touch.
 func PlanProxyRemoval(env ProxySettings, routerURL string, others []string) ProxyPlan {
-	ours := env.HTTPSProxy != nil && ProxyRouterName(*env.HTTPSProxy) == PluginRouters[PortOf(routerURL)]
-	if !ours || PluginRouters[PortOf(routerURL)] == "" {
+	if env.HTTPSProxy == nil || !ProxyIsThisRouter(*env.HTTPSProxy, routerURL) {
 		return ProxyPlan{Kind: ProxyPlanKeep}
 	}
 	staleBaseURL := env.BaseURL != nil && IsPluginRouterURL(*env.BaseURL)
