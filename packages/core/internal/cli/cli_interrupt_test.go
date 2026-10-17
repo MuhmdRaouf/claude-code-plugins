@@ -11,11 +11,13 @@ import (
 	"strings"
 	"syscall"
 	"testing"
+	"time"
 
 	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/cli"
 	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/domain"
 	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/testkit"
 	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/testkit/fakedeps"
+	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/testkit/fakes"
 )
 
 func TestRunCliInterruptedFollower(t *testing.T) {
@@ -88,11 +90,31 @@ func TestRunCliInterruptedFollower(t *testing.T) {
 	t.Run("board --watch redraws the board every 2 s on a TTY until Ctrl-C; off a TTY it prints once", func(t *testing.T) {
 		world := fakedeps.FakeDeps(t)
 		cliReviewable(t, world)
-		cliAfterSleeps(&world, 3, func() {
-			sendTestSignal(t, "SIGINT")
-		})
+		// The watch redraws on the test's clock: two released ticks are two redraws after the
+		// first print, and the SIGINT ends the watch through the same clock, so the render
+		// count cannot race the signal's asynchronous delivery.
+		watch := &cliWatchClock{ManualClock: world.Clock, tick: make(chan struct{})}
+		world.Deps.Clock = watch
+		exited := make(chan cli.ExitCode, 1)
+		go func() {
+			exited <- withTTY(t, true, func() cli.ExitCode { return cliRun(t, world, "board", "--watch") })
+		}()
+		for ticks := 0; ticks < 2; ticks++ {
+			select {
+			case watch.tick <- struct{}{}:
+			case code := <-exited:
+				t.Fatalf("the watch ended after %d ticks: exit %d, errors %q", ticks, code, world.Out.Errors)
+			}
+		}
+		sendTestSignal(t, "SIGINT")
+		var code cli.ExitCode
+		select {
+		case code = <-exited:
+		case <-time.After(10 * time.Second):
+			t.Fatal("the watch did not end after SIGINT")
+		}
 
-		if code := withTTY(t, true, func() cli.ExitCode { return cliRun(t, world, "board", "--watch") }); code != cli.ExitOK {
+		if code != cli.ExitOK {
 			t.Fatalf("exit = %d, want 0", code)
 		}
 		if len(world.Out.Lines) != 3 {
@@ -113,6 +135,24 @@ func TestRunCliInterruptedFollower(t *testing.T) {
 			t.Fatalf("lines = %q", plain.Out.Lines)
 		}
 	})
+}
+
+// cliWatchClock is the board watch's clock under the test's control: Sleep returns only for a
+// released tick (one redraw, 2 s later on the manual clock) or for the cancelled interrupt
+// context, so the renders are exactly the ticks the test drove.
+type cliWatchClock struct {
+	*fakes.ManualClock
+	tick chan struct{}
+}
+
+func (c *cliWatchClock) Sleep(ctx context.Context, ms int64) error {
+	select {
+	case <-c.tick:
+		c.Advance(ms)
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 // sendTestSignal names one of the signals the tests send to this own process.
