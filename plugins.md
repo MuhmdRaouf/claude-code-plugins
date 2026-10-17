@@ -62,7 +62,9 @@ binary, `plugin-core`).
 
 ```text
 cc-plugins/
-├── .claude-plugin/marketplace.json     the catalogue: one entry per plugin, source ./plugins/<project>/plugin
+├── .claude-plugin/marketplace.json     the catalogue: one entry per provider plugin (source
+│                                       ./plugins/<project>/plugin, dependencies ["huddle"]) plus the huddle
+│                                       entry, fetched from MuhmdRaouf/huddle (`git-subdir`, path `plugin`)
 ├── .github/workflows/release.yml       runs on a tag v<VERSION> pushed by hand (no workflow creates tags) and
 │                                       publishes that GitHub release: the four cross-built binaries, SHA256SUMS,
 │                                       the attestation, the changelog section as the notes
@@ -729,6 +731,10 @@ once, on zai, against the binary.
 /plugin marketplace add MuhmdRaouf/claude-code-plugins
 /plugin install zai-plugin-cc@muhmdraouf          # and/or kimi-, deepseek-, minimax-, qwen-plugin-cc
 ```
+
+Every provider plugin declares `huddle` as a dependency, so installing one installs
+[huddle](https://github.com/MuhmdRaouf/huddle) with it — no extra command. `claude plugin uninstall
+zai-plugin-cc@muhmdraouf --prune` removes huddle again once no installed plugin needs it.
 
 ### 4.2 Provider plugins
 

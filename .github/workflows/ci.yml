@@ -123,7 +123,9 @@ jobs:
       - name: Validate the marketplace and every plugin it lists
         run: |
           npx -y @anthropic-ai/claude-code plugin validate .
-          for source in $(jq -r '.plugins[].source' .claude-plugin/marketplace.json); do
+          # `strings` keeps the relative-path sources only: the huddle entry's git-subdir source is an object,
+          # not a local path to validate.
+          for source in $(jq -r '.plugins[].source | strings' .claude-plugin/marketplace.json); do
             npx -y @anthropic-ai/claude-code plugin validate "$source"
           done
 

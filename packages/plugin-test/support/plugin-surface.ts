@@ -259,6 +259,14 @@ export function describePluginSurface(options: PluginSurfaceOptions): void {
       expect(readPluginFile("LICENSE")).toBe(readFileSync(join(REPO_ROOT, "LICENSE"), "utf8"));
     });
 
+    it("declares huddle as a dependency", () => {
+      const manifest = JSON.parse(readPluginFile(".claude-plugin/plugin.json")) as {
+        dependencies?: string[];
+      };
+
+      expect(manifest.dependencies).toEqual(["huddle"]);
+    });
+
     it("reads the documented command set from the plugin-core binary's help", async () => {
       const synopsis = await cliSynopsis(plugin);
 

@@ -42,6 +42,10 @@ that workflow automatically.
 2. Restart Claude Code after installing, so it loads the plugin's commands.
 3. Run `/kimi:setup`.
 
+Installing the plugin installs [huddle](https://github.com/MuhmdRaouf/huddle) (the session hub, radar and the
+kanban board) with it, no extra command. `claude plugin uninstall kimi-plugin-cc@muhmdraouf --prune` removes
+huddle again once no installed plugin needs it.
+
 Other ways to install:
 
 - User scope is the default. From a terminal the same is
