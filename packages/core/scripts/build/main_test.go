@@ -154,7 +154,7 @@ func TestSHA256SUMS(t *testing.T) {
 func TestManifestJSON(t *testing.T) {
 	want := `{
   "version": "0.1.0",
-  "tag": "core-v0.1.0",
+  "tag": "v0.1.0",
   "assets": {
     "darwin-amd64": {
       "name": "plugin-core-darwin-amd64",
@@ -191,7 +191,7 @@ func TestManifestJSON(t *testing.T) {
 func TestPartialTargetManifestJSON(t *testing.T) {
 	want := `{
   "version": "0.0.1",
-  "tag": "core-v0.0.1",
+  "tag": "v0.0.1",
   "assets": {
     "darwin-amd64": {
       "name": "plugin-core-darwin-amd64",

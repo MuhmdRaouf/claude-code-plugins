@@ -26,8 +26,9 @@ go run ./scripts/build -check               # rebuild and compare with the manif
 
 1. Bump `VERSION` and add the version's section to `CHANGELOG.md`.
 2. `go run ./scripts/build -manifest` and commit `VERSION` + `release/v<VERSION>.json`.
-3. On main, CI sees a VERSION without a `core-v<VERSION>` tag, rebuilds, refuses to publish if any sha256 differs
-   from the manifest, then creates the GitHub release with the 4 assets and SHA256SUMS. The notes are the
-   version's `CHANGELOG.md` section, the checksums and the commit (`go run ./scripts/releasenotes` builds them);
-   a `VERSION` with no section there fails CI.
+3. Push the tag `v<VERSION>` by hand (no workflow creates tags); `.github/workflows/release.yml` runs on it. It
+   refuses a tag that does not name the committed VERSION and its manifest, rebuilds, refuses to publish if any
+   sha256 differs from the manifest, then creates the GitHub release with the 4 assets and SHA256SUMS. The notes
+   are the version's `CHANGELOG.md` section, the checksums and the commit (`go run ./scripts/releasenotes` builds
+   them); a `VERSION` with no section there fails CI.
 4. The plugins' `dist/run` pins that version and those sha256 values.

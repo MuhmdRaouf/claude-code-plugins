@@ -2,7 +2,7 @@
 # kimi: starts one of this plugin's bundles on the installed plugin-core binary, downloading and verifying
 #   it during setup.
 #   sh "${CLAUDE_PLUGIN_ROOT}/dist/run" <bundle>.js [args...]
-# plugin-core lives under ${AGENTS_CORE_HOME:-$HOME/.agents/core}/0.0.2; setup downloads it from
+# plugin-core lives under ${AGENTS_CORE_HOME:-$HOME/.agents/core}/0.0.1; setup downloads it from
 # MuhmdRaouf/claude-code-plugins's GitHub releases and verifies its sha256 there (CORE_DOWNLOAD_BASE overrides the release
 # URL for tests). With no binary available and none downloadable this says why and exits 127; a hook (any
 # --hook argument) never blocks or fails Claude Code: it exits 0 at once, starting one detached download —
@@ -40,23 +40,23 @@ case "$arch" in
   *) arch=unsupported ;;
 esac
 home=${AGENTS_CORE_HOME:-$HOME/.agents/core}
-bin=$home/0.0.2/plugin-core
+bin=$home/0.0.1/plugin-core
 base=${CORE_DOWNLOAD_BASE:-https://github.com/MuhmdRaouf/claude-code-plugins/releases/download}
-url=$base/core-v0.0.2/plugin-core-$os-$arch
+url=$base/v0.0.1/plugin-core-$os-$arch
 want=
 case "$os-$arch" in
-  darwin-amd64) want=157adcc88fb01eab915b2f41885371c005709c7746ee9c8ac4ffe26ecd5df436 ;;
-  darwin-arm64) want=2a43ae3ac6903ef7e0953cfff016527a6ba4b9d74e398b87d7ba6e2f096ac496 ;;
-  linux-amd64) want=973b6831310ffea469eebd4dac2dac5fd397676c76612b785621ce72556edfac ;;
-  linux-arm64) want=976cfa545414ed0007cca1c9841027c7897e6c432a2a84fd1c8ee2f4da10000a ;;
+  darwin-amd64) want=62f52fc4f93982ceed9f013780156f9c774c774deffb0d42678cabb7ed49ada6 ;;
+  darwin-arm64) want=77b0e5249b981aff8fa65a32c1025296535e24c5921f6d86c2dcde3c9ec81213 ;;
+  linux-amd64) want=00abad70b40853635b2c7808cddd37d865f75079cd7639a6ff39eb0fd509b897 ;;
+  linux-arm64) want=c16f3afb9840415a99b026f585a2ff7845b45bd61e815feecbfe94c20310b7f7 ;;
 esac
 
 # download_core <timeout>: fetch the release asset, verify its sha256 and install it as $bin. Returns 0 when
 # the binary is installed, 1 when the asset could not be fetched, 2 when it failed its checksum.
 download_core() {
   timeout=$1
-  mkdir -p "$home/0.0.2"
-  tmp=$home/0.0.2/.plugin-core.$$.download
+  mkdir -p "$home/0.0.1"
+  tmp=$home/0.0.1/.plugin-core.$$.download
   got=
   if command -v curl >/dev/null 2>&1; then
     curl -fsSL --max-time "$timeout" -o "$tmp" "$url" && got=1
@@ -86,8 +86,8 @@ download_core() {
 # old, and takes over a lock whose holder died or stalled, so one download serves every hook.
 fetch_under_lock() {
   trap '' HUP
-  mkdir -p "$home/0.0.2"
-  lock=$home/0.0.2/.plugin-core.fetch.lock
+  mkdir -p "$home/0.0.1"
+  lock=$home/0.0.1/.plugin-core.fetch.lock
   now=$(date +%s)
   if (set -C; echo "$$ $now" >"$lock") 2>/dev/null; then
     :
@@ -130,7 +130,7 @@ if [ "$os" != unsupported ] && [ "$arch" != unsupported ]; then
     if [ "$status" = 2 ]; then
       echo "kimi: plugin-core download failed its checksum" >&2
     else
-      echo "kimi: could not download plugin-core 0.0.2 ($url)" >&2
+      echo "kimi: could not download plugin-core 0.0.1 ($url)" >&2
     fi
     exit 127
   fi
@@ -150,5 +150,5 @@ if [ "$os" != unsupported ] && [ "$arch" != unsupported ]; then
 fi
 [ -n "$hook" ] && exit 0
 [ -n "$detached" ] && exit 0
-echo "kimi: plugin-core 0.0.2 is not installed; run /kimi:setup" >&2
+echo "kimi: plugin-core 0.0.1 is not installed; run /kimi:setup" >&2
 exit 127

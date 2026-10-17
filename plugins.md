@@ -63,8 +63,9 @@ binary, `plugin-core`).
 ```
 cc-plugins/
 ├── .claude-plugin/marketplace.json     the catalogue: one entry per plugin, source ./plugins/<project>/plugin
-├── .github/workflows/release-core.yml  publishes the core-v<VERSION> GitHub release: the four cross-built binaries,
-│                                       SHA256SUMS, the attestation, the changelog section as the notes
+├── .github/workflows/release.yml       runs on a tag v<VERSION> pushed by hand (no workflow creates tags) and
+│                                       publishes that GitHub release: the four cross-built binaries, SHA256SUMS,
+│                                       the attestation, the changelog section as the notes
 ├── .github/actions/setup, dependabot.yml   the shared setup action; weekly updates for actions and npm
 ├── .github/FUNDING.yml                 the sponsor links; .gitleaks.toml: the secret scan's allowlist
 ├── .claude/settings.json                turns off Claude Code's commit and PR attribution in this repository
@@ -943,19 +944,17 @@ claude --plugin-dir ./plugins/zai-plugin-cc/plugin
 - Every job stops at 10 minutes; Go test runs carry a shorter `-timeout`, so a hang prints its stacks instead of
   using up the job's minutes.
 
-**Releases** (`.github/workflows/release-core.yml`), on a push to `main` that changes `packages/core/VERSION` or
-`packages/core/release/**`, or on a manual run:
+**Releases** (`.github/workflows/release.yml`), on a tag `v<VERSION>` pushed by hand; no workflow creates tags:
 
-- `Release: plugin-core` stops successfully when `core-v<VERSION>` is already tagged;
-- it fails when `release/v<VERSION>.json` is missing: the releaser runs `go run ./scripts/build -manifest` and
-  commits the manifest first;
+- `Release: plugin-core` fails when the tag does not name the committed `packages/core/VERSION` or when
+  `release/v<VERSION>.json` is missing: the releaser runs `go run ./scripts/build -manifest` and commits the
+  manifest first;
 - it rebuilds all four targets and compares every sha256 with the manifest (`go run ./scripts/build -check`), so
   only the pinned bytes are published;
-- it builds `dist/` with `SHA256SUMS`, attests the binaries' build provenance, then runs
-  `gh release create core-v<VERSION>`; the notes are the version's `CHANGELOG.md` section, the checksums and
-  `Built reproducibly from <commit sha>.`, printed by `go run ./scripts/releasenotes`. A release needs its
-  `CHANGELOG.md` section: CI fails a `VERSION` without one before the release runs.
-- `packages/core/scripts/release-dryrun.sh` dry-runs the shell steps with a fake `gh`.
+- it builds `dist/` with `SHA256SUMS`, attests the binaries' build provenance, then runs `gh release create v<VERSION>`;
+  the notes are the version's `CHANGELOG.md` section, the checksums and `Built reproducibly from <commit sha>.`,
+  printed by `go run ./scripts/releasenotes`. A release needs its `CHANGELOG.md` section: CI fails a `VERSION`
+  without one before the release runs.
 
 ## 6. Operations and failure modes
 

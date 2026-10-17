@@ -223,7 +223,7 @@ describe("dist/run", () => {
     assert.equal(result.status, 0);
     assert.equal(result.stderr, "");
     assert.equal(result.stdout, "plugin-core acme cli setup --json\n");
-    assert.deepEqual(urls, [`/core-v9.9.9/plugin-core-${OS}-${ARCH}`]);
+    assert.deepEqual(urls, [`/v9.9.9/plugin-core-${OS}-${ARCH}`]);
     const bin = join(binHome, "9.9.9", `plugin-core`);
     assert.equal(readFileSync(bin, "utf8"), asset("plugin-core"));
     assert.equal(statSync(bin).mode & 0o777, 0o755);
@@ -256,7 +256,7 @@ describe("dist/run", () => {
     // curl -S reports the connection failure itself; the launcher adds the URL to retry by.
     assert.ok(
       result.stderr.includes(
-        `acme: could not download plugin-core 9.9.9 (http://127.0.0.1:1/core-v9.9.9/plugin-core-${OS}-${ARCH})\n`,
+        `acme: could not download plugin-core 9.9.9 (http://127.0.0.1:1/v9.9.9/plugin-core-${OS}-${ARCH})\n`,
       ),
       `stderr says the URL: ${result.stderr}`,
     );
@@ -280,7 +280,7 @@ describe("dist/run", () => {
     assert.ok(
       result.stderr.includes(
         `acme: could not download plugin-core 9.9.9 (https://github.com/MuhmdRaouf/claude-code-plugins` +
-          `/releases/download/core-v9.9.9/plugin-core-${OS}-${ARCH})\n`,
+          `/releases/download/v9.9.9/plugin-core-${OS}-${ARCH})\n`,
       ),
       `stderr says the URL: ${result.stderr}`,
     );
@@ -304,7 +304,7 @@ describe("dist/run", () => {
     assert.deepEqual(readdirSync(dir), [`plugin-core`]);
     const second = await run(["acme-ensure.js", "--hook"], { CORE_DOWNLOAD_BASE: base });
     assert.deepEqual(second, ran(0, "plugin-core acme ensure --hook\n", ""));
-    assert.deepEqual(urls, [`/core-v9.9.9/plugin-core-${OS}-${ARCH}`]);
+    assert.deepEqual(urls, [`/v9.9.9/plugin-core-${OS}-${ARCH}`]);
   });
 
   it("two concurrent ensure hooks start one download between them", async (t) => {
@@ -321,7 +321,7 @@ describe("dist/run", () => {
       await until(() => existsSync(bin) && !existsSync(lock), 10_000),
       "one download installs the binary",
     );
-    assert.deepEqual(urls, [`/core-v9.9.9/plugin-core-${OS}-${ARCH}`]);
+    assert.deepEqual(urls, [`/v9.9.9/plugin-core-${OS}-${ARCH}`]);
   });
 
   it("a detached download that fails its checksum leaves no binary and no lock behind", async (t) => {
@@ -358,7 +358,7 @@ describe("dist/run", () => {
       await until(() => existsSync(join(binHome, "9.9.9", `plugin-core`)), 10_000),
       "the hook's fetch takes over the dead lock",
     );
-    assert.deepEqual(urls, [`/core-v9.9.9/plugin-core-${OS}-${ARCH}`]);
+    assert.deepEqual(urls, [`/v9.9.9/plugin-core-${OS}-${ARCH}`]);
   });
 
   it("a fetch lock held by a live, fresh holder starts no second download", async (t) => {
@@ -380,7 +380,7 @@ describe("dist/run", () => {
       await until(() => existsSync(join(binHome, "9.9.9", `plugin-core`)), 10_000),
       "the stale lock does not stop the fetch",
     );
-    assert.deepEqual(urls, [`/core-v9.9.9/plugin-core-${OS}-${ARCH}`]);
+    assert.deepEqual(urls, [`/v9.9.9/plugin-core-${OS}-${ARCH}`]);
   });
 
   it("with no binary and no runtime on PATH: a hook exits 0 silently, a command exits 127 asking for setup", async (t) => {
@@ -430,7 +430,7 @@ describe("releaseInfo", () => {
       join(dir, "v0.9.0.json"),
       JSON.stringify({
         version: "0.9.0",
-        tag: "core-v0.9.0",
+        tag: "v0.9.0",
         assets: { "linux-amd64": { name: "plugin-core-linux-amd64", sha256: "cafe00", size: 1 } },
       }),
     );
@@ -438,7 +438,7 @@ describe("releaseInfo", () => {
       join(dir, "v0.10.0.json"),
       JSON.stringify({
         version: "0.10.0",
-        tag: "core-v0.10.0",
+        tag: "v0.10.0",
         assets: {
           "darwin-arm64": { name: "plugin-core-darwin-arm64", sha256: "abcd00", size: 2 },
           "linux-amd64": { name: "plugin-core-linux-amd64", sha256: "beef00", size: 3 },

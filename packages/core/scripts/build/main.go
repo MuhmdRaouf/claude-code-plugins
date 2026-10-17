@@ -46,7 +46,7 @@ var binaries = []binary{
 		pkg:         "./cmd/plugin-core",
 		versionFile: "VERSION",
 		releaseDir:  "release",
-		tagPrefix:   "core-v",
+		tagPrefix:   "v",
 		extraStamp:  "github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/adapters.version",
 	},
 }
@@ -161,7 +161,7 @@ type manifestFile struct {
 var versionRe = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
 
 // parseVersion trims surrounding whitespace and requires the x.y.z shape the
-// release tag core-v<VERSION> is built from.
+// release tag v<VERSION> is built from.
 func parseVersion(content string) (string, error) {
 	version := strings.TrimSpace(content)
 	if !versionRe.MatchString(version) {

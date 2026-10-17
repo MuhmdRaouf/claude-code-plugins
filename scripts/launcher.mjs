@@ -55,7 +55,7 @@ export function providerSpec(name, core) {
     name,
     binary: "plugin-core",
     downloadFn: "download_core",
-    tagPrefix: "core-v",
+    tagPrefix: "v",
     version: core.version,
     repo: core.repo,
     sha256: core.sha256,
