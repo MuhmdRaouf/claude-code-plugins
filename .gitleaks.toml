@@ -1,0 +1,6 @@
+# gitleaks: the default rules, plus the exact fake keys the tests use. Each allowlist names one exact value in the
+# exact files that hold it; nothing else is exempt.
+title = "claude-code-plugins"
+
+[extend]
+useDefault = true

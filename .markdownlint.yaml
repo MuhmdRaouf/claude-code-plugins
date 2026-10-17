@@ -1,0 +1,52 @@
+# =============================================================================
+# .markdownlint.yaml — Markdown rules for this repository (markdownlint 0.x).
+#
+#   Why: READMEs, AGENTS.md, CLAUDE.md, changelogs and skill text render on
+#   GitHub and inside Claude Code; one style keeps them readable in both.
+#
+#   Rules: every default rule is on; the entries below only relax or tune.
+#   Each relaxation says why.
+# =============================================================================
+
+default: true
+
+# ── Layout ──────────────────────────────────────────────────────────────────
+# Prose wraps at the editor, not at a column; tables and URLs run long.
+MD013: false
+# Headings, lists and fences may touch the text around them.
+MD022: false
+MD031: false
+MD032: false
+
+# ── Headings ────────────────────────────────────────────────────────────────
+# Changelogs repeat "Fixes" or "Verify" under each version.
+MD024:
+  siblings_only: true
+# Skills and commands carry `name:` front matter and their own H1.
+MD025:
+  front_matter_title: ""
+# A README may open with its banner, and a command file with its front matter.
+MD041: false
+
+# ── Lists ───────────────────────────────────────────────────────────────────
+MD029:
+  style: ordered
+
+# ── Inline HTML ─────────────────────────────────────────────────────────────
+# Only what GitHub keeps.
+MD033:
+  allowed_elements: [a, br, details, img, kbd, p, sub, summary, sup]
+
+# ── Code ────────────────────────────────────────────────────────────────────
+# Every fence names its language, and only its language.
+MD040:
+  language_only: true
+MD046:
+  style: fenced
+
+# ── Emphasis ────────────────────────────────────────────────────────────────
+MD049: false
+
+# ── Tables ──────────────────────────────────────────────────────────────────
+# Column alignment is not worth hand-padding every table.
+MD060: false

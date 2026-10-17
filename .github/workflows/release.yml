@@ -1,0 +1,60 @@
+name: Release
+
+# A pushed tag v<VERSION> publishes the GitHub release of the same name: plugin-core for darwin and linux on amd64
+# and arm64, SHA256SUMS and a build-provenance attestation. The digests are checked against the committed manifest
+# packages/core/release/v<VERSION>.json first, so what is published is exactly what the plugins' launchers pin. The
+# notes are the version's packages/core/CHANGELOG.md section, the checksums and the commit. No workflow creates tags.
+
+on:
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write # the release
+  id-token: write # the build-provenance attestation
+  attestations: write
+
+jobs:
+  release:
+    name: "Release: plugin-core"
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: packages/core
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: packages/core/go.mod
+          cache-dependency-path: packages/core/go.sum
+      - name: The tag names the committed VERSION and its manifest
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version=$(cat VERSION)
+          if [ "$TAG" != "v$version" ]; then
+            echo "tag $TAG does not match VERSION $version" >&2
+            exit 1
+          fi
+          test -f "release/v$version.json" || { echo "release/v$version.json is not committed" >&2; exit 1; }
+      - name: Check the manifest against a fresh build
+        run: go run ./scripts/build -check
+      - name: Build the release assets
+        run: go run ./scripts/build -out dist
+      - name: Attest the assets' build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: packages/core/dist/plugin-core-*
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          version=$(cat VERSION)
+          go run ./scripts/releasenotes -version "$version" -sums dist/SHA256SUMS -commit "$GITHUB_SHA" |
+            gh release create "$TAG" dist/plugin-core-* dist/SHA256SUMS --title "plugin-core $version" --notes-file -

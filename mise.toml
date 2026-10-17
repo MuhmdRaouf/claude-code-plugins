@@ -1,0 +1,56 @@
+# =============================================================================
+# mise.toml — pins every tool this repository uses to an exact version.
+#
+#   Why: builds are reproducible and CI and a laptop must agree, so the
+#   toolchain is pinned here and CI reads the same versions.
+#
+#   Rules:
+#     - Exact versions only, never ranges. Bump one row, run `mise run check`,
+#       commit.
+#     - Go comes from go.mod's toolchain line; the pin here matches it.
+#
+#   Start:    mise run setup    (tools + the git hook, once per clone)
+#             mise tasks        (every task below)
+# =============================================================================
+
+[tools]
+go         = "1.27.2"
+node       = "24.22.0"
+bun        = "1.4.2"
+python     = "3.14.7"
+pre-commit = "4.6.2"
+gitleaks   = "8.30.1"
+
+# =============================================================================
+# Tasks — the one entry point for everything the repo does (`mise run <task>`).
+# =============================================================================
+
+[tasks.setup]
+description = "Install the pinned tools and the pre-commit hook (once per clone)"
+dir = "{{config_root}}"
+run = [
+  "mise install",
+  "pre-commit install --install-hooks",
+]
+
+[tasks.lint]
+description = "Run every pre-commit hook on every file"
+dir = "{{config_root}}"
+run = "pre-commit run --all-files"
+
+[tasks.check]
+description = "Every gate CI runs: lint, static checks and the test suites"
+dir = "{{config_root}}"
+depends = ["lint"]
+run = [
+  "npm run check",
+  "cd packages/core && test -z \"$(gofmt -l .)\" && go vet ./... && go test -race ./...",
+]
+
+[tasks."check:history"]
+description = "Scan every commit of the current branch for secrets and AI attribution (as CI does)"
+dir = "{{config_root}}"
+run = [
+  "gitleaks git --config .gitleaks.toml --redact --verbose .",
+  "node scripts/check-attribution.mjs",
+]

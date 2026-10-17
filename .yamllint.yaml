@@ -1,0 +1,37 @@
+# =============================================================================
+# .yamllint.yaml — YAML rules for this repository (yamllint 1.x).
+#
+#   Why: the workflows, dependabot and lint configs are YAML, so one style
+#   keeps diffs small and reviews readable.
+#
+#   Rules:
+#     - Start from `relaxed`, then tighten what matters: 2-space indents and
+#       consistent sequence indentation.
+#     - Comments, braces and octal values follow one strict style.
+#     - Generated YAML is never committed, so nothing is ignored.
+# =============================================================================
+
+extends: relaxed
+
+rules:
+  # ── Layout ────────────────────────────────────────────────────────────────
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+  line-length: disable
+  document-start: disable
+
+  # ── Comments, braces, octal values ───────────────────────────────────────
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  braces:
+    max-spaces-inside: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+
+  # ── Values ────────────────────────────────────────────────────────────────
+  # `on:` in GitHub workflows is a key, not a boolean.
+  truthy:
+    check-keys: false

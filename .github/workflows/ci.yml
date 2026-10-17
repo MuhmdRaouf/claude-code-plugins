@@ -1,0 +1,437 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Everything, unfiltered, on any branch.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Flow:
+#   1. Plan: decide which projects changed (a manual run checks everything).
+#   2. Repository rules: run on every push, whatever changed.
+#   3. Tests: one job per changed project.
+#   4. Compatibility: older Node and macOS for the reference plugin; the macOS Go leg
+#      only after core's tests pass.
+#   5. All checks passed: the single check branch protection requires; a job the plan skipped counts as passed.
+# Runners are pinned (ubuntu-26.04, macos-26) so an image migration never changes the toolchain under a green build.
+# Third-party actions are pinned to commit SHAs (Dependabot proposes the bumps).
+
+jobs:
+  # 1. Plan
+
+  plan:
+    name: "Plan: what changed"
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    outputs:
+      core: ${{ steps.pick.outputs.core }}
+      zai: ${{ steps.pick.outputs.zai }}
+      providers: ${{ steps.pick.outputs.providers }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        if: github.event_name != 'workflow_dispatch'
+        id: filter
+        with:
+          # Every provider plugin ships the root LICENSE in plugin/, runs the shared suites in packages/plugin-test on
+          # the plugin-core binary built from core, and generates its dist/run launcher with scripts/launcher.mjs
+          # against core's release manifest, so a change to any of those re-checks all five. The setup action and
+          # this file re-run everything.
+          filters: |
+            # Shared lists (YAML anchors; paths-filter flattens them). Their names never end in -plugin-cc.
+            workspace: &workspace
+              - package.json
+              - package-lock.json
+              - scripts/check-ci.test.mjs
+              - scripts/check-all.mjs
+              - scripts/launcher.mjs
+              - .github/actions/**
+              - .github/workflows/ci.yml
+            provider-shared: &provider
+              - *workspace
+              # the suites every plugin runs: the shared tests and the binary they build
+              - packages/plugin-test/**
+              - packages/core/**
+              - LICENSE
+              - .claude-plugin/marketplace.json
+            core:
+              - *workspace
+              - packages/core/**
+            zai-plugin-cc: [*provider, plugins/zai-plugin-cc/**]
+            kimi-plugin-cc: [*provider, plugins/kimi-plugin-cc/**]
+            deepseek-plugin-cc: [*provider, plugins/deepseek-plugin-cc/**]
+            minimax-plugin-cc: [*provider, plugins/minimax-plugin-cc/**]
+            qwen-plugin-cc: [*provider, plugins/qwen-plugin-cc/**]
+      - id: pick
+        env:
+          ALL: ${{ github.event_name == 'workflow_dispatch' }}
+          CHANGES: ${{ steps.filter.outputs.changes || '[]' }}
+        run: |
+          all='["core","zai-plugin-cc","kimi-plugin-cc","deepseek-plugin-cc","minimax-plugin-cc","qwen-plugin-cc"]'
+          if [ "$ALL" = true ]; then changes=$all; else changes=$CHANGES; fi
+          # A project whose folder does not exist yet is never planned.
+          present='[]'
+          [ -f packages/core/go.mod ] && present=$(jq -c '. + ["core"]' <<<"$present")
+          for p in zai kimi deepseek minimax qwen; do
+            [ -f "plugins/$p-plugin-cc/package.json" ] && present=$(jq -c --arg p "$p-plugin-cc" '. + [$p]' <<<"$present")
+          done
+          changes=$(jq -c --argjson present "$present" '[.[] | select(. as $c | $present | index($c))]' <<<"$changes")
+          has() { jq -r --arg name "$1" 'index($name) != null' <<<"$changes"; }
+          {
+            echo "core=$(has core)"
+            echo "zai=$(has zai-plugin-cc)"
+            echo "providers=$(jq -c '[.[] | select(endswith("-plugin-cc"))]' <<<"$changes")"
+          } >> "$GITHUB_OUTPUT"
+          cat "$GITHUB_OUTPUT"
+
+  # 2. Repository rules
+
+  # The five provider plugins are hand-written copies: every file must match zai's after normalising the names,
+  # except the differences scripts/check-siblings.mjs allows with a reason. Git and Node only, no install.
+  siblings:
+    name: "Repo: provider plugins in sync"
+    needs: plan
+    if: needs.plan.outputs.providers != '[]'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: npm run check:siblings
+
+  catalogue:
+    name: "Repo: marketplace and plugins valid"
+    needs: plan
+    if: needs.plan.outputs.providers != '[]'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Validate the marketplace and every plugin it lists
+        run: |
+          npx -y @anthropic-ai/claude-code plugin validate .
+          for source in $(jq -r '.plugins[].source' .claude-plugin/marketplace.json); do
+            npx -y @anthropic-ai/claude-code plugin validate "$source"
+          done
+
+  secrets:
+    name: "Repo: no secrets in history"
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # every commit, not just the tip
+      # The gitleaks CLI at a pinned release, its tarball checked against the release's published SHA-256; no licence
+      # and no secret needed. It scans the whole history with the default rules (.gitleaks.toml extends them with the
+      # exact fake keys the tests use, once those tests exist).
+      - name: Install gitleaks 8.30.1
+        run: |
+          curl -sSfLo gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          rm gitleaks.tar.gz
+      - name: Scan every commit for secrets
+        run: ./gitleaks git --redact --verbose .
+
+  # GitHub lists every author and co-author as a contributor: no commit may credit an AI tool.
+  attribution:
+    name: "Repo: no AI attribution in history"
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: node scripts/check-attribution.mjs
+
+  # The pre-commit hooks at the versions .pre-commit-config.yaml pins: Markdown, YAML, workflows (actionlint with
+  # shellcheck), file hygiene and private keys. A clone without the hook is caught here.
+  lint:
+    name: "Repo: lint (pre-commit hooks)"
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14.7"
+      - name: Run every hook on every file
+        run: |
+          pip install pre-commit==4.6.2
+          pre-commit run --all-files --show-diff-on-failure
+
+  # 3. Tests
+
+  core:
+    name: "Test: core"
+    needs: plan
+    if: needs.plan.outputs.core == 'true'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: packages/core
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: packages/core/go.mod
+          cache: false
+      # setup-go keys its cache on go.sum alone, so a saved build cache never refreshes; this key follows the
+      # sources, and the restore key brings back the newest one when they change.
+      - id: gocache
+        shell: bash
+        run: echo "build=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"; echo "mod=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ steps.gocache.outputs.build }}
+            ${{ steps.gocache.outputs.mod }}
+          key: go-${{ runner.os }}-${{ github.job }}-${{ hashFiles('packages/core/go.sum', 'packages/core/**/*.go') }}
+          restore-keys: go-${{ runner.os }}-${{ github.job }}-
+      # Formatted, vetted, race-tested, coverage-gated, then all four release
+      # targets built. The release manifest is compared only while it can still change: with no manifest yet there
+      # is nothing to compare against, and once v<VERSION> is tagged the manifest is immutable.
+      - name: No file needs gofmt
+        run: test -z "$(gofmt -l .)"
+      # Builds every package without its tests, so production code never leans on a test-only helper.
+      - run: go build ./...
+      - run: go vet ./...
+      - name: go.mod and go.sum are tidy
+        run: go mod tidy -diff
+      - name: staticcheck
+        run: go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
+      - name: govulncheck
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+      # One run of the suite, raced and covered; covergate only judges the profile it leaves.
+      - run: go test -race -timeout 7m -coverprofile=coverage.out -covermode=atomic ./...
+      # Saved here, not only in the post step: a job that later fails or hits its cap still leaves the raced build.
+      - if: always()
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ steps.gocache.outputs.build }}
+            ${{ steps.gocache.outputs.mod }}
+          key: go-${{ runner.os }}-${{ github.job }}-${{ hashFiles('packages/core/go.sum', 'packages/core/**/*.go') }}
+      - run: go run ./scripts/covergate -profile coverage.out
+      - run: go run ./scripts/build -out dist
+      # A version with no CHANGELOG.md section must fail here, before the release workflow reaches publishing.
+      - name: VERSION has a CHANGELOG.md section
+        run: go run ./scripts/releasenotes -version "$(cat VERSION)" -sums /dev/null -commit x >/dev/null
+      - name: Release manifest matches the built digests
+        run: |
+          version=$(cat VERSION)
+          if [ ! -f "release/v$version.json" ]; then
+            echo "no release manifest for v$version yet; nothing to compare with"
+            exit 0
+          fi
+          if [ -n "$(git ls-remote --tags origin "v$version")" ]; then
+            echo "v$version is already tagged; the manifest is immutable"
+            exit 0
+          fi
+          go run ./scripts/build -check
+      # The macOS job rebuilds linux/amd64 and must reproduce this digest byte for byte.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: core-sha256sums
+          path: packages/core/dist/SHA256SUMS
+          if-no-files-found: error
+
+  providers:
+    name: "Test: ${{ matrix.plugin }}"
+    needs: plan
+    if: needs.plan.outputs.providers != '[]'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: ${{ fromJSON(needs.plan.outputs.providers) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      # Every shared suite drives the plugin-core binary, built by packages/core/scripts/host-build.sh.
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: packages/core/go.mod
+          cache: false
+      # setup-go keys its cache on go.sum alone, so a saved build cache never refreshes; this key follows the
+      # sources, and the restore key brings back the newest one when they change.
+      - id: gocache
+        shell: bash
+        run: echo "build=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"; echo "mod=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ steps.gocache.outputs.build }}
+            ${{ steps.gocache.outputs.mod }}
+          key: go-${{ runner.os }}-${{ github.job }}-${{ hashFiles('packages/core/go.sum', 'packages/core/**/*.go') }}
+          restore-keys: go-${{ runner.os }}-${{ github.job }}-
+      # Typecheck, Biome, tests (the shared surface suite, the bundle smoke and the fresh install, all on the
+      # plugin-core binary), no it.todo left, the committed dist/run launcher is fresh.
+      # The suites drive these binaries; building them in their own step keeps a cold compile out of any one test's
+      # 60 s budget.
+      - name: Build the host binaries
+        timeout-minutes: 6
+        run: sh packages/core/scripts/host-build.sh
+      - run: npm run check --workspace plugins/${{ matrix.plugin }}
+
+  # 4. Compatibility
+
+  # The oldest Node the packages promise (engines: node >=22.3; 22.x has type stripping on by default) for the
+  # reference plugin; the full check above runs on 24.
+  node-22:
+    name: "Compat: Node 22 (zai)"
+    needs: [plan]
+    if: ${{ !failure() && !cancelled() && needs.plan.outputs.zai == 'true' }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+        with:
+          node-version: "22"
+      # zai's tests build the plugin-core binary with Go.
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: packages/core/go.mod
+          cache: false
+      # setup-go keys its cache on go.sum alone, so a saved build cache never refreshes; this key follows the
+      # sources, and the restore key brings back the newest one when they change.
+      - id: gocache
+        shell: bash
+        run: echo "build=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"; echo "mod=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ steps.gocache.outputs.build }}
+            ${{ steps.gocache.outputs.mod }}
+          key: go-${{ runner.os }}-${{ github.job }}-${{ hashFiles('packages/core/go.sum', 'packages/core/**/*.go') }}
+          restore-keys: go-${{ runner.os }}-${{ github.job }}-
+      # The suites drive these binaries; building them in their own step keeps a cold compile out of any one test's
+      # 60 s budget.
+      - name: Build the host binaries
+        timeout-minutes: 6
+        run: sh packages/core/scripts/host-build.sh
+      - run: npm test --workspace plugins/zai-plugin-cc
+
+  # macOS: launchd/Keychain paths, /private/tmp realpaths and BSD tools. zai's suite, then a real Keychain round trip
+  # through the Go keystore (a throwaway item, removed again) that only this job enables.
+  macos:
+    name: "Compat: macOS (zai, Keychain)"
+    needs: [plan]
+    if: ${{ !failure() && !cancelled() && (needs.plan.outputs.zai == 'true' || needs.plan.outputs.core == 'true') }}
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      # zai's tests build the plugin-core binary with Go.
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: packages/core/go.mod
+          cache: false
+      # setup-go keys its cache on go.sum alone, so a saved build cache never refreshes; this key follows the
+      # sources, and the restore key brings back the newest one when they change.
+      - id: gocache
+        shell: bash
+        run: echo "build=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"; echo "mod=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ steps.gocache.outputs.build }}
+            ${{ steps.gocache.outputs.mod }}
+          key: go-${{ runner.os }}-${{ github.job }}-${{ hashFiles('packages/core/go.sum', 'packages/core/**/*.go') }}
+          restore-keys: go-${{ runner.os }}-${{ github.job }}-
+      # The suites drive these binaries; building them in their own step keeps a cold compile out of any one test's
+      # 60 s budget.
+      - name: Build the host binaries
+        timeout-minutes: 6
+        run: sh packages/core/scripts/host-build.sh
+      - run: npm test --workspace plugins/zai-plugin-cc
+      - name: Real Keychain round trip (core keystore)
+        run: go test ./internal/adapters/keystore/ -run TestMacOSKeychainForReal
+        working-directory: packages/core
+        env:
+          CORE_KEYCHAIN_ROUNDTRIP: "1"
+
+  # core on macOS: the suite there, plus the cross-host reproducibility proof. linux/amd64 is rebuilt and its
+  # digest compared with the ubuntu job's; equal sha256s mean the built bytes depend on nothing but the sources,
+  # the version and the target.
+  core-macos:
+    name: "Compat: macOS (core, reproducible build)"
+    needs: [plan, core]
+    if: ${{ !failure() && !cancelled() && needs.plan.outputs.core == 'true' }}
+    runs-on: macos-26
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: packages/core
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: packages/core/go.mod
+          cache: false
+      # setup-go keys its cache on go.sum alone, so a saved build cache never refreshes; this key follows the
+      # sources, and the restore key brings back the newest one when they change.
+      - id: gocache
+        shell: bash
+        run: echo "build=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"; echo "mod=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ steps.gocache.outputs.build }}
+            ${{ steps.gocache.outputs.mod }}
+          key: go-${{ runner.os }}-${{ github.job }}-${{ hashFiles('packages/core/go.sum', 'packages/core/**/*.go') }}
+          restore-keys: go-${{ runner.os }}-${{ github.job }}-
+      - run: go test -timeout 8m ./...
+      - run: go run ./scripts/build -target linux/amd64 -out dist-mac
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: core-sha256sums
+          path: sums
+      # The artifact lands at the workspace root (uses steps ignore the job's working-directory).
+      - name: linux/amd64 digest matches the ubuntu build
+        run: |
+          want=$(awk '$2 == "plugin-core-linux-amd64" {print $1}' "$GITHUB_WORKSPACE/sums/SHA256SUMS")
+          got=$(shasum -a 256 dist-mac/plugin-core-linux-amd64 | awk '{print $1}')
+          echo "ubuntu $want"
+          echo "macos  $got"
+          test "$want" = "$got"
+  # 5. Gate
+
+  # The one check branch protection requires: fails when any job below failed or was cancelled; a skipped job passes.
+  all-checks:
+    name: All checks passed
+    if: always()
+    needs:
+      [plan, siblings, catalogue, secrets, attribution, lint, providers, node-22, macos, core, core-macos]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - env:
+          FAILED: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          if [ "$FAILED" = true ]; then
+            echo "a required job failed or was cancelled"
+            exit 1
+          fi
+          echo "every required job passed or was skipped"

@@ -1,0 +1,3 @@
+# Runner images newer than the actionlint release that checks them.
+self-hosted-runner:
+  labels: [ubuntu-26.04]
