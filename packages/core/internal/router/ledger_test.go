@@ -211,4 +211,42 @@ func TestMergeSettingsUndo(t *testing.T) {
 			t.Fatalf("baseUrlBefore = %v, want the delta's", merged.BaseURLBefore)
 		}
 	})
+
+	t.Run("the first proxy before wins, the rest fill in, creation flags or", func(t *testing.T) {
+		previous := adapters.SettingsUndo{
+			ProxyBefore:   strPtr("http://proxy.corp:3128"),
+			NoProxyBefore: strPtr("corp.internal"),
+		}
+		d := delta(func(d *adapters.SettingsDelta) {
+			d.ProxyBefore = strPtr("http://later.example:3128")
+			d.CABefore = strPtr("/old/ca.pem")
+			d.CreatedProxy = true
+		})
+		merged := MergeSettingsUndo(&previous, &d)
+		if merged.ProxyBefore == nil || *merged.ProxyBefore != "http://proxy.corp:3128" {
+			t.Fatalf("proxyBefore = %v, want the first known one", merged.ProxyBefore)
+		}
+		if merged.CABefore == nil || *merged.CABefore != "/old/ca.pem" {
+			t.Fatalf("caBefore = %v, want the delta's", merged.CABefore)
+		}
+		if merged.NoProxyBefore == nil || *merged.NoProxyBefore != "corp.internal" {
+			t.Fatalf("noProxyBefore = %v, want the previous", merged.NoProxyBefore)
+		}
+		if !merged.CreatedProxy {
+			t.Fatal("createdProxy = false; want the flag or'ed in")
+		}
+	})
+
+	t.Run("a previous without the proxy fields takes the delta's", func(t *testing.T) {
+		previous := adapters.SettingsUndo{OptionsAdded: []string{}, AvailableAppended: []string{}}
+		d := delta(func(d *adapters.SettingsDelta) {
+			d.ProxyBefore = strPtr("http://proxy.corp:3128")
+			d.CABefore = strPtr("/old/ca.pem")
+			d.NoProxyBefore = strPtr("corp.internal")
+		})
+		merged := MergeSettingsUndo(&previous, &d)
+		if merged.ProxyBefore == nil || merged.CABefore == nil || merged.NoProxyBefore == nil {
+			t.Fatalf("merged = %+v, want the delta's proxy fields", merged)
+		}
+	})
 }

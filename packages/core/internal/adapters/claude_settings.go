@@ -43,13 +43,19 @@ func ClaudeSettingsPath(env domain.EnvLookup) string {
 type SettingsDelta struct {
 	// BaseURLBefore is the base URL before a run that changed it; nil when there was none or the
 	// run left the base URL alone.
-	BaseURLBefore     *string  `json:"baseUrlBefore,omitempty"`
+	BaseURLBefore *string `json:"baseUrlBefore,omitempty"`
+	// ProxyBefore, CABefore and NoProxyBefore are the proxy-mode values before a run that changed
+	// them; nil when there was none or the run left the keys alone.
+	ProxyBefore       *string  `json:"proxyBefore,omitempty"`
+	CABefore          *string  `json:"caBefore,omitempty"`
+	NoProxyBefore     *string  `json:"noProxyBefore,omitempty"`
 	OptionsAdded      []string `json:"optionsAdded"`
 	AvailableAppended []string `json:"availableAppended"`
 	// Containers this run created, removed again when they end up empty.
 	CreatedModelPicker bool `json:"createdModelPicker"`
 	CreatedOptions     bool `json:"createdOptions"`
 	CreatedEnv         bool `json:"createdEnv"`
+	CreatedProxy       bool `json:"createdProxy"`
 	CreatedToolSearch  bool `json:"createdToolSearch"`
 	// EffortsAdded are the catalog ids whose modelSettings effort level this run set, with the
 	// value written, in catalog order.
@@ -204,6 +210,18 @@ func ClearBaseUrl(ctx context.Context, path string, routerURL string, othersRegi
 	}, false)
 }
 
+// ClearProxy is ClearBaseUrl for proxy mode: clear or repoint the three proxy keys only, leaving
+// every model entry alone. The caller names the router; setups pass "provider-router".
+func ClearProxy(ctx context.Context, path string, routerURL string, othersRegistered []string, name string) ([]string, error) {
+	return editSettings(ctx, path, name, func(root *jsonNode) ([]string, error) {
+		current, err := currentProxySettings(root, path)
+		if err != nil {
+			return nil, err
+		}
+		return applyProxy(root, domain.PlanProxyRemoval(current, routerURL, othersRegistered), path), nil
+	}, false)
+}
+
 // ReadBaseUrl is the current env.ANTHROPIC_BASE_URL; ok is false when unset or the file cannot be
 // read.
 func ReadBaseUrl(path string) (string, bool) {
@@ -227,11 +245,15 @@ func ReadBaseUrl(path string) (string, bool) {
 // runs).
 type SettingsUndo struct {
 	BaseURLBefore      *string    `json:"baseUrlBefore,omitempty"`
+	ProxyBefore        *string    `json:"proxyBefore,omitempty"`
+	CABefore           *string    `json:"caBefore,omitempty"`
+	NoProxyBefore      *string    `json:"noProxyBefore,omitempty"`
 	OptionsAdded       []string   `json:"optionsAdded"`
 	AvailableAppended  []string   `json:"availableAppended"`
 	CreatedModelPicker bool       `json:"createdModelPicker"`
 	CreatedOptions     bool       `json:"createdOptions"`
 	CreatedEnv         bool       `json:"createdEnv"`
+	CreatedProxy       bool       `json:"createdProxy"`
 	CreatedToolSearch  bool       `json:"createdToolSearch"`
 	EffortsAdded       *StringMap `json:"effortsAdded"`
 }
@@ -252,6 +274,7 @@ func UndoProviderSettings(ctx context.Context, path string, name string, undo Se
 			return nil, err
 		}
 		lines = append(lines, baseURL...)
+		lines = append(lines, undoProxy(root, undo, routerURL, livePluginURLs)...)
 		lines = append(lines, undoToolSearch(root, undo)...)
 		lines = append(lines, undoEfforts(root, undo)...)
 		return lines, nil
@@ -339,6 +362,71 @@ func undoBaseUrl(root *jsonNode, undo SettingsUndo, routerURL string, livePlugin
 		root.del("env")
 	}
 	return []string{fmt.Sprintf("removed ANTHROPIC_BASE_URL (%s)", routerURL)}, nil
+}
+
+// undoProxy puts the proxy keys back while they are still ours: HTTPS_PROXY naming this router is
+// the ownership test, and a proxy the user changed since takes its CA and NO_PROXY with it. The
+// before-values go back; a key with nothing before it goes (see UndoProviderSettings), and an env
+// this undo created and emptied goes with them.
+func undoProxy(root *jsonNode, undo SettingsUndo, routerURL string, livePluginURLs []string) []string {
+	env := root.get("env")
+	if !env.isObject() {
+		return nil
+	}
+	current, ok := env.get("HTTPS_PROXY").text()
+	if !ok || !proxyIsOurs(current, routerURL) {
+		return nil
+	}
+	var lines []string
+	restore := ""
+	if undo.ProxyBefore != nil {
+		if name := domain.ProxyRouterName(*undo.ProxyBefore); name == "" || domain.ProxyRouterIsLive(livePluginURLs, name) {
+			restore = *undo.ProxyBefore
+		}
+	}
+	if restore == "" {
+		// The before router is gone or was never recorded: another live plugin router takes over
+		// when there is one.
+		for _, url := range livePluginURLs {
+			if domain.PluginRouters[domain.PortOf(url)] != domain.PluginRouters[domain.PortOf(routerURL)] {
+				restore = url
+				break
+			}
+		}
+	}
+	if restore != "" {
+		env.set("HTTPS_PROXY", newText(restore))
+		lines = append(lines, "set HTTPS_PROXY back to "+restore)
+	} else {
+		env.del("HTTPS_PROXY")
+		lines = append(lines, "removed HTTPS_PROXY ("+routerURL+")")
+	}
+	// A key with a recorded before goes back to it; one that is still there without a before goes;
+	// a key the user already took away is not reported.
+	if undo.CABefore != nil {
+		env.set("NODE_EXTRA_CA_CERTS", newText(*undo.CABefore))
+		lines = append(lines, "set NODE_EXTRA_CA_CERTS back to "+*undo.CABefore)
+	} else if _, there := env.get("NODE_EXTRA_CA_CERTS").text(); there {
+		env.del("NODE_EXTRA_CA_CERTS")
+		lines = append(lines, "removed NODE_EXTRA_CA_CERTS")
+	}
+	if undo.NoProxyBefore != nil {
+		env.set("NO_PROXY", newText(*undo.NoProxyBefore))
+		lines = append(lines, "set NO_PROXY back to "+*undo.NoProxyBefore)
+	} else if _, there := env.get("NO_PROXY").text(); there {
+		env.del("NO_PROXY")
+		lines = append(lines, "removed NO_PROXY")
+	}
+	if undo.CreatedProxy && env.size() == 0 {
+		root.del("env")
+	}
+	return lines
+}
+
+// proxyIsOurs is whether an HTTPS_PROXY value names this plugin's router.
+func proxyIsOurs(current, routerURL string) bool {
+	ours := domain.PluginRouters[domain.PortOf(routerURL)]
+	return ours != "" && domain.ProxyRouterName(current) == ours
 }
 
 // undoToolSearch takes env.ENABLE_TOOL_SEARCH out when setup set it and it still says so: a value
@@ -635,6 +723,34 @@ func currentEnvString(root *jsonNode, key, path string) (*string, error) {
 	return &value, nil
 }
 
+// currentProxySettings reads the four env values the proxy plan decides on; the same wrong-shape
+// errors as the base URL.
+func currentProxySettings(root *jsonNode, path string) (domain.ProxySettings, error) {
+	// Claude Code reads https_proxy before HTTPS_PROXY, so the lowercase one, when set, is in force.
+	proxy, err := currentEnvString(root, "https_proxy", path)
+	if err != nil {
+		return domain.ProxySettings{}, err
+	}
+	if proxy == nil {
+		if proxy, err = currentEnvString(root, "HTTPS_PROXY", path); err != nil {
+			return domain.ProxySettings{}, err
+		}
+	}
+	ca, err := currentEnvString(root, "NODE_EXTRA_CA_CERTS", path)
+	if err != nil {
+		return domain.ProxySettings{}, err
+	}
+	noProxy, err := currentEnvString(root, "NO_PROXY", path)
+	if err != nil {
+		return domain.ProxySettings{}, err
+	}
+	baseURL, err := currentBaseUrl(root, path)
+	if err != nil {
+		return domain.ProxySettings{}, err
+	}
+	return domain.ProxySettings{HTTPSProxy: proxy, CA: ca, NoProxy: noProxy, BaseURL: baseURL}, nil
+}
+
 func applyBaseUrl(root *jsonNode, plan domain.BaseUrlPlan, path string) []string {
 	if plan.Kind == domain.BaseUrlPlanKeep {
 		if plan.Report == nil {
@@ -661,6 +777,68 @@ func applyBaseUrl(root *jsonNode, plan domain.BaseUrlPlan, path string) []string
 		env.set("ANTHROPIC_BASE_URL", newText(plan.URL))
 	}
 	return []string{*plan.Report}
+}
+
+// applyProxy writes the proxy plan into env, mirroring applyBaseUrl: a set writes its keys, a keep
+// only writes the NO_PROXY it appends and takes a stale plugin-router base URL out, a remove takes
+// the three keys out (an emptied env with them).
+func applyProxy(root *jsonNode, plan domain.ProxyPlan, path string) []string {
+	var lines []string
+	if plan.Report != nil {
+		lines = append(lines, *plan.Report)
+	}
+	if plan.RemoveBaseURL {
+		lines = append(lines, takeOutBaseURL(root)...)
+	}
+	switch plan.Kind {
+	case domain.ProxyPlanRemove:
+		env, err := objectAt(root, "env", path)
+		if err != nil || env == nil {
+			return lines
+		}
+		for _, key := range []string{"HTTPS_PROXY", "NODE_EXTRA_CA_CERTS"} {
+			env.del(key)
+		}
+		if env.size() == 0 {
+			root.del("env")
+		}
+	case domain.ProxyPlanSet:
+		env, err := ensureObject(root, "env", path)
+		if err != nil || env == nil {
+			return lines
+		}
+		env.set("HTTPS_PROXY", newText(plan.Proxy))
+		if plan.CA != "" {
+			env.set("NODE_EXTRA_CA_CERTS", newText(plan.CA))
+		}
+		if plan.NoProxy != "" {
+			env.set("NO_PROXY", newText(plan.NoProxy))
+		}
+	case domain.ProxyPlanKeep:
+		if plan.NoProxy == "" {
+			return lines
+		}
+		env, err := objectAt(root, "env", path)
+		if err != nil || env == nil {
+			return lines
+		}
+		env.set("NO_PROXY", newText(plan.NoProxy))
+	}
+	return lines
+}
+
+// takeOutBaseURL removes the base URL the proxy mode replaces and says so.
+func takeOutBaseURL(root *jsonNode) []string {
+	env := root.get("env")
+	if !env.isObject() {
+		return nil
+	}
+	current, ok := env.get("ANTHROPIC_BASE_URL").text()
+	if !ok {
+		return nil
+	}
+	env.del("ANTHROPIC_BASE_URL")
+	return []string{"removed ANTHROPIC_BASE_URL (" + current + ")"}
 }
 
 // applyToolSearch sets env.ENABLE_TOOL_SEARCH when the settings end up pointing Claude Code at

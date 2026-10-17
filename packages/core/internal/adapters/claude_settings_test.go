@@ -1241,6 +1241,26 @@ func TestUndoProviderSettings(t *testing.T) {
 		assertFile(t, path, "{\n  \"env\": {\n    \"ENABLE_TOOL_SEARCH\": \"false\"\n  }\n}\n")
 	})
 
+	t.Run("takes the proxy keys back the ledger recorded", func(t *testing.T) {
+		path := settingsFilePath(t)
+		writeSettingsFile(t, path, "{\n  \"theme\": \"dark\",\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\",\n    \"NODE_EXTRA_CA_CERTS\": \"/ca/ca.pem\",\n    \"NO_PROXY\": \"localhost,127.0.0.1\"\n  }\n}\n")
+
+		lines, err := UndoProviderSettings(t.Context(), path, "zai", SettingsUndo{
+			OptionsAdded:      []string{},
+			AvailableAppended: []string{},
+			CreatedProxy:      true,
+		}, routerURL, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assertLines(t, lines,
+			"removed HTTPS_PROXY ("+routerURL+")",
+			"removed NODE_EXTRA_CA_CERTS",
+			"removed NO_PROXY",
+		)
+		assertFile(t, path, "{\n  \"theme\": \"dark\"\n}\n")
+	})
+
 	t.Run("takes the effort levels out, an emptied entry with them", func(t *testing.T) {
 		path := settingsFilePath(t)
 		delta := appliedWithDelta(t, path)
@@ -1829,4 +1849,312 @@ func TestClaudeSettingsInternals(t *testing.T) {
 			t.Fatal("a nil map is not empty")
 		}
 	})
+}
+
+// proxyRoot parses settings JSON for the proxy edits' white-box tests.
+func proxyRoot(t *testing.T, text string) *jsonNode {
+	t.Helper()
+	root, err := parseJSON(text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return root
+}
+
+// envString reads one env value back out of a parsed root.
+func envString(t *testing.T, root *jsonNode, key string) (string, bool) {
+	t.Helper()
+	env := root.get("env")
+	if !env.isObject() {
+		return "", false
+	}
+	return env.get(key).text()
+}
+
+const caPath = "/ca/zai/ca.pem"
+
+func TestApplyProxy(t *testing.T) {
+	t.Run("a set plan writes the three keys into env", func(t *testing.T) {
+		root := proxyRoot(t, "{}\n")
+		lines := applyProxy(root, domain.ProxyPlan{
+			Kind:    domain.ProxyPlanSet,
+			Proxy:   routerURL,
+			CA:      caPath,
+			NoProxy: "localhost,127.0.0.1",
+			Report:  strPtr("pointed HTTPS_PROXY at " + routerURL),
+		}, "settings.json")
+		assertLines(t, lines, "pointed HTTPS_PROXY at "+routerURL)
+		if value, _ := envString(t, root, "HTTPS_PROXY"); value != routerURL {
+			t.Fatalf("HTTPS_PROXY = %q; want %q", value, routerURL)
+		}
+		if value, _ := envString(t, root, "NODE_EXTRA_CA_CERTS"); value != caPath {
+			t.Fatalf("NODE_EXTRA_CA_CERTS = %q; want %q", value, caPath)
+		}
+		if value, _ := envString(t, root, "NO_PROXY"); value != "localhost,127.0.0.1" {
+			t.Fatalf("NO_PROXY = %q; want the loopback entries", value)
+		}
+	})
+
+	t.Run("a keep plan with nothing to write changes nothing", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"OTHER\": \"x\"\n  }\n}\n")
+		if lines := applyProxy(root, domain.ProxyPlan{Kind: domain.ProxyPlanKeep}, "settings.json"); lines != nil {
+			t.Fatalf("lines = %#v; want none", lines)
+		}
+		if value, _ := envString(t, root, "OTHER"); value != "x" {
+			t.Fatalf("OTHER = %q; want untouched", value)
+		}
+	})
+
+	t.Run("a keep plan writes only the NO_PROXY it appends", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \"http://localhost:18787\"\n  }\n}\n")
+		lines := applyProxy(root, domain.ProxyPlan{
+			Kind:    domain.ProxyPlanKeep,
+			NoProxy: "localhost,127.0.0.1",
+			Report:  strPtr("appended localhost and 127.0.0.1 to NO_PROXY"),
+		}, "settings.json")
+		assertLines(t, lines, "appended localhost and 127.0.0.1 to NO_PROXY")
+		if value, _ := envString(t, root, "NO_PROXY"); value != "localhost,127.0.0.1" {
+			t.Fatalf("NO_PROXY = %q; want the loopback entries", value)
+		}
+		if value, _ := envString(t, root, "HTTPS_PROXY"); value != "http://localhost:18787" {
+			t.Fatalf("HTTPS_PROXY = %q; want untouched", value)
+		}
+	})
+
+	t.Run("a keep plan takes a stale plugin-router base URL out", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\",\n    \"ANTHROPIC_BASE_URL\": \""+kimiRouter+"\"\n  }\n}\n")
+		lines := applyProxy(root, domain.ProxyPlan{Kind: domain.ProxyPlanKeep, RemoveBaseURL: true}, "settings.json")
+		assertLines(t, lines, "removed ANTHROPIC_BASE_URL ("+kimiRouter+")")
+		if _, ok := envString(t, root, "ANTHROPIC_BASE_URL"); ok {
+			t.Fatal("ANTHROPIC_BASE_URL survived")
+		}
+	})
+
+	t.Run("the base-URL fallback reports and writes nothing", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"ANTHROPIC_BASE_URL\": \"x\"\n  }\n}\n")
+		lines := applyProxy(root, domain.ProxyPlan{
+			Kind:   domain.ProxyPlanBaseURL,
+			Report: strPtr("kept your own proxy/CA"),
+		}, "settings.json")
+		assertLines(t, lines, "kept your own proxy/CA")
+		if value, _ := envString(t, root, "ANTHROPIC_BASE_URL"); value != "x" {
+			t.Fatalf("ANTHROPIC_BASE_URL = %q; want untouched", value)
+		}
+	})
+
+	t.Run("a set plan takes the base URL out with it", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"ANTHROPIC_BASE_URL\": \""+kimiRouter+"\"\n  }\n}\n")
+		lines := applyProxy(root, domain.ProxyPlan{
+			Kind:          domain.ProxyPlanSet,
+			Proxy:         routerURL,
+			CA:            caPath,
+			NoProxy:       "localhost,127.0.0.1",
+			RemoveBaseURL: true,
+			Report:        strPtr("pointed HTTPS_PROXY at " + routerURL),
+		}, "settings.json")
+		assertLines(t, lines,
+			"pointed HTTPS_PROXY at "+routerURL,
+			"removed ANTHROPIC_BASE_URL ("+kimiRouter+")",
+		)
+		if _, ok := envString(t, root, "ANTHROPIC_BASE_URL"); ok {
+			t.Fatal("ANTHROPIC_BASE_URL survived")
+		}
+		if value, _ := envString(t, root, "HTTPS_PROXY"); value != routerURL {
+			t.Fatalf("HTTPS_PROXY = %q; want %q", value, routerURL)
+		}
+	})
+
+	t.Run("a repoint set writes only HTTPS_PROXY", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\",\n    \"NODE_EXTRA_CA_CERTS\": \""+caPath+"\",\n    \"NO_PROXY\": \"localhost,127.0.0.1\"\n  }\n}\n")
+		lines := applyProxy(root, domain.ProxyPlan{
+			Kind:   domain.ProxyPlanSet,
+			Proxy:  kimiRouter,
+			Report: strPtr("pointed HTTPS_PROXY at " + kimiRouter),
+		}, "settings.json")
+		assertLines(t, lines, "pointed HTTPS_PROXY at "+kimiRouter)
+		if value, _ := envString(t, root, "HTTPS_PROXY"); value != kimiRouter {
+			t.Fatalf("HTTPS_PROXY = %q; want %q", value, kimiRouter)
+		}
+		if value, _ := envString(t, root, "NODE_EXTRA_CA_CERTS"); value != caPath {
+			t.Fatalf("NODE_EXTRA_CA_CERTS = %q; want untouched", value)
+		}
+		if value, _ := envString(t, root, "NO_PROXY"); value != "localhost,127.0.0.1" {
+			t.Fatalf("NO_PROXY = %q; want untouched", value)
+		}
+	})
+
+	t.Run("a remove plan takes the proxy and CA and an emptied env out", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\",\n    \"NODE_EXTRA_CA_CERTS\": \""+caPath+"\"\n  }\n}\n")
+		lines := applyProxy(root, domain.ProxyPlan{
+			Kind:   domain.ProxyPlanRemove,
+			Report: strPtr("removed HTTPS_PROXY and NODE_EXTRA_CA_CERTS (" + routerURL + ")"),
+		}, "settings.json")
+		assertLines(t, lines, "removed HTTPS_PROXY and NODE_EXTRA_CA_CERTS ("+routerURL+")")
+		if root.get("env") != nil {
+			t.Fatal("an emptied env survived")
+		}
+	})
+
+	t.Run("a remove plan leaves an env that holds more", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"ANTHROPIC_AUTH_TOKEN\": \"redacted\",\n    \"HTTPS_PROXY\": \""+routerURL+"\",\n    \"NO_PROXY\": \"localhost,127.0.0.1\"\n  }\n}\n")
+		applyProxy(root, domain.ProxyPlan{Kind: domain.ProxyPlanRemove, Report: strPtr("removed ours")}, "settings.json")
+		if value, _ := envString(t, root, "ANTHROPIC_AUTH_TOKEN"); value != "redacted" {
+			t.Fatalf("ANTHROPIC_AUTH_TOKEN = %q; want kept", value)
+		}
+		if _, ok := envString(t, root, "HTTPS_PROXY"); ok {
+			t.Fatal("HTTPS_PROXY survived")
+		}
+	})
+}
+
+func TestUndoProxy(t *testing.T) {
+	t.Run("restores the before-values while the proxy is still ours", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\",\n    \"NODE_EXTRA_CA_CERTS\": \""+caPath+"\",\n    \"NO_PROXY\": \"localhost,127.0.0.1\"\n  }\n}\n")
+		lines := undoProxy(root, SettingsUndo{
+			ProxyBefore:   strPtr("http://proxy.corp:3128"),
+			CABefore:      strPtr("/old/ca.pem"),
+			NoProxyBefore: strPtr("corp.internal"),
+		}, routerURL, nil)
+		assertLines(t, lines,
+			"set HTTPS_PROXY back to http://proxy.corp:3128",
+			"set NODE_EXTRA_CA_CERTS back to /old/ca.pem",
+			"set NO_PROXY back to corp.internal",
+		)
+		if value, _ := envString(t, root, "HTTPS_PROXY"); value != "http://proxy.corp:3128" {
+			t.Fatalf("HTTPS_PROXY = %q; want the value before", value)
+		}
+		if value, _ := envString(t, root, "NO_PROXY"); value != "corp.internal" {
+			t.Fatalf("NO_PROXY = %q; want the value before", value)
+		}
+	})
+
+	t.Run("removes our keys and the env this run created", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\"\n  }\n}\n")
+		lines := undoProxy(root, SettingsUndo{CreatedProxy: true}, routerURL, nil)
+		assertLines(t, lines, "removed HTTPS_PROXY ("+routerURL+")")
+		if root.get("env") != nil {
+			t.Fatal("an emptied env this run created survived")
+		}
+	})
+
+	t.Run("leaves an env this run did not create", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\"\n  }\n}\n")
+		undoProxy(root, SettingsUndo{}, routerURL, nil)
+		env := root.get("env")
+		if !env.isObject() || env.size() != 0 {
+			t.Fatalf("env = %v; want an emptied object left in place", env)
+		}
+	})
+
+	t.Run("leaves everything when the proxy is not ours anymore", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \"http://proxy.corp:3128\",\n    \"NODE_EXTRA_CA_CERTS\": \""+caPath+"\"\n  }\n}\n")
+		if lines := undoProxy(root, SettingsUndo{CreatedProxy: true}, routerURL, nil); lines != nil {
+			t.Fatalf("lines = %#v; want none", lines)
+		}
+		if value, _ := envString(t, root, "NODE_EXTRA_CA_CERTS"); value != caPath {
+			t.Fatalf("NODE_EXTRA_CA_CERTS = %q; want untouched", value)
+		}
+	})
+
+	t.Run("leaves everything when there is no env", func(t *testing.T) {
+		root := proxyRoot(t, "{}\n")
+		if lines := undoProxy(root, SettingsUndo{CreatedProxy: true}, routerURL, nil); lines != nil {
+			t.Fatalf("lines = %#v; want none", lines)
+		}
+	})
+
+	t.Run("a dead before router is replaced by a live other", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\"\n  }\n}\n")
+		lines := undoProxy(root, SettingsUndo{ProxyBefore: strPtr(kimiRouter)}, routerURL, []string{"http://localhost:18790"})
+		assertLines(t, lines, "set HTTPS_PROXY back to http://localhost:18790")
+	})
+
+	t.Run("a live before router goes back", func(t *testing.T) {
+		root := proxyRoot(t, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\"\n  }\n}\n")
+		lines := undoProxy(root, SettingsUndo{ProxyBefore: strPtr(kimiRouter)}, routerURL, []string{kimiRouter})
+		assertLines(t, lines, "set HTTPS_PROXY back to "+kimiRouter)
+	})
+}
+
+func TestClearProxy(t *testing.T) {
+	t.Run("removes the proxy and CA, leaving NO_PROXY (it may hold the user's own entries) and the rest of env", func(t *testing.T) {
+		path := settingsFilePath(t)
+		writeSettingsFile(t, path, "{\n  \"env\": {\n    \"ANTHROPIC_AUTH_TOKEN\": \"redacted\",\n    \"HTTPS_PROXY\": \""+routerURL+"\",\n    \"NODE_EXTRA_CA_CERTS\": \""+caPath+"\",\n    \"NO_PROXY\": \"localhost,127.0.0.1\"\n  }\n}\n")
+
+		lines, err := ClearProxy(t.Context(), path, routerURL, nil, "provider-router")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assertLines(t, lines, "removed HTTPS_PROXY and NODE_EXTRA_CA_CERTS ("+routerURL+")")
+		assertFile(t, path, "{\n  \"env\": {\n    \"ANTHROPIC_AUTH_TOKEN\": \"redacted\",\n    \"NO_PROXY\": \"localhost,127.0.0.1\"\n  }\n}\n")
+	})
+
+	t.Run("repoints at another live router, leaving its CA and NO_PROXY alone", func(t *testing.T) {
+		path := settingsFilePath(t)
+		writeSettingsFile(t, path, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\",\n    \"NODE_EXTRA_CA_CERTS\": \""+caPath+"\",\n    \"NO_PROXY\": \"localhost,127.0.0.1\"\n  }\n}\n")
+
+		lines, err := ClearProxy(t.Context(), path, routerURL, []string{kimiRouter}, "provider-router")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assertLines(t, lines, "pointed HTTPS_PROXY at another plugin's router ("+kimiRouter+")")
+		assertFile(t, path, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+kimiRouter+"\",\n    \"NODE_EXTRA_CA_CERTS\": \""+caPath+"\",\n    \"NO_PROXY\": \"localhost,127.0.0.1\"\n  }\n}\n")
+	})
+
+	t.Run("takes a stale plugin-router base URL out with the keys", func(t *testing.T) {
+		path := settingsFilePath(t)
+		writeSettingsFile(t, path, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \""+routerURL+"\",\n    \"ANTHROPIC_BASE_URL\": \""+kimiRouter+"\"\n  }\n}\n")
+
+		lines, err := ClearProxy(t.Context(), path, routerURL, nil, "provider-router")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assertLines(t, lines,
+			"removed HTTPS_PROXY and NODE_EXTRA_CA_CERTS ("+routerURL+")",
+			"removed ANTHROPIC_BASE_URL ("+kimiRouter+")",
+		)
+		content, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if env := proxyRoot(t, string(content)).get("env"); env != nil {
+			t.Fatal("an emptied env survived")
+		}
+	})
+
+	t.Run("leaves a proxy that is not ours", func(t *testing.T) {
+		path := settingsFilePath(t)
+		writeSettingsFile(t, path, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \"http://proxy.corp:3128\"\n  }\n}\n")
+
+		lines, err := ClearProxy(t.Context(), path, routerURL, nil, "provider-router")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assertLines(t, lines)
+		assertFile(t, path, "{\n  \"env\": {\n    \"HTTPS_PROXY\": \"http://proxy.corp:3128\"\n  }\n}\n")
+	})
+
+	t.Run("refuses an env that is not an object", func(t *testing.T) {
+		path := settingsFilePath(t)
+		writeSettingsFile(t, path, "{\"env\":\"nope\"}\n")
+		if _, err := ClearProxy(t.Context(), path, routerURL, nil, "provider-router"); err == nil || !strings.Contains(err.Error(), "env must be an object") {
+			t.Fatalf("error = %v; want it to say env must be an object", err)
+		}
+		assertFile(t, path, "{\"env\":\"nope\"}\n")
+	})
+}
+
+func TestCurrentProxySettingsReadsTheLowercaseProxyFirst(t *testing.T) {
+	// Claude Code reads https_proxy before HTTPS_PROXY: a user's lowercase proxy is the one in force.
+	root := proxyRoot(t, "{\n  \"env\": {\n    \"https_proxy\": \"http://proxy.corp:3128\",\n    \"HTTPS_PROXY\": \""+routerURL+"\"\n  }\n}\n")
+	got, err := currentProxySettings(root, "settings.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.HTTPSProxy == nil || *got.HTTPSProxy != "http://proxy.corp:3128" {
+		t.Fatalf("HTTPSProxy = %v; want the lowercase value", got.HTTPSProxy)
+	}
+	if plan := domain.PlanProxy(got, routerURL, caPath, nil); plan.Kind != domain.ProxyPlanBaseURL {
+		t.Fatalf("plan = %s; want base-url beside the user's own proxy", plan.Kind)
+	}
 }

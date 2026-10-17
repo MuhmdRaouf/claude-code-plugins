@@ -61,6 +61,7 @@ func TestLedgerAgentsOrder(t *testing.T) {
     "createdModelPicker": false,
     "createdOptions": false,
     "createdEnv": false,
+    "createdProxy": false,
     "createdToolSearch": false,
     "effortsAdded": {}
   },
@@ -248,6 +249,7 @@ func orderedLedgerJSON(t *testing.T) string {
     "createdModelPicker": false,
     "createdOptions": false,
     "createdEnv": false,
+    "createdProxy": false,
     "createdToolSearch": false,
     "effortsAdded": {}
   },

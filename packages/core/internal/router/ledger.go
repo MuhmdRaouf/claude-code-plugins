@@ -341,15 +341,28 @@ func MergeSettingsUndo(previous *adapters.SettingsUndo, delta *adapters.Settings
 	}
 	merged := adapters.SettingsUndo{
 		BaseURLBefore:      base.BaseURLBefore,
+		ProxyBefore:        base.ProxyBefore,
+		CABefore:           base.CABefore,
+		NoProxyBefore:      base.NoProxyBefore,
 		OptionsAdded:       dedupe(union(base.OptionsAdded, delta.OptionsAdded)),
 		AvailableAppended:  dedupe(union(base.AvailableAppended, delta.AvailableAppended)),
 		CreatedModelPicker: base.CreatedModelPicker || delta.CreatedModelPicker,
 		CreatedOptions:     base.CreatedOptions || delta.CreatedOptions,
 		CreatedEnv:         base.CreatedEnv || delta.CreatedEnv,
+		CreatedProxy:       base.CreatedProxy || delta.CreatedProxy,
 		CreatedToolSearch:  base.CreatedToolSearch || delta.CreatedToolSearch,
 	}
 	if merged.BaseURLBefore == nil {
 		merged.BaseURLBefore = delta.BaseURLBefore
+	}
+	if merged.ProxyBefore == nil {
+		merged.ProxyBefore = delta.ProxyBefore
+	}
+	if merged.CABefore == nil {
+		merged.CABefore = delta.CABefore
+	}
+	if merged.NoProxyBefore == nil {
+		merged.NoProxyBefore = delta.NoProxyBefore
 	}
 	// { ...delta.effortsAdded, ...base.effortsAdded }: the delta's keys first, the previous values
 	// winning on the same key.
