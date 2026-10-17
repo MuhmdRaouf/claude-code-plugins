@@ -4,22 +4,22 @@
   "assets": {
     "darwin-amd64": {
       "name": "plugin-core-darwin-amd64",
-      "sha256": "7814284125c5e3377cdfb92d4456b68cf96e1abe5d55acbc0b5e5f8e91cdcf9c",
+      "sha256": "2b309a6d67216597bc97687769ff636abda370d7b52490ea70cd22819fba159c",
       "size": 11785408
     },
     "darwin-arm64": {
       "name": "plugin-core-darwin-arm64",
-      "sha256": "20812bcdd1b467de02be235672b95704933b49d936b39f3fb3d4edbda807828b",
+      "sha256": "4c18bf67545ca3bd82c208dec826402d2615a2100e40a19001606cfb53121db6",
       "size": 10828594
     },
     "linux-amd64": {
       "name": "plugin-core-linux-amd64",
-      "sha256": "575af4202dbe295e60b33c66dbc1b6bba33a7624d0309fe118eebad149f07889",
+      "sha256": "f45e96ef38ad0aeae4b313292ff429aeb4f08f0825b10e3394d3904c0ac6eefe",
       "size": 11546748
     },
     "linux-arm64": {
       "name": "plugin-core-linux-arm64",
-      "sha256": "012f9193c6446e8eb68c762ee26c8f203588bc77751ba5afa29789c60335366d",
+      "sha256": "ad5fa9e4e9608a3f8e81a12578d3cec15ff8fbd22815790cb85c5a45ac3d52f2",
       "size": 10616956
     }
   }

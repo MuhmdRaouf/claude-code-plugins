@@ -265,7 +265,7 @@ Three independent mechanisms. Each one works without the others:
   `budget-status.json` in its state root (`$RADAR_HOME`, else `~/.agents/radar`).
   - The worker reads it at most every 5 seconds.
   - While it lists `provider:<p>` or `total` as stopped, the provider's models get the same non-retryable 400:
-    `<Display> budget reached for this <period>: raise or lift it in the Radar dashboard (/radar:open)`.
+    `<Display> budget reached for this <period>: raise or lift it in the Radar dashboard (/huddle:open)`.
     The period comes from `budgets.json`.
   - The check comes before the key lookup.
   - A missing, unparsable, oversized, non-regular or stale (over 10 minutes old) file stops nothing.

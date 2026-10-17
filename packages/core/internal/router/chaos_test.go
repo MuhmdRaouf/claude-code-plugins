@@ -1745,7 +1745,7 @@ func TestChaosClaudeRequestsGetAnthropicsExactBytes(t *testing.T) {
 		if err := json.Unmarshal([]byte(refused.body), &message); err != nil {
 			t.Fatal(err)
 		}
-		if want := "Chaos Models budget reached for this month: raise or lift it in the Radar dashboard (/radar:open)"; message.Error.Message != want {
+		if want := "Chaos Models budget reached for this month: raise or lift it in the Radar dashboard (/huddle:open)"; message.Error.Message != want {
 			t.Fatalf("the 400 = %q, want %q", message.Error.Message, want)
 		}
 		chaosExpectClaudeBoth(t, r)

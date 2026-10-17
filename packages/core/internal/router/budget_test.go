@@ -119,7 +119,7 @@ func TestStoppedBudgetOnRouter(t *testing.T) {
 			t.Errorf("x-should-retry = %q", retry)
 		}
 		want := `{"type":"error","error":{"type":"invalid_request_error","message":` +
-			`"Z.ai GLM budget reached for this month: raise or lift it in the Radar dashboard (/radar:open)"}}`
+			`"Z.ai GLM budget reached for this month: raise or lift it in the Radar dashboard (/huddle:open)"}}`
 		if body != want {
 			t.Errorf("body = %s", body)
 		}

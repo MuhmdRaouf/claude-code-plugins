@@ -102,7 +102,7 @@ func BudgetMessage(display string, stop BudgetStop) string {
 	if stop.Period != nil {
 		period = string(*stop.Period)
 	}
-	return fmt.Sprintf("%s budget reached for this %s: raise or lift it in the Radar dashboard (/radar:open)", display, period)
+	return fmt.Sprintf("%s budget reached for this %s: raise or lift it in the Radar dashboard (/huddle:open)", display, period)
 }
 
 // budgetsOf returns the budgets that parse, one bad entry skipped rather than all of them lost.
