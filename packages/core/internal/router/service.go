@@ -290,7 +290,10 @@ func serviceRun(ctx context.Context, options RouterServiceOptions) int {
 		ListenPort: portFromEnv(env, provider.EnvPrefix+"_ROUTER_LISTEN_PORT", port),
 		Anthropic:  anthropic,
 		Env:        ProxyEnv(env),
-		Version:    version,
+		// Proxy mode: the CA lives next to the state root (~/.agents/ca), shared by every plugin's
+		// router, so CONNECT api.anthropic.com can be decrypted and routed.
+		CADir:   filepath.Join(filepath.Dir(stateRoot), "ca"),
+		Version: version,
 		FrontVersion: func() *int {
 			if tuning.FrontVersion == nil {
 				return nil

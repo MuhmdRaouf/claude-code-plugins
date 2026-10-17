@@ -21,6 +21,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -36,6 +37,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/adapters/localca"
 	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/domain"
 )
 
@@ -173,6 +175,14 @@ type FrontOptions struct {
 	ListenPort int
 	Anthropic  *url.URL
 	Env        ProxyEnv
+	// CADir is the local CA's directory (~/.agents/ca). Proxy mode is on only when it is set:
+	// CONNECT then decrypts api.anthropic.com and routes it as base-URL mode routes a request, and
+	// every other CONNECT is a blind tunnel. Empty keeps base-URL mode: every CONNECT is a blind
+	// tunnel.
+	CADir string
+	// Dial opens a blind tunnel's socket; nil dials through the user's own proxy when one applies,
+	// else directly with a 10 s timeout.
+	Dial func(ctx context.Context, network, addr string) (net.Conn, error)
 	// Version is the bundle's version, reported by health so the starter can tell a stale router.
 	Version string
 	// FrontVersion is the front protocol this front speaks; nil is FrontVersion (the chaos suite
@@ -309,6 +319,16 @@ type Front struct {
 	supervise     *time.Ticker
 	watchTicker   *time.Ticker
 	retiredTicker *time.Ticker
+
+	// The HTTPS proxy's certificate state, guarded by mu (connect.go): the local CA, the leaf it
+	// signed for api.anthropic.com, and the last load attempt — its error, when it ran and whether
+	// the failure is already in the log.
+	ca           *localca.CA
+	caErr        error
+	caAt         time.Time
+	caLogged     bool
+	leaf         *tls.Certificate
+	leafNotAfter time.Time
 }
 
 // workerReady is a worker requests can go to.
@@ -600,6 +620,13 @@ func (f *Front) listen(port int) error {
 }
 
 func (f *Front) handle(w http.ResponseWriter, req *http.Request) {
+	// A CONNECT names the tunnel's target in the authority, so the Host check below (a
+	// DNS-rebinding guard for pages a browser could reach) cannot apply to it; only a proxy client
+	// sends one.
+	if req.Method == http.MethodConnect {
+		f.connect(w, req)
+		return
+	}
 	res := NewResponse(w)
 	f.mu.Lock()
 	listenPort := f.listenPort
