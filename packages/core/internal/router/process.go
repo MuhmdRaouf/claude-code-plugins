@@ -312,16 +312,30 @@ func childExactSet(provider domain.Provider) map[string]bool {
 }
 
 // ChildEnv is the environment the router runs with: what it needs to find its state, its key and
-// the network (the caller's proxy and certificate settings, in any case), and nothing else.
+// the network (the caller's proxy and certificate settings, in any case), and nothing else. A
+// proxy naming a plugin router never passes: proxy mode puts the router in HTTPS_PROXY, and a
+// child sending its own upstream requests through the router loops back into itself — the CA
+// variable goes with it, since it was set for that proxy's certificate.
 func ChildEnv(provider domain.Provider, env domain.EnvLookup, stateRoot string, extra map[string]string) map[string]string {
 	exact := childExactSet(provider)
 	out := map[string]string{}
+	routerProxy := false
 	for name, value := range env {
-		if exact[name] || strings.EqualFold(name, "http_proxy") ||
-			strings.EqualFold(name, "https_proxy") || strings.EqualFold(name, "no_proxy") ||
+		if exact[name] || strings.EqualFold(name, "no_proxy") ||
 			strings.HasPrefix(name, provider.EnvPrefix+"_") {
 			out[name] = value
+			continue
 		}
+		if strings.EqualFold(name, "http_proxy") || strings.EqualFold(name, "https_proxy") {
+			if domain.IsPluginRouterProxy(value) {
+				routerProxy = true
+				continue
+			}
+			out[name] = value
+		}
+	}
+	if routerProxy {
+		delete(out, "NODE_EXTRA_CA_CERTS")
 	}
 	out[domain.RouterEnvName(provider, domain.RouterEnvKnobPort)] = strconv.Itoa(domain.RouterPort(provider, env))
 	out[provider.EnvPrefix+"_STATE_DIR"] = stateRoot

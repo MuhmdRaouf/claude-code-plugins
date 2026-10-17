@@ -71,6 +71,16 @@ func IsPluginRouterURL(rawURL string) bool {
 	return IsLoopback(urlHostname(parsed)) && PluginRouters[routerPortOf(parsed)] != ""
 }
 
+// IsPluginRouterProxy reports whether a proxy variable's value names one of the five plugin routers, adding `http://`
+// when the value has no scheme the way a proxy URL is read. Proxy mode must not hand such a proxy on: a process
+// sending its own upstream requests through the router loops back into itself.
+func IsPluginRouterProxy(raw string) bool {
+	if !strings.Contains(raw, "://") {
+		raw = "http://" + raw
+	}
+	return IsPluginRouterURL(raw)
+}
+
 // urlHostname mirrors a WHATWG URL's hostname: the host without its port, lowercased, IPv6 brackets kept (JS reports
 // "[::1]", never "::1").
 func urlHostname(parsed *url.URL) string {

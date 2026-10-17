@@ -47,6 +47,33 @@ func TestToolEnv(t *testing.T) {
 		}
 	})
 
+	t.Run("withholds a proxy that names a plugin router and the CA set for it, keeps a corporate proxy and its CA", func(t *testing.T) {
+		cases := []domain.EnvLookup{
+			{"HTTPS_PROXY": "http://127.0.0.1:18787"},
+			{"https_proxy": "http://127.0.0.1:18787"},
+			{"HTTP_PROXY": "http://localhost:18790"},
+			{"HTTPS_PROXY": "localhost:18790"},
+		}
+		for _, parent := range cases {
+			parent["NODE_EXTRA_CA_CERTS"] = "/ca.pem"
+			env := ToolEnv(parent, nil, withheld, reserved)
+			for _, name := range []string{
+				"HTTPS_PROXY", "https_proxy", "HTTP_PROXY", "http_proxy", "NODE_EXTRA_CA_CERTS",
+			} {
+				if _, ok := env[name]; ok {
+					t.Errorf("ToolEnv(%v) kept %s", parent, name)
+				}
+			}
+		}
+		env := ToolEnv(domain.EnvLookup{
+			"HTTPS_PROXY":         "http://proxy.corp:3128",
+			"NODE_EXTRA_CA_CERTS": "/ca.pem",
+		}, nil, withheld, reserved)
+		if env["HTTPS_PROXY"] != "http://proxy.corp:3128" || env["NODE_EXTRA_CA_CERTS"] != "/ca.pem" {
+			t.Errorf("ToolEnv dropped a corporate proxy or its CA: %v", env)
+		}
+	})
+
 	t.Run("knows Claude Code's routing and session variables from the user's own", func(t *testing.T) {
 		for _, name := range []string{
 			"ANTHROPIC_BASE_URL",

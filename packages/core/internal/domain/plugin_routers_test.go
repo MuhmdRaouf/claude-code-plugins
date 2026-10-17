@@ -99,6 +99,30 @@ func TestIsPluginRouterURL(t *testing.T) {
 	}
 }
 
+func TestIsPluginRouterProxy(t *testing.T) {
+	cases := []struct {
+		proxy string
+		want  bool
+	}{
+		{"http://127.0.0.1:18787", true},
+		{"http://localhost:18790", true},
+		{"https://LOCALHOST:18788", true},
+		{"127.0.0.1:18787", true},
+		{"localhost:18791", true},
+		{"http://proxy.corp:3128", false},
+		{"proxy.corp:3128", false},
+		{"http://localhost:8080", false},
+		{"http://example.com:18787", false},
+		{"127.0.0.1", false},
+		{"", false},
+	}
+	for _, tc := range cases {
+		if got := IsPluginRouterProxy(tc.proxy); got != tc.want {
+			t.Errorf("IsPluginRouterProxy(%q) = %v, want %v", tc.proxy, got, tc.want)
+		}
+	}
+}
+
 func TestPlanBaseUrl(t *testing.T) {
 	const routerURL = "http://127.0.0.1:18787"
 	kimi := "http://localhost:18788"

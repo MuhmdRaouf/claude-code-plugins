@@ -408,6 +408,24 @@ func TestProxyEnvironment(t *testing.T) {
 				t.Errorf("ProxyFor(%v) = %v, want none", env, proxy)
 			}
 		}
+		// A proxy naming a plugin router is no proxy: routing the router's own upstream through
+		// the router is a loop.
+		for _, env := range []ProxyEnv{
+			{"HTTPS_PROXY": "http://127.0.0.1:18787"},
+			{"https_proxy": "http://127.0.0.1:18787"},
+			{"HTTPS_PROXY": "127.0.0.1:18788"},
+			{"HTTP_PROXY": "http://localhost:18790"},
+		} {
+			if proxy, ok := ProxyFor(https, env); ok {
+				t.Errorf("ProxyFor(%v) = %v, want none", env, proxy)
+			}
+			if proxy, ok := ProxyFor(plain, env); ok {
+				t.Errorf("ProxyFor(%v) = %v, want none", env, proxy)
+			}
+		}
+		if proxy, ok := ProxyFor(https, ProxyEnv{"HTTPS_PROXY": "http://proxy.corp:3128"}); !ok || proxy.String() != "http://proxy.corp:3128" {
+			t.Errorf("ProxyFor(corporate proxy) = %v, %v, want http://proxy.corp:3128", proxy, ok)
+		}
 	})
 
 	t.Run("keeps one pooled agent per route and makes a fresh one for a retry", func(t *testing.T) {

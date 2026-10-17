@@ -30,6 +30,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/MuhmdRaouf/claude-code-plugins/packages/core/internal/domain"
 	"github.com/andybalholm/brotli"
 )
 
@@ -566,7 +567,8 @@ func sortStrings(values []string) {
 }
 
 // ProxyFor is the proxy a request to the target goes through, from HTTPS_PROXY/HTTP_PROXY (either
-// case), or none.
+// case), or none. A proxy naming a plugin router is no proxy: routing the router's own upstream
+// through the router is a loop.
 func ProxyFor(target *url.URL, env ProxyEnv) (*url.URL, bool) {
 	port := target.Port()
 	if port == "" {
@@ -585,6 +587,9 @@ func ProxyFor(target *url.URL, env ProxyEnv) (*url.URL, bool) {
 	}
 	raw, ok := envValue(env, name)
 	if !ok {
+		return nil, false
+	}
+	if domain.IsPluginRouterProxy(raw) {
 		return nil, false
 	}
 	if !strings.Contains(raw, "://") {

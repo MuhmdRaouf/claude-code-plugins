@@ -671,6 +671,36 @@ func TestRouterProcessPieces(t *testing.T) {
 		}
 	})
 
+	t.Run("drops a proxy that names a plugin router and the CA set for it, keeps a corporate proxy and its CA", func(t *testing.T) {
+		cases := []struct {
+			name string
+			env  domain.EnvLookup
+		}{
+			{"upper https", domain.EnvLookup{"HTTPS_PROXY": "http://127.0.0.1:18787"}},
+			{"lower https", domain.EnvLookup{"https_proxy": "http://127.0.0.1:18787"}},
+			{"http", domain.EnvLookup{"HTTP_PROXY": "http://localhost:18790"}},
+			{"no scheme", domain.EnvLookup{"HTTPS_PROXY": "localhost:18790"}},
+		}
+		for _, tc := range cases {
+			tc.env["NODE_EXTRA_CA_CERTS"] = "/ca.pem"
+			env := ChildEnv(processAcme, tc.env, "/state", nil)
+			for _, name := range []string{
+				"HTTPS_PROXY", "https_proxy", "HTTP_PROXY", "http_proxy", "NODE_EXTRA_CA_CERTS",
+			} {
+				if _, ok := env[name]; ok {
+					t.Errorf("%s: ChildEnv kept %s (%v)", tc.name, name, env)
+				}
+			}
+		}
+		env := ChildEnv(processAcme, domain.EnvLookup{
+			"HTTPS_PROXY":         "http://proxy.corp:3128",
+			"NODE_EXTRA_CA_CERTS": "/ca.pem",
+		}, "/state", nil)
+		if env["HTTPS_PROXY"] != "http://proxy.corp:3128" || env["NODE_EXTRA_CA_CERTS"] != "/ca.pem" {
+			t.Errorf("ChildEnv dropped a corporate proxy or its CA: %v", env)
+		}
+	})
+
 	t.Run("reads a pid's command line, and calls it ours only when it runs one of our bundles", func(t *testing.T) {
 		command, ok := CommandLineOf(context.Background(), int64(os.Getpid()))
 		if !ok || !strings.Contains(command, filepath.Base(os.Args[0])) {
