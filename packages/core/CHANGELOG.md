@@ -5,7 +5,7 @@ run. A provider plugin pins one release; `/<p>:setup` downloads that release's b
 it runs. The release workflow publishes the section for the version it releases, and refuses a version with no
 section here.
 
-## 0.0.1 (2026-10-14)
+## 0.0.1 (2026-10-18)
 
 The first release: one static binary that holds the whole engine. Nothing to install besides the plugin; no Bun,
 Node or other runtime is needed. Every provider plugin declares huddle as a dependency, so installing one brings
