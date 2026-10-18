@@ -42,4 +42,5 @@ repos:
       - id: check-json
         exclude: (^|/)testdata/
       - id: detect-private-key
-        exclude: (^|/)testdata/
+        # localca_test.go feeds a fake, unparsable PEM ("EC PRIVATE KEY\nAAAA") to the error cases.
+        exclude: (^|/)testdata/|^packages/core/internal/adapters/localca/localca_test\.go$
