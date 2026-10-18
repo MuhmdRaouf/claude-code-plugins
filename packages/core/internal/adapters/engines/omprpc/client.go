@@ -114,7 +114,8 @@ type HandshakeOptions struct {
 	EventFilter EventFilter
 	// TimeoutMs covers waiting for ready and every handshake response.
 	TimeoutMs int64
-	// ExpectTools: when given, get_state.dumpTools[].name must be exactly this set.
+	// ExpectTools: when given, get_state.dumpTools[].name must carry every name in this set;
+	// extra names are fine.
 	ExpectTools []string
 }
 
@@ -801,7 +802,9 @@ func requireProtocol2(ready ReadyFrame) *RpcError {
 	}
 }
 
-// checkTools refuses a peer whose exposed tools are not exactly the expected set.
+// checkTools refuses a peer that lacks any expected tool. Tools beyond the expected set are
+// fine: newer omp adds its own registry tools, and the session's --tools allowlist governs what
+// it can call.
 func checkTools(state map[string]any, expected []string) *RpcError {
 	if expected == nil {
 		return nil
@@ -816,29 +819,26 @@ func checkTools(state map[string]any, expected []string) *RpcError {
 			}
 		}
 	}
-	same := len(names) == len(expected)
-	if same {
-		for _, want := range expected {
-			found := false
-			for _, name := range names {
-				if name == want {
-					found = true
-					break
-				}
-			}
-			if !found {
-				same = false
+	var missing []string
+	for _, want := range expected {
+		found := false
+		for _, name := range names {
+			if name == want {
+				found = true
 				break
 			}
 		}
+		if !found {
+			missing = append(missing, want)
+		}
 	}
-	if same {
+	if len(missing) == 0 {
 		return nil
 	}
 	return &RpcError{
 		Kind: RpcErrorProtocol,
-		Message: fmt.Sprintf("omp exposes the tools [%s], expected exactly [%s]",
-			strings.Join(names, ", "), strings.Join(expected, ", ")),
+		Message: fmt.Sprintf("omp lacks the expected tools [%s]; it exposes [%s]",
+			strings.Join(missing, ", "), strings.Join(names, ", ")),
 	}
 }
 

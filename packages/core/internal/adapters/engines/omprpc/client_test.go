@@ -140,13 +140,22 @@ func TestHandshake(t *testing.T) {
 		}
 	})
 
-	t.Run("fails when dumpTools is not exactly the expected set", func(t *testing.T) {
+	t.Run("tolerates tools beyond the expected set", func(t *testing.T) {
 		client := startFake(t, nil, fakeOptions{})
 		options := handshakeOptions()
 		options.ExpectTools = []string{"read", "grep", "glob"}
+		if _, err := client.Handshake(context.Background(), options); err != nil {
+			t.Errorf("handshake error = %v, want the mounted submit_report tolerated", err)
+		}
+	})
+
+	t.Run("fails when dumpTools lacks an expected tool", func(t *testing.T) {
+		client := startFake(t, nil, fakeOptions{})
+		options := handshakeOptions()
+		options.ExpectTools = []string{"read", "grep", "glob", "plan"}
 		_, err := client.Handshake(context.Background(), options)
-		if err == nil || err.Kind != RpcErrorProtocol || !strings.Contains(err.Message, "submit_report") {
-			t.Errorf("handshake error = %v, want a protocol error naming submit_report", err)
+		if err == nil || err.Kind != RpcErrorProtocol || !strings.Contains(err.Message, "plan") {
+			t.Errorf("handshake error = %v, want a protocol error naming plan", err)
 		}
 	})
 
