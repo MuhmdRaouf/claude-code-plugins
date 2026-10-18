@@ -8,12 +8,23 @@ section here.
 ## 0.0.1 (2026-10-14)
 
 The first release: one static binary that holds the whole engine. Nothing to install besides the plugin; no Bun,
-Node or other runtime is needed.
+Node or other runtime is needed. Every provider plugin declares huddle as a dependency, so installing one brings
+the session hub, the radar dashboard and the kanban board with it. A release is published by a hand-pushed
+`v<VERSION>` tag; no workflow creates tags.
 
 ### Native routing
 
 - Each provider plugin runs its own router on localhost: zai :18787, kimi :18788, deepseek :18789,
-  minimax :18790, qwen :18791. Claude Code's `ANTHROPIC_BASE_URL` points at it.
+  minimax :18790, qwen :18791.
+- Proxy mode is the default: `HTTPS_PROXY` names the router and `NODE_EXTRA_CA_CERTS` a per-user local CA, so
+  `ANTHROPIC_BASE_URL` stays unset and Remote Control (`claude rc`) keeps working. Base-URL mode points
+  `ANTHROPIC_BASE_URL` at the router instead, beside a proxy or a CA of your own.
+- As a proxy, the router terminates TLS only for `api.anthropic.com` and tunnels every other host untouched. A
+  CONNECT naming this machine is refused, and a proxy naming a plugin router is never handed to the router's own
+  upstream calls, so nothing loops back into itself.
+- The local CA carries a critical name constraint for `api.anthropic.com` and reaches Claude Code only through
+  `NODE_EXTRA_CA_CERTS`: it never enters a system trust store, and a leaked key cannot sign a certificate any
+  client accepts for another host.
 - `claude-*` requests pass through to Anthropic byte for byte. Provider model ids go to the provider. Another
   provider's model id hops once to that provider's router.
 - The router supervises itself: a front process keeps the port and runs a worker. A worker that crashes, hangs
@@ -21,7 +32,7 @@ Node or other runtime is needed.
   is retried; one it did send is never sent twice.
 - When the router cannot serve, it degrades to passthrough. It never cuts Claude Code off.
 - Every request and every health change is written to Radar's spool, and a provider whose Radar budget is stopped
-  is refused with a clear message. `claude-*` requests are never affected by a budget.
+  is refused with a message naming `/huddle:open`. `claude-*` requests are never affected by a budget.
 - Loopback and upstream connections are pooled, so a busy session does not run the machine out of ports.
 
 ### Background jobs
@@ -38,6 +49,9 @@ Node or other runtime is needed.
 - `/<p>:setup` stores the provider key in the OS keystore (macOS Keychain, Secret Service on Linux)
   through a one-time local page, so the key is never typed into the chat.
 - A key file (mode 0600) is the fallback where no keystore answers.
+- Setup plans, applies and undoes the proxy-mode keys (`HTTPS_PROXY`, `NODE_EXTRA_CA_CERTS`) through the same
+  ledger: the SessionStart hook re-applies them after plugin updates, `setup --remove` puts back what was there,
+  and the agents fall back to Sonnet when the router cannot come back.
 - Everything setup changes outside the plugin is recorded in a ledger and restored on uninstall.
 
 ### Platforms
