@@ -26,6 +26,7 @@ A [Claude Code](https://code.claude.com) plugin marketplace with three jobs:
 | I want to… | Start here |
 |---|---|
 | Install a plugin | [Quick start](#quick-start) |
+| Check the requirements | [Requirements](#requirements) |
 | Choose a provider or model | [Delegate to other models](#delegate-to-other-models) |
 | Run verified background jobs, or use omp, opencode, pi or ZCode | [Background jobs](#background-jobs) |
 | See sessions, requests and cost | [Huddle, radar and kanban](#huddle-radar-and-kanban) |
@@ -51,6 +52,14 @@ A [Claude Code](https://code.claude.com) plugin marketplace with three jobs:
   configuring.
 - From a terminal: `claude plugin marketplace add MuhmdRaouf/claude-code-plugins`, then
   `claude plugin install zai-plugin-cc@muhmdraouf`. Add `--scope project` to enable a plugin for one repository.
+
+## Requirements
+
+- Claude Code, with the `claude` CLI on `PATH`: the setup ping and job workers run through `claude -p`.
+- No runtime of its own: plugin-core is one static binary. macOS and Linux, on amd64 and arm64.
+- git, for edit jobs, which run in git worktrees.
+- An API key for the provider. Keys live in the OS keystore (macOS Keychain, Linux Secret Service); a key file
+  with mode 0600 is the fallback where no keystore answers.
 
 ## Plugins
 
@@ -167,14 +176,6 @@ Uninstalled without `/<p>:remove` first:
 
 - After uninstalling every plugin, run `/plugin marketplace remove muhmdraouf`.
 
-## Requirements
-
-- Claude Code, with the `claude` CLI on `PATH`: the setup ping and job workers run through `claude -p`.
-- No runtime of its own: plugin-core is one static binary. macOS and Linux, on amd64 and arm64.
-- git, for edit jobs, which run in git worktrees.
-- An API key for the provider. Keys live in the OS keystore (macOS Keychain, Linux Secret Service); a key file
-  with mode 0600 is the fallback where no keystore answers.
-
 ## Development
 
 `mise run setup` installs the pinned tools and the pre-commit hook once per clone; `npm ci` installs the locked
@@ -196,6 +197,11 @@ dependencies.
 - The five provider plugins are hand-written copies; `npm run check:siblings` keeps them in step.
 - [AGENTS.md](AGENTS.md) has the rules for commits and coding agents. [plugins.md](plugins.md) covers every
   plugin in depth. Shared packages: [core](packages/core/README.md).
+- Bugs and ideas: [open an issue](https://github.com/MuhmdRaouf/claude-code-plugins/issues).
+
+## Security
+
+- Report security problems privately through [GitHub security advisories](https://github.com/MuhmdRaouf/claude-code-plugins/security/advisories/new); never open a public issue.
 
 ## Trademarks
 
@@ -215,8 +221,6 @@ dependencies.
 <p align="center">
   <a href="https://github.com/sponsors/MuhmdRaouf"><img src="https://img.shields.io/badge/Sponsor_on_GitHub-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" height="36" alt="Sponsor on GitHub"></a>&nbsp;&nbsp;<a href="https://buymeacoffee.com/muhmdraouf"><img src="https://img.shields.io/badge/Buy_me_a_coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" height="36" alt="Buy me a coffee"></a>
 </p>
-
-- Bugs and ideas: [open an issue](https://github.com/MuhmdRaouf/claude-code-plugins/issues).
 
 ## License
 
