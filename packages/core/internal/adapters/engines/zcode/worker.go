@@ -171,13 +171,13 @@ func (w *ZcodeWorker) Start(ctx context.Context, spec ports.WorkerSpec) (ports.W
 	}
 	args := append(prefix, "--cwd", spec.Cwd, "--json", "--no-color", "--mode", "yolo")
 	if spec.Access != ports.AccessWrite {
-		tools := "Read,Glob,Grep,Bash"
+		// zcode has no allow list: narrowing access means removing the write tools (and Bash for
+		// readonly) from this run.
 		disallowed := "Write,Edit,NotebookEdit"
 		if spec.Access == ports.AccessReadonly {
-			tools = "Read,Glob,Grep"
 			disallowed = "Bash,Write,Edit,NotebookEdit"
 		}
-		args = append(args, "--allowed-tools", tools, "--disallowed-tools", disallowed)
+		args = append(args, "--disallowed-tools", disallowed)
 	}
 	if spec.Session.Kind == ports.SessionKindResume {
 		args = append(args, "--resume", spec.Session.Key)

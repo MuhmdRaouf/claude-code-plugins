@@ -530,22 +530,25 @@ func TestPassesAccessTheAttachedContractAndOnlyTheToolsOwnSettings(t *testing.T)
 			if seen.Env["OTHER"] != "passed" {
 				t.Fatal("the brief's env did not pass through")
 			}
-			allowed := slices.Index(seen.Args, "--allowed-tools")
+			if slices.Contains(seen.Args, "--allowed-tools") {
+				t.Fatal("zcode has no --allowed-tools flag")
+			}
+			disallowed := slices.Index(seen.Args, "--disallowed-tools")
 			if access == ports.AccessWrite {
-				if allowed >= 0 {
+				if disallowed >= 0 {
 					t.Fatal("write access narrowed the tools")
 				}
 				return
 			}
-			if allowed < 0 {
-				t.Fatal("readonly or exec access did not name the allowed tools")
+			if disallowed < 0 {
+				t.Fatal("readonly or exec access did not remove the write tools")
 			}
-			want := "Read,Glob,Grep,Bash"
+			want := "Write,Edit,NotebookEdit"
 			if access == ports.AccessReadonly {
-				want = "Read,Glob,Grep"
+				want = "Bash,Write,Edit,NotebookEdit"
 			}
-			if seen.Args[allowed+1] != want {
-				t.Fatalf("--allowed-tools = %s, want %s", seen.Args[allowed+1], want)
+			if seen.Args[disallowed+1] != want {
+				t.Fatalf("--disallowed-tools = %s, want %s", seen.Args[disallowed+1], want)
 			}
 		})
 	}
