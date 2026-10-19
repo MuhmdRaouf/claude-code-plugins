@@ -241,7 +241,7 @@ func engineReportOf(ctx context.Context, deps app.Deps, tool domain.EngineTool, 
 	binary := findEngineBinary(deps, tool)
 	version := app.StringResult{Error: "not run: no binary"}
 	if binary.OK {
-		version = engineVersionResult(ctx, binary.Value, tool)
+		version = engineVersionResult(ctx, binary.Value, tool, deps.Env)
 	}
 	worker := engineWorkerOf(deps, tool)
 	linesOK := binary.OK && version.OK && worker != nil
@@ -426,7 +426,7 @@ func engineEnable(ctx context.Context, call Invocation, name string, watcher *st
 	binary := findEngineBinary(deps, tool)
 	version := binary
 	if binary.OK {
-		version = engineVersionResult(ctx, binary.Value, tool)
+		version = engineVersionResult(ctx, binary.Value, tool, deps.Env)
 	}
 	blocker := binary
 	if blocker.OK && !version.OK {
@@ -565,8 +565,22 @@ func engineReapplyWatchers(deps app.Deps, config domain.EngineConfig) []string {
 }
 
 // findEngineBinary is the tool's binary: a readable zcode script counts as found, whatever its
-// mode, the way the desktop app installs it.
+// mode, the way the desktop app installs it, and a GUI executable maps to the CLI script it
+// stands for.
 func findEngineBinary(deps app.Deps, tool domain.EngineTool) app.StringResult {
+	result := findEngineBinaryResult(deps, tool)
+	if tool == domain.EngineToolZcode && result.OK {
+		// zcode on PATH can be a symlink to the desktop app's GUI executable; the engine wiring
+		// maps it too — this covers a lookup with no wiring behind it.
+		if script := zcode.CLIScriptFor(result.Value); script != "" {
+			result.Value = script
+		}
+	}
+	return result
+}
+
+// findEngineBinaryResult is the binary as found, before the GUI-executable mapping.
+func findEngineBinaryResult(deps app.Deps, tool domain.EngineTool) app.StringResult {
 	bin := string(tool)
 	if deps.Engines != nil {
 		bin = deps.Engines.Bin(tool)
@@ -590,12 +604,18 @@ func engineWorkerOf(deps app.Deps, tool domain.EngineTool) ports.Worker {
 }
 
 // engineVersionResult is what `<bin> --version` printed, zcode through its runner.
-func engineVersionResult(ctx context.Context, bin string, tool domain.EngineTool) app.StringResult {
+func engineVersionResult(ctx context.Context, bin string, tool domain.EngineTool, env map[string]string) app.StringResult {
 	command, prefixArgs := bin, []string(nil)
+	childEnv := []string(nil)
 	if tool == domain.EngineToolZcode {
 		command, prefixArgs = zcode.ZcodeCommand(bin)
+		if len(prefixArgs) == 1 && zcode.ElectronApp(prefixArgs[0]) != "" {
+			// The app's own Electron runs the CLI script as plain node; without these it starts
+			// the GUI and dies.
+			childEnv = zcode.RunnerEnv(domain.EnvLookup(env), prefixArgs[0])
+		}
 	}
-	version, err := process.ToolVersion(ctx, command, prefixArgs)
+	version, err := process.ToolVersion(ctx, command, prefixArgs, childEnv)
 	if err != nil {
 		return app.StringResult{Error: err.Error()}
 	}

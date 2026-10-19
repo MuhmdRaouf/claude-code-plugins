@@ -122,7 +122,7 @@ func Wire(ctx context.Context, options WireOptions) app.Deps {
 			WorkerBin: bin,
 			Runtime:   runtimeOf(pins),
 			WorkerVersion: func(ctx context.Context) (string, error) {
-				return process.ToolVersion(ctx, bin, nil)
+				return process.ToolVersion(ctx, bin, nil, nil)
 			},
 			LoadKey: hostKey,
 			EnsureRouter: func(ctx context.Context) (string, error) {

@@ -152,8 +152,10 @@ func (w *ZcodeWorker) Start(ctx context.Context, spec ports.WorkerSpec) (ports.W
 	env := shared.ToolEnv(w.options.ParentEnv, spec.PassEnv, w.options.Withheld, reservedName)
 	if IsZcodeScript(bin) {
 		if app := ElectronApp(bin); app != "" {
-			// The app's own Electron runs the bundle as plain node.
-			env["ELECTRON_RUN_AS_NODE"] = "1"
+			// The app's own Electron runs the bundle as plain node; the config variable points
+			// the CLI at its built-in provider config, which it cannot find from Resources/glm
+			// alone.
+			SetAppRunnerEnv(env, bin)
 		} else {
 			node, ok := NodeOnPath(w.options.ParentEnv)
 			if !ok {

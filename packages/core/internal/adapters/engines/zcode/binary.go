@@ -64,6 +64,80 @@ func isExecutableFile(path string) bool {
 	return info.Mode().Perm()&0o111 != 0
 }
 
+// isRegularFile says whether path is a regular file, executable or not.
+func isRegularFile(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && info.Mode().IsRegular()
+}
+
+// builtinProviderConfigEnv names the variable that points the bundled CLI at its built-in
+// provider config.
+const builtinProviderConfigEnv = "ZCODE_BUILTIN_PROVIDER_CONFIG_FILE"
+
+// CLIScriptFor is the desktop bundle's CLI script when bin is the app's GUI executable: zcode on
+// PATH can be a symlink to <X>.app/Contents/MacOS/ZCode — Electron, which without
+// ELECTRON_RUN_AS_NODE starts the GUI and dies — while the CLI is the bundle's
+// Contents/Resources/glm/zcode.cjs, run by that same executable as plain node. Empty for any
+// other binary, which runs as itself.
+func CLIScriptFor(bin string) string {
+	resolved, err := filepath.EvalSymlinks(bin)
+	if err != nil {
+		return ""
+	}
+	// <X>.app/Contents/MacOS/<exe>: the CLI lives two directories up, in Resources/glm.
+	if filepath.Base(filepath.Dir(resolved)) != "MacOS" ||
+		filepath.Base(filepath.Dir(filepath.Dir(resolved))) != "Contents" {
+		return ""
+	}
+	script := filepath.Join(filepath.Dir(filepath.Dir(resolved)), "Resources", "glm", "zcode.cjs")
+	if ReadableZcodeScript(script) {
+		return script
+	}
+	return ""
+}
+
+// BuiltinProviderConfig is the built-in provider config of the app bundle an app-bundled script
+// belongs to: started from Resources/glm the CLI looks for it in glm/provider/ and five
+// directories up, while the file sits in Contents/Resources/config/provider/zcode-builtin.json.
+// Empty when the script runs from no app bundle or the bundle has no such file.
+func BuiltinProviderConfig(script string) string {
+	if ElectronApp(script) == "" {
+		return ""
+	}
+	// glm/zcode.cjs → glm → Resources: the config sits under the script's own Resources.
+	config := filepath.Join(filepath.Dir(filepath.Dir(script)),
+		"config", "provider", "zcode-builtin.json")
+	if isRegularFile(config) {
+		return config
+	}
+	return ""
+}
+
+// SetAppRunnerEnv prepares env for the desktop app's own executable running the bundle's CLI as
+// plain node: ELECTRON_RUN_AS_NODE=1, and the bundle's built-in provider config when it has one.
+// A config the environment already names is kept. It runs after the environment was filtered, so
+// reservedName cannot strip the value the plugin adds.
+func SetAppRunnerEnv(env map[string]string, script string) {
+	env["ELECTRON_RUN_AS_NODE"] = "1"
+	if config := BuiltinProviderConfig(script); config != "" {
+		if _, ok := env[builtinProviderConfigEnv]; !ok {
+			env[builtinProviderConfigEnv] = config
+		}
+	}
+}
+
+// RunnerEnv is the environment for the desktop app's own executable running the bundle's CLI as
+// plain node (`--version` and the like): the parent's environment with SetAppRunnerEnv applied,
+// as name=value sorted by name.
+func RunnerEnv(parent domain.EnvLookup, script string) []string {
+	env := make(map[string]string, len(parent)+2)
+	for name, value := range parent {
+		env[name] = value
+	}
+	SetAppRunnerEnv(env, script)
+	return envList(env)
+}
+
 // ReadableZcodeScript says whether bin is a script the runtime can read: present, readable and a
 // regular file. No executable bit is needed.
 func ReadableZcodeScript(bin string) bool {
@@ -80,9 +154,19 @@ func ReadableZcodeScript(bin string) bool {
 }
 
 // ZcodeBinary finds the zcode CLI: an explicit override wins, then ZCODE_CLI, then an executable
-// PATH entry, then the app's bundled script (Linux needs PATH or an override). platform is the
-// Node platform name ("darwin", "linux"), not runtime.GOOS's.
+// PATH entry, then the app's bundled script (Linux needs PATH or an override). A found or
+// overridden binary that is the desktop app's GUI executable maps to the CLI it stands for.
+// platform is the Node platform name ("darwin", "linux"), not runtime.GOOS's.
 func ZcodeBinary(env domain.EnvLookup, override string, platform string) string {
+	bin := zcodeBinary(env, override, platform)
+	if script := CLIScriptFor(bin); script != "" {
+		return script
+	}
+	return bin
+}
+
+// zcodeBinary is the found or overridden binary, before the GUI-executable mapping.
+func zcodeBinary(env domain.EnvLookup, override string, platform string) string {
 	if override != "" {
 		return override
 	}

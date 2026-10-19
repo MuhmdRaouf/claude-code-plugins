@@ -71,6 +71,36 @@ func engineSetupExec(bin string, tool domain.EngineTool) string {
 	return "CLI_ENGINE_CHILD=" + string(tool) + " exec \"" + bin + "\" \"$@\"\n"
 }
 
+// engineSetupAppBundle builds the desktop app's install layout: the bundled CLI, its built-in
+// provider config, and the GUI executable — a script that starts the GUI and dies unless it was
+// run as plain node, and otherwise runs this binary's fake zcode child.
+func engineSetupAppBundle(t *testing.T, testbin string) (script, exe, config string) {
+	t.Helper()
+	root := testkit.TempDir(t, "engine-gui-")
+	contents := filepath.Join(root, "ZCode.app", "Contents")
+	script = filepath.Join(contents, "Resources", "glm", "zcode.cjs")
+	config = filepath.Join(contents, "Resources", "config", "provider", "zcode-builtin.json")
+	exe = filepath.Join(contents, "MacOS", "ZCode")
+	for _, file := range []string{script, config} {
+		if err := os.MkdirAll(filepath.Dir(file), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(file, []byte("// the bundled CLI\n"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.MkdirAll(filepath.Dir(exe), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	runner := "#!/bin/sh\n" +
+		"[ \"$ELECTRON_RUN_AS_NODE\" = \"1\" ] || { echo \"Unable to find helper app\" >&2; exit 1; }\n" +
+		engineSetupExec(testbin, domain.EngineToolZcode)
+	if err := os.WriteFile(exe, []byte(runner), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	return script, exe, config
+}
+
 // engineSetupNew builds the world with every tool on PATH: the configured ones answer, the rest
 // stop the way a tool with no login stops.
 func engineSetupNew(t *testing.T, provider *domain.Provider, configured ...domain.EngineTool) engineSetupWorld {
@@ -562,6 +592,87 @@ func TestSetupEngineEnable(t *testing.T) {
 		}
 		if model := engineSetupAgentModel(t, world, "zcode"); model != "glm-5.3" {
 			t.Fatalf("agent model = %q", model)
+		}
+	})
+
+	t.Run("enables zcode whose binary is a symlink to the desktop app's GUI executable", func(t *testing.T) {
+		world := engineSetupNew(t, nil, domain.EngineToolZcode)
+		script, exe, config := engineSetupAppBundle(t, world.testbin)
+		// `zcode` on the tool's PATH is a symlink to the GUI executable; the CLI is the bundle's
+		// script, and the config is what that CLI cannot find on its own. The tool's binary
+		// override names the symlink, the way the PATH find would.
+		link := filepath.Join(world.bin, "zcode")
+		if err := os.Remove(link); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Symlink(exe, link); err != nil {
+			t.Fatal(err)
+		}
+		world.deps.Deps.Env["FAKE_ZCODE_ENV_LOG"] = filepath.Join(testkit.TempDir(t, "engine-env-"), "env.json")
+		world.deps.Deps.Engines = cli.EngineWorkers(cli.EngineWireOptions{
+			Provider:    world.deps.Deps.Provider,
+			Env:         domain.EnvLookup(world.deps.Deps.Env),
+			StopGraceMs: 100,
+		})
+
+		if code := engineSetupRun(t, world, "setup", "--engine-enable", "zcode", "--watcher", "provider"); code != cli.ExitOK {
+			t.Fatalf("exit = %d, want 0; errors = %q", code, world.fakes.Out.Errors)
+		}
+		setting, ok := adapters.CreateFsEngineConfig(world.fakes.Root).Read().Engines[domain.EngineToolZcode]
+		if !ok {
+			t.Fatal("zcode was not recorded")
+		}
+		// The recorded binary is the bundle's script, and the version ran through it: the GUI
+		// executable refuses to answer anything without ELECTRON_RUN_AS_NODE.
+		want := domain.EngineSetting{Watcher: domain.WatcherProvider, Version: "zcode 0.16.1", Path: script}
+		if setting != want {
+			t.Fatalf("setting = %+v, want %+v", setting, want)
+		}
+		// The check's smoke run reaches the tool the same way: as plain node, config named.
+		if code := engineSetupRun(t, world, "setup", "--engine-check", "zcode"); code != cli.ExitOK {
+			t.Fatalf("check exit = %d, want 0; errors = %q", code, world.fakes.Out.Errors)
+		}
+		data, err := os.ReadFile(world.deps.Deps.Env["FAKE_ZCODE_ENV_LOG"])
+		if err != nil {
+			t.Fatal(err)
+		}
+		var childEnv map[string]string
+		if err := json.Unmarshal(data, &childEnv); err != nil {
+			t.Fatal(err)
+		}
+		if childEnv["ELECTRON_RUN_AS_NODE"] != "1" {
+			t.Fatalf("ELECTRON_RUN_AS_NODE = %q, want 1", childEnv["ELECTRON_RUN_AS_NODE"])
+		}
+		if childEnv["ZCODE_BUILTIN_PROVIDER_CONFIG_FILE"] != config {
+			t.Fatalf("ZCODE_BUILTIN_PROVIDER_CONFIG_FILE = %q, want %s",
+				childEnv["ZCODE_BUILTIN_PROVIDER_CONFIG_FILE"], config)
+		}
+	})
+
+	t.Run("finds the bundle's CLI when no engines are wired", func(t *testing.T) {
+		world := engineSetupNew(t, nil, domain.EngineToolZcode)
+		script, exe, _ := engineSetupAppBundle(t, world.testbin)
+		link := filepath.Join(world.bin, "zcode")
+		if err := os.Remove(link); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Symlink(exe, link); err != nil {
+			t.Fatal(err)
+		}
+		// The lookup goes through the PATH entry alone: no override, no engines.
+		world.deps.Deps.Env["ZCODE_CLI"] = ""
+		world.deps.Deps.Env[engineSetupBinEnv(world.deps.Deps.Provider, domain.EngineToolZcode)] = ""
+		world.deps.Deps.Engines = nil
+
+		if code := engineSetupRun(t, world, "setup", "--engine-enable", "zcode", "--watcher", "provider"); code != cli.ExitOK {
+			t.Fatalf("exit = %d, want 0; errors = %q", code, world.fakes.Out.Errors)
+		}
+		setting, ok := adapters.CreateFsEngineConfig(world.fakes.Root).Read().Engines[domain.EngineToolZcode]
+		if !ok {
+			t.Fatal("zcode was not recorded")
+		}
+		if setting.Path != script || setting.Version != "zcode 0.16.1" {
+			t.Fatalf("setting = %+v, want the bundle's script at zcode 0.16.1", setting)
 		}
 	})
 

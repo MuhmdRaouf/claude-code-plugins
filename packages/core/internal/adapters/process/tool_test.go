@@ -88,7 +88,7 @@ func TestRunToolSync(t *testing.T) {
 func TestToolVersion(t *testing.T) {
 	t.Run("is the first line of --version", func(t *testing.T) {
 		t.Setenv(childModeEnv, "version-line")
-		version, err := ToolVersion(context.Background(), selfExe(t), nil)
+		version, err := ToolVersion(context.Background(), selfExe(t), nil, nil)
 		if err != nil || version != "v1.2.3" {
 			t.Fatalf("toolVersion = (%q, %v), want (v1.2.3, nil)", version, err)
 		}
@@ -96,14 +96,14 @@ func TestToolVersion(t *testing.T) {
 
 	t.Run("prefix args come before --version", func(t *testing.T) {
 		t.Setenv(childModeEnv, "version-line")
-		version, err := ToolVersion(context.Background(), selfExe(t), []string{"anything"})
+		version, err := ToolVersion(context.Background(), selfExe(t), []string{"anything"}, nil)
 		if err != nil || version != "v1.2.3" {
 			t.Fatalf("toolVersion = (%q, %v), want (v1.2.3, nil)", version, err)
 		}
 	})
 
 	t.Run("a missing tool is an error", func(t *testing.T) {
-		if _, err := ToolVersion(context.Background(), "/nonexistent/versioned-tool", nil); err == nil ||
+		if _, err := ToolVersion(context.Background(), "/nonexistent/versioned-tool", nil, nil); err == nil ||
 			!strings.Contains(err.Error(), "ENOENT") {
 			t.Fatalf("error = %v, want ENOENT", err)
 		}
@@ -112,7 +112,7 @@ func TestToolVersion(t *testing.T) {
 	t.Run("a failing --version is an error", func(t *testing.T) {
 		t.Setenv(childModeEnv, "fail-3")
 		self := selfExe(t)
-		_, err := ToolVersion(context.Background(), self, nil)
+		_, err := ToolVersion(context.Background(), self, nil, nil)
 		if err == nil || err.Error() != "command failed: "+self+" --version" {
 			t.Fatalf("error = %v, want command failed", err)
 		}
@@ -120,7 +120,7 @@ func TestToolVersion(t *testing.T) {
 
 	t.Run("a silent --version is an error", func(t *testing.T) {
 		t.Setenv(childModeEnv, "silent-ok")
-		if _, err := ToolVersion(context.Background(), selfExe(t), nil); err == nil || err.Error() != "printed no version" {
+		if _, err := ToolVersion(context.Background(), selfExe(t), nil, nil); err == nil || err.Error() != "printed no version" {
 			t.Fatalf("error = %v, want printed no version", err)
 		}
 	})

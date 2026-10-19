@@ -940,6 +940,80 @@ func TestLaunchesTheAppBundledScriptThroughTheAppsOwnExecutable(t *testing.T) {
 	}
 }
 
+// zcode on PATH is a symlink to the desktop app's GUI executable: the binary the lookup answers is
+// the bundle's CLI script, and the app's own executable runs it as plain node with the bundle's
+// built-in provider config named. A config the parent environment already set is kept, and the
+// brief's env cannot replace it — ZCODE_ names are reserved.
+func TestRunsTheBundlesScriptWhenThePathBinaryIsTheGUIExecutable(t *testing.T) {
+	script, exe, config := appBundle(t)
+	copyTestBinary(t, exe)
+	binDir := testkit.TempDir(t, "zcode-guipath-")
+	link := filepath.Join(binDir, "zcode")
+	if err := os.Symlink(exe, link); err != nil {
+		t.Fatal(err)
+	}
+	parentEnv := domain.EnvLookup{
+		"PATH": binDir,
+		"HOME": testkit.TempDir(t, "zcode-home-"),
+		// How the started app executable knows to be the fake rather than run the suite.
+		engineChildEnv: "fake-zcode",
+	}
+	if bin := ZcodeBinary(parentEnv, "", runtime.GOOS); bin != script {
+		t.Fatalf("ZcodeBinary = %s, want the bundle's script %s", bin, script)
+	}
+	recordOf := func(t *testing.T, w *ZcodeWorker, extra map[string]string) fakeRecord {
+		t.Helper()
+		passEnv := make(map[string]string, len(extra)+1)
+		for name, value := range extra {
+			passEnv[name] = value
+		}
+		dir := testkit.TempDir(t, "zcode-record-")
+		record := filepath.Join(dir, "record.json")
+		passEnv["FAKE_ZCODE_RECORD"] = record
+		r := run(t, w, spec(t, passEnv, func(s *ports.WorkerSpec) {
+			s.Cwd = testkit.TempDir(t, "zcode-job-")
+			s.LogPath = filepath.Join(s.Cwd, "attempt.jsonl")
+		}))
+		if r.result.Outcome.Kind != domain.WorkerOutcomeCompleted {
+			t.Fatalf("outcome = %s, want completed", r.result.Outcome.Kind)
+		}
+		return readRecord(t, record)
+	}
+	seen := recordOf(t, workerWithParentEnv(t, script, parentEnv), nil)
+	if seen.Argv0 != exe {
+		t.Fatalf("argv0 = %s, want the app's own executable %s", seen.Argv0, exe)
+	}
+	if seen.Env["ELECTRON_RUN_AS_NODE"] != "1" {
+		t.Fatalf("ELECTRON_RUN_AS_NODE = %q, want 1", seen.Env["ELECTRON_RUN_AS_NODE"])
+	}
+	if seen.Env[builtinProviderConfigEnv] != config {
+		t.Fatalf("%s = %q, want %s", builtinProviderConfigEnv, seen.Env[builtinProviderConfigEnv], config)
+	}
+	if len(seen.Args) == 0 || seen.Args[0] != script {
+		t.Fatalf("args = %s, want the script first", mustJSON(seen.Args))
+	}
+
+	// The parent's own value is kept, and a brief's env cannot set the name (reserved): the
+	// plugin's value stands.
+	withParent := make(domain.EnvLookup, len(parentEnv)+1)
+	for name, value := range parentEnv {
+		withParent[name] = value
+	}
+	withParent[builtinProviderConfigEnv] = "/parent/config.json"
+	seen = recordOf(t, workerWithParentEnv(t, script, withParent), map[string]string{
+		builtinProviderConfigEnv: "/brief/config.json",
+	})
+	if seen.Env[builtinProviderConfigEnv] != "/parent/config.json" {
+		t.Fatalf("%s = %q, want the parent's value", builtinProviderConfigEnv, seen.Env[builtinProviderConfigEnv])
+	}
+	seen = recordOf(t, workerWithParentEnv(t, script, parentEnv), map[string]string{
+		builtinProviderConfigEnv: "/brief/config.json",
+	})
+	if seen.Env[builtinProviderConfigEnv] != config {
+		t.Fatalf("%s = %q, want the bundle's config", builtinProviderConfigEnv, seen.Env[builtinProviderConfigEnv])
+	}
+}
+
 // A script with no app executable beside it runs on node resolved from the tool's own environment —
 // never from the orchestrator's PATH, which the binary never consults. The node here is the test
 // binary itself; the real one is never started.

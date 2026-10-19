@@ -126,11 +126,12 @@ func Succeeded(result ToolResult) bool {
 // versionTimeoutMs bounds a --version that hangs (a tool waiting on a first-run prompt).
 const versionTimeoutMs = 10_000
 
-// ToolVersion is the first line `<bin> --version` prints, or why there is none.
-func ToolVersion(ctx context.Context, bin string, prefixArgs []string) (string, error) {
+// ToolVersion is the first line `<bin> --version` prints, or why there is none. env is the tool's
+// whole environment; the caller's own when nil.
+func ToolVersion(ctx context.Context, bin string, prefixArgs []string, env []string) (string, error) {
 	args := append(append([]string{}, prefixArgs...), "--version")
 	timeoutMs := int64(versionTimeoutMs)
-	run := RunTool(ctx, bin, args, ToolOptions{TimeoutMs: &timeoutMs})
+	run := RunTool(ctx, bin, args, ToolOptions{TimeoutMs: &timeoutMs, Env: env})
 	if run.Kind == ToolMissing {
 		return "", errors.New(run.Message)
 	}
