@@ -825,6 +825,21 @@ func hopPresent(req *http.Request) bool {
 	return len(req.Header.Values(PeerHop)) > 0
 }
 
+// threadsBeta collects the message-threads tokens of the anthropic-beta header: every
+// comma-separated token, trimmed, across all header lines, named in the spelling the request
+// carried; nil when none. The message-threads betas are Anthropic-only.
+func threadsBeta(req *http.Request) []string {
+	var tokens []string
+	for _, value := range req.Header.Values("anthropic-beta") {
+		for _, token := range strings.Split(value, ",") {
+			if token = strings.TrimSpace(token); strings.HasPrefix(strings.ToLower(token), "message-threads-") {
+				tokens = append(tokens, token)
+			}
+		}
+	}
+	return tokens
+}
+
 // textHeader is a request header as a non-empty string, or false.
 func textHeader(req *http.Request, name string) (string, bool) {
 	value := req.Header.Get(name)
@@ -1322,6 +1337,19 @@ func (w *routerWorker) forward(req *http.Request, res *Response, original []byte
 	}
 	if route != "provider" {
 		w.dispatch(req, res, original, model, route, w.opts.Anthropic, note, nil, "", nil)
+		return
+	}
+	// The message-threads beta is Anthropic-only: Claude Code sends only the newest messages and
+	// expects the server to hold the rest, which the provider keeps no thread of. This exact 400
+	// is the one Claude Code reads as "beta rejected": it drops the header and resends the whole
+	// conversation, which the router then forwards in full.
+	if tokens := threadsBeta(req); len(tokens) > 0 {
+		w.log(fmt.Sprintf("%s %s model=%s → refused: message threads", req.Method, requestPath(req), modelOrDash(model)))
+		AnthropicError(res, 400, "invalid_request_error", "Unexpected value(s) `"+strings.Join(tokens, "`, `")+"` for the `anthropic-beta` header: "+provider.Name+" keeps no server-side message thread, so Claude Code must resend the whole conversation.")
+		if note != nil {
+			reason := "message threads beta"
+			note(400, "refused", "-", nil, &reason, nil)
+		}
 		return
 	}
 	// A stopped budget turns the provider's models off before anything else, the key included;
