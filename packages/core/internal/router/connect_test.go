@@ -219,6 +219,14 @@ func (r *connectRig) dialed() []string {
 	return append([]string(nil), r.dials...)
 }
 
+// targetFor teaches the dial hook one more fake host: the CONNECT authority name goes to the
+// server listening for it.
+func (r *connectRig) targetFor(name string, server *httptest.Server) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.targets[name] = hostPortOf(r.t, server.URL)
+}
+
 // client is an HTTP client the way Claude Code runs in proxy mode: the front as its proxy, the
 // local CA as a root.
 func (r *connectRig) client() *http.Client {
@@ -722,11 +730,13 @@ func TestConnect(t *testing.T) {
 		}
 	})
 
-	// (f) A tunnel the front must not open is refused with a 403 and never dialled.
+	// (f) A tunnel the front must not open is refused with a 403 and never dialled. Every port on
+	// a remote host is tunnelled (TestConnectPorts), so only the local names and the portless
+	// authority stay in this list.
 	t.Run("refuses the tunnels it must not open", func(t *testing.T) {
 		t.Parallel()
 		r := newConnectRig(t, connectSetup{})
-		for _, target := range []string{"x.test:80", "127.0.0.1:443", "[::1]:443", "localhost:443", "LOCALHOST:443", "api.localhost:443", "portless.test"} {
+		for _, target := range []string{"127.0.0.1:443", "[::1]:443", "localhost:443", "LOCALHOST:443", "api.localhost:443", "portless.test"} {
 			conn, answer := connectThrough(t, r.port, target)
 			if answer.StatusCode != 403 {
 				conn.Close()
@@ -809,6 +819,134 @@ func TestConnect(t *testing.T) {
 		defer answer.Body.Close()
 		if answer.StatusCode != 421 {
 			t.Fatalf("a non-CONNECT request for api.anthropic.com = %d, want 421", answer.StatusCode)
+		}
+	})
+}
+
+// TestConnectPorts is the port rule: any valid port on a remote host is tunnelled blind, the
+// local machine is refused on every port, and only api.anthropic.com:443 is ever decrypted.
+func TestConnectPorts(t *testing.T) {
+	t.Parallel()
+
+	// (a) A CONNECT to a remote host on a port other than 443 is a blind tunnel like any other:
+	// the handshake is with that host and the bytes flow both ways.
+	t.Run("tunnels a remote host on a non-443 port, bytes both ways", func(t *testing.T) {
+		t.Parallel()
+		r := newConnectRig(t, connectSetup{})
+		r.targetFor("example.com:8443", r.other)
+		conn, answer := connectThrough(t, r.port, "example.com:8443")
+		defer conn.Close()
+		if answer.StatusCode != 200 {
+			t.Fatalf("CONNECT = %d", answer.StatusCode)
+		}
+		tlsConn := tls.Client(conn, &tls.Config{ServerName: "example.com", InsecureSkipVerify: true})
+		tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
+		if err := tlsConn.HandshakeContext(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := tlsConn.Write([]byte("GET /hello HTTP/1.1\r\nHost: example.com:8443\r\nConnection: close\r\n\r\n")); err != nil {
+			t.Fatal(err)
+		}
+		text, err := io.ReadAll(tlsConn)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(string(text), "hello from other") {
+			t.Fatalf("answer = %q", string(text))
+		}
+		if dialed := r.dialed(); len(dialed) != 1 || dialed[0] != "example.com:8443" {
+			t.Fatalf("the front dialled %v, want one example.com:8443", dialed)
+		}
+	})
+
+	// (b) The local-machine refusal is about the target, not the port: any port is refused, and by
+	// the local rule, not the port one.
+	t.Run("still refuses the local machine on any port", func(t *testing.T) {
+		t.Parallel()
+		r := newConnectRig(t, connectSetup{})
+		for _, target := range []string{"127.0.0.1:8443", "[::1]:9443", "localhost:8443"} {
+			conn, answer := connectThrough(t, r.port, target)
+			if answer.StatusCode != 403 {
+				conn.Close()
+				t.Fatalf("CONNECT %s = %d, want 403", target, answer.StatusCode)
+			}
+			body := refuseBody(t, answer)
+			conn.Close()
+			if !strings.Contains(body, `"type":"error"`) {
+				t.Fatalf("CONNECT %s body = %q, want the Anthropic error shape", target, body)
+			}
+			if !strings.Contains(body, "may not name this machine") {
+				t.Fatalf("CONNECT %s body = %q, want the local-target refusal", target, body)
+			}
+		}
+		if dialed := r.dialed(); len(dialed) != 0 {
+			t.Fatalf("the front dialled %v for refused CONNECTs", dialed)
+		}
+	})
+
+	// (c) The intercepted host on a port other than 443 is a blind tunnel too: the client sees the
+	// target's own certificate, never the local CA's leaf.
+	t.Run("tunnels the intercepted host on a non-443 port blind", func(t *testing.T) {
+		t.Parallel()
+		r := newConnectRig(t, connectSetup{})
+		r.targetFor("api.anthropic.com:8443", r.realTarget)
+		conn, answer := connectThrough(t, r.port, "api.anthropic.com:8443")
+		defer conn.Close()
+		if answer.StatusCode != 200 {
+			t.Fatalf("CONNECT = %d", answer.StatusCode)
+		}
+		tlsConn := tls.Client(conn, &tls.Config{ServerName: localca.Host, InsecureSkipVerify: true})
+		tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
+		if err := tlsConn.HandshakeContext(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		if peer := tlsConn.ConnectionState().PeerCertificates[0]; !bytes.Equal(peer.Raw, r.realTarget.Certificate().Raw) {
+			t.Fatal("the handshake was not with the real target's certificate")
+		}
+		if _, err := tlsConn.Write([]byte("GET / HTTP/1.1\r\nHost: api.anthropic.com:8443\r\nConnection: close\r\n\r\n")); err != nil {
+			t.Fatal(err)
+		}
+		text, err := io.ReadAll(tlsConn)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(string(text), "the real target") {
+			t.Fatalf("answer = %q", string(text))
+		}
+		if dialed := r.dialed(); len(dialed) != 1 || dialed[0] != "api.anthropic.com:8443" {
+			t.Fatalf("the front dialled %v, want one api.anthropic.com:8443", dialed)
+		}
+	})
+
+	// (d) An authority without a usable port is refused before anything is dialled. A port that is
+	// not a number is refused by Go's own server with a bare 400 before the front's handler runs;
+	// a missing port, 0 and a port above 65535 reach the front and get the Anthropic 403.
+	t.Run("refuses a malformed authority", func(t *testing.T) {
+		t.Parallel()
+		r := newConnectRig(t, connectSetup{})
+		for _, target := range []string{"portless.test", "x.test:0", "x.test:65536", "x.test:99999999999999999999"} {
+			conn, answer := connectThrough(t, r.port, target)
+			if answer.StatusCode != 403 {
+				conn.Close()
+				t.Fatalf("CONNECT %s = %d, want 403", target, answer.StatusCode)
+			}
+			body := refuseBody(t, answer)
+			conn.Close()
+			if !strings.Contains(body, `"type":"error"`) {
+				t.Fatalf("CONNECT %s body = %q, want the Anthropic error shape", target, body)
+			}
+			if !strings.Contains(body, "a CONNECT names host:port") {
+				t.Fatalf("CONNECT %s body = %q, want the port refusal", target, body)
+			}
+		}
+		conn, answer := connectThrough(t, r.port, "x.test:not-a-port")
+		if answer.StatusCode != 400 && answer.StatusCode != 403 {
+			conn.Close()
+			t.Fatalf("CONNECT x.test:not-a-port = %d, want refused", answer.StatusCode)
+		}
+		conn.Close()
+		if dialed := r.dialed(); len(dialed) != 0 {
+			t.Fatalf("the front dialled %v for refused CONNECTs", dialed)
 		}
 	})
 }

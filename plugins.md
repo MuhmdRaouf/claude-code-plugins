@@ -238,8 +238,8 @@ Three independent mechanisms. Each one works without the others:
   - A `CONNECT` to `api.anthropic.com:443` is decrypted with the per-user local CA and routed exactly as a base-URL
     request, model claim included. The CA signs only that one name (`internal/adapters/localca`), is handed to Claude
     Code through `NODE_EXTRA_CA_CERTS`, and never enters a system trust store.
-  - Every other `CONNECT` is tunnelled blind: the TLS stays between the client and the target, nothing is read, and a
-    tunnel that names this machine is refused.
+  - Every other `CONNECT` is tunnelled blind, on any port: the TLS stays between the client and the target, nothing
+    is read, and a tunnel that names this machine is refused.
   - The loopback entries are appended to `NO_PROXY`; a base URL that is one of the five plugin routers is taken out.
   - A proxy or CA of the user's own keeps base-URL mode, and so does an unusable CA: the fallback is said in one
     line, and `CONNECT api.anthropic.com` then passes through as a blind tunnel (one line in `router.log`), so Claude

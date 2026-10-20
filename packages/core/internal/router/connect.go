@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -24,11 +25,17 @@ import (
 
 // connect serves one CONNECT. Browsers cannot send CONNECT, so the front's Host check (a
 // DNS-rebinding guard for pages a browser could reach) does not apply to it: the authority names
-// the tunnel's target, not this front.
+// the tunnel's target, not this front. Any port on a remote host is tunnelled blind; only
+// api.anthropic.com:443 is decrypted, with the local CA.
 func (f *Front) connect(w http.ResponseWriter, req *http.Request) {
 	host, port, err := net.SplitHostPort(req.RequestURI)
-	if err != nil || port != "443" {
-		f.connectRefused(w, "a CONNECT names host:443")
+	if err != nil {
+		f.connectRefused(w, "a CONNECT names host:port")
+		return
+	}
+	number, err := strconv.Atoi(port)
+	if err != nil || number < 1 || number > 65535 {
+		f.connectRefused(w, "a CONNECT names host:port")
 		return
 	}
 	// A tunnel to this machine would reach the front's own port, the worker ports and every other
@@ -52,7 +59,9 @@ func (f *Front) connect(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	client := &bufferedConn{Conn: conn, front: rw.Reader}
-	if f.options.CADir != "" && strings.EqualFold(host, localca.Host) {
+	// Only api.anthropic.com on its real port is decrypted; the same name on any other port is a
+	// blind tunnel like every other host.
+	if f.options.CADir != "" && number == 443 && strings.EqualFold(host, localca.Host) {
 		if _, err := f.leafFor(); err == nil {
 			f.serveDecrypted(client)
 			return
