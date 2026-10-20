@@ -49,10 +49,10 @@ base=${CORE_DOWNLOAD_BASE:-https://github.com/MuhmdRaouf/claude-code-plugins/rel
 url=$base/v0.0.1/plugin-core-$os-$arch
 want=
 case "$os-$arch" in
-  darwin-amd64) want=c0d3841a7876a377fb143509bc73fc47ca7c014e2a1fc2498a5e116e63963cf2 ;;
-  darwin-arm64) want=2ebb28836b941e86d21bb6b11aee4e4266e86401466a918331c79630254841f0 ;;
-  linux-amd64) want=48990fa052f569c70de08d841194f484428591ca357fff34ed9b2b7d34e6d771 ;;
-  linux-arm64) want=ec04188915f5a8813f3e39d1913afa3d39e4f028844a67c0ff56beeb9c2aafa2 ;;
+  darwin-amd64) want=d8ae550ee715c916f2d3184b24ffeba0b26e6bd5f00ff7b55bcb863b4244ce39 ;;
+  darwin-arm64) want=9014aa3c8510a7d7ab11a09db76326228abef9991e28fb1ff6aa8b640dbedea1 ;;
+  linux-amd64) want=11b8cd72e07d0b7cbe9f6d707e7a73e9de0e837bbe2c3ee013547653f1cb062e ;;
+  linux-arm64) want=cf73c0d7295924439fbaeda9fafdaae2e9a851385cab47df49d72fd3177a8e63 ;;
 esac
 
 # download_core <timeout>: fetch the release asset, verify its sha256 and install it as $bin. Returns 0 when
